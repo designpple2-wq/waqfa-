@@ -151,7 +151,17 @@ textarea.inp{min-height:84px;resize:vertical;line-height:1.7}
 .crow .mini input{width:58px;text-align:center;border:1px solid var(--line);border-radius:10px;background:var(--white);padding:4px;font-weight:600}
 .crow .g{font-size:12px;color:var(--muted);width:44px}
 .crow .g.ok{color:var(--forest);font-weight:600}
-.cam{cursor:pointer;display:inline-flex;align-items:center;gap:6px}.cam.busy{opacity:.6;pointer-events:none}
+.kbt{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tools{display:flex;align-items:center;gap:8px}
+.tool{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--white);display:grid;place-items:center;color:var(--ink);cursor:pointer;transition:all .2s var(--ease)}
+.tool svg{width:20px;height:20px}.tool:active{background:var(--fog)}
+.tool.off{opacity:.35;pointer-events:none}
+.tool.rec{background:var(--alert);border-color:var(--alert);color:#fff;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(200,16,27,.35)}50%{box-shadow:0 0 0 8px rgba(200,16,27,0)}}
+.busytxt{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.busytxt.rect{color:var(--alert);font-weight:600}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--forest);animation:spin .8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
 .missbtn{align-self:flex-start;color:var(--muted);font-size:13px;text-decoration:underline}
 /* review wizard */
 .wz-bar{display:flex;gap:4px}
@@ -248,7 +258,7 @@ const P={salah:'<path d="M4 20h16M6 20v-8a6 6 0 0 1 12 0v8M12 6V3"/>',dhikr:'<ci
  jamaai:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15.5 14.2c2.9.3 5.5 2.6 5.5 5.8"/>',adab:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
  nafs:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',ok:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
- back:'<path d="M9 6l6 6-6 6"/>',fwd:'<path d="M15 6l-6 6 6 6"/>',up:'<path d="M6 15l6-6 6 6"/>',down:'<path d="M6 9l6 6 6-6"/>',map:'<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>'};
+ back:'<path d="M9 6l6 6-6 6"/>',fwd:'<path d="M15 6l-6 6 6 6"/>',up:'<path d="M6 15l6-6 6 6"/>',down:'<path d="M6 9l6 6 6-6"/>',map:'<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',cam:'<path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.2l1.6-2.2h6.4L16.8 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.4"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',stop:'<rect x="7" y="7" width="10" height="10" rx="2.5" fill="currentColor" stroke="none"/>'};
 const ico=(n,cls='')=>`<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]||''}</svg>`;
 /* ================= question bank (from the original app, kept word for word) ================= */
 const HEART=['كان غائبًا غالبًا','حاضرًا أحيانًا','حاضرًا غالبًا'];
@@ -506,7 +516,10 @@ function fieldHTML(d,f,e,k){if(!visible(f,e,k))return '';const v=ans(e,f.id),A=`
     h+=`<div class="stepper"><button class="sb" data-act="inc" ${A} data-n="${-st}" aria-label="أقل">−</button><input type="number" inputmode="numeric" min="0" data-act="numin" ${A} value="${n||''}" placeholder="0"><button class="sb" data-act="inc" ${A} data-n="${st}" aria-label="أكتر">+</button><span class="u">${esc(f.unit||'')}${f.goal?` من ${num(f.goal)}`:''}</span></div>${f.goal?`<div class="meter"><i style="width:${Math.min(100,n/f.goal*100)}%"></i></div>`:''}`}
   else if(f.type==='text'&&f.kb){const arr=kbArr(v),more=f.kb==='حديث'?'تاني':'تانية';
     h+=(arr.length?arr:[{id:'new',t:''}]).map((o,i)=>`<div class="row-in" style="align-items:flex-start"><textarea class="inp" data-act="kbtext" ${A} data-e="${o.id}" placeholder="${esc(i?f.kb+' '+more:(f.ph||'اكتب هنا'))}">${esc(o.t||'')}</textarea>${arr.length>1?xbtn('kbdel',`${A} data-e="${o.id}"`):''}</div>`).join('')
-      +`<div class="row-in" style="justify-content:space-between"><button class="link" data-act="kbadd" ${A}>+ ${esc(f.kb)} ${more}</button><label class="btn ghost sm cam ${view.ocrBusy===d.id+f.id?'busy':''}">${view.ocrBusy===d.id+f.id?'بيقرا الصفحة…':'📷 صوّر الصفحة'}<input type="file" accept="image/*" data-act="ocr" ${A} hidden></label></div>`}
+      +(()=>{const key=d.id+f.id,busy=view.aiBusy&&view.aiBusy.key===key,isRec=rec&&rec.key===key;
+      return `<div class="kbt"><button class="link" data-act="kbadd" ${A}>+ ${esc(f.kb)} ${more}</button><span class="tools">${busy?`<span class="busytxt"><i class="spin"></i>${esc(view.aiBusy.label)}</span>`:isRec?`<span class="busytxt rect" data-rect>0:00</span>`:''}
+        <label class="tool ${busy||rec?'off':''}" aria-label="صوّر الصفحة" title="صوّر الصفحة">${ico('cam')}<input type="file" accept="image/*" data-act="ocr" ${A} hidden></label>
+        <button class="tool ${isRec?'rec':''} ${busy||(rec&&!isRec)?'off':''}" data-act="mic" ${A} aria-label="${isRec?'وقّف التسجيل':'سجّل بصوتك'}" title="${isRec?'وقّف التسجيل':'سجّل بصوتك'}">${ico(isRec?'stop':'mic')}</button></span></div>`})()}
   else if(f.type==='text'){h+=`<textarea class="inp" data-act="text" ${A} placeholder="${esc(f.ph||'اكتب هنا')}">${esc(v||'')}</textarea>`}
   else if(f.type==='counts'){const c=v||{};h+=`<div>${f.items.map(it=>{const n=Number(c[it.n]||0);return `<div class="crow"><span class="n">${esc(it.n)}</span><span class="mini"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="-10">−</button><input type="number" inputmode="numeric" data-act="cnt" ${A} data-k="${esc(it.n)}" value="${n||''}" placeholder="0"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="33">+</button></span><span class="g ${n>=it.goal?'ok':''}">/ ${num(it.goal)}</span></div>`}).join('')}</div><p class="small muted">+ بيزوّد ٣٣، و− بينقص ١٠. وتقدر تكتب الرقم بإيدك.</p>`}
   else if(f.type==='faults'){const c=v||{};const fl=db.faults.filter(x=>x.on);
@@ -779,17 +792,39 @@ function accountCard(){if(!auth)return `<section class="card"><h2>احفظ بي�
    <div class="row-in"><button class="btn" data-act="acc-sync">احفظ دلوقتي</button><button class="btn ghost" data-act="acc-logout">${view.logoutAsk?'متأكد؟':'خروج من الحساب'}</button></div></section>`}
 function shrinkImage(file,max=1800){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{const s=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');
   c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',0.85).split(',')[1])};img.onerror=rej;img.src=url})}
-async function ocrImage(file,d,f){if(!auth){toast('سجّل دخول الأول من ⚙︎ عشان التصوير يشتغل');return}if(!navigator.onLine){toast('التصوير محتاج نت');return}
-  view.ocrBusy=d.id+f.id;if(sheetEl)paintSheet();
-  try{const image=await shrinkImage(file),tk=await token();
-    const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({image,mime:'image/jpeg',kind:f.kb})});
+let rec=null;
+const paintKB=()=>{if(sheetEl)paintSheet();else render()};
+const blobB64=blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(blob)});
+async function toWav16k(ab){const AC=window.AudioContext||window.webkitAudioContext,OC=window.OfflineAudioContext||window.webkitOfflineAudioContext;const ac=new AC();
+  const audio=await new Promise((res,rej)=>ac.decodeAudioData(ab,res,rej));try{ac.close()}catch(e){}
+  const sr=16000,len=Math.max(1,Math.ceil(audio.duration*sr)),off=new OC(1,len,sr),src=off.createBufferSource();src.buffer=audio;src.connect(off.destination);src.start(0);
+  const r=await off.startRendering(),ch=r.getChannelData(0),buf=new ArrayBuffer(44+ch.length*2),v=new DataView(buf),ws=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+  ws(0,'RIFF');v.setUint32(4,36+ch.length*2,true);ws(8,'WAVE');ws(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);ws(36,'data');v.setUint32(40,ch.length*2,true);
+  for(let i=0;i<ch.length;i++){const s=Math.max(-1,Math.min(1,ch[i]));v.setInt16(44+i*2,s<0?s*0x8000:s*0x7fff,true)}return new Blob([buf],{type:'audio/wav'})}
+async function sendAI(payload,d,f,label){if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
+  view.aiBusy={key:d.id+f.id,label};paintKB();
+  try{const tk=await token();const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({...payload,kind:f.kb})});
     const j=await r.json().catch(()=>({}));
-    if(!r.ok)throw new Error(j.error==='no_key'?'لسه مفتاح Gemini ما اتحطّش':j.error==='rate'?'استخدمت التصوير كتير. استنى دقيقة وجرّب تاني':j.error==='key'?'مفتاح Gemini فيه مشكلة':'حصلت مشكلة في القراءة');
-    const txt=(j.text||'').trim();if(!txt||txt==='لا يوجد نص')throw new Error('مش لاقي نص واضح. قرّب الكاميرا وخلّي الإضاءة كويسة');
+    if(!r.ok)throw new Error(j.error==='no_key'?'لسه مفتاح Gemini ما اتحطّش في Supabase':j.error==='rate'?'استنى دقيقة وجرّب تاني':j.error==='key'?'مفتاح Gemini فيه مشكلة':j.error==='too_big'?'التسجيل طويل. خليه أقل من دقيقتين':'حصلت مشكلة. جرّب تاني');
+    const txt=(j.text||'').trim();if(!txt||txt==='لا يوجد نص')throw new Error(payload.image?'مش لاقي نص واضح. قرّب الكاميرا وخلّي الإضاءة كويسة':'مسمعتش كلام واضح. جرّب تاني');
     const e=E(d.id);e.a=e.a||{};const arr=kbArr(e.a[f.id]).filter(o=>(o.t||'').trim()),nid=uid('e');arr.push({id:nid,t:txt});e.a[f.id]=arr;delete e.miss;save();
-    view.ocrBusy=null;if(sheetEl)paintSheet();else render();const el=document.querySelector(`[data-act="kbtext"][data-e="${nid}"]`);if(el){el.scrollIntoView({block:'center'});el.style.height=Math.min(400,el.scrollHeight+4)+'px'}
+    view.aiBusy=null;paintKB();const el=document.querySelector(`[data-act="kbtext"][data-e="${nid}"]`);if(el){el.scrollIntoView({block:'center'});el.style.height=Math.min(420,el.scrollHeight+4)+'px'}
     toast('اتكتب ✓ راجعه وعدّل لو محتاج')}
-  catch(err){view.ocrBusy=null;if(sheetEl)paintSheet();toast(err.message||'حصلت مشكلة')}}
+  catch(err){view.aiBusy=null;paintKB();toast(err.message||'حصلت مشكلة')}}
+async function ocrImage(file,d,f){try{const image=await shrinkImage(file);await sendAI({image,mime:'image/jpeg'},d,f,'بيقرا الصفحة…')}catch(e){toast('مقدرناش نفتح الصورة')}}
+async function toggleMic(d,f){const key=d.id+f.id;if(rec&&rec.key===key){rec.mr.stop();return}if(rec)return;
+  if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
+  if(!navigator.mediaDevices||!window.MediaRecorder){toast('التسجيل مش متاح هنا. استخدم مايك الكيبورد');return}
+  let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){toast('اسمح لوقفة تستخدم المايك من إعدادات الموبايل');return}
+  const mime=['audio/mp4','audio/webm','audio/ogg'].find(m=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m))||'';
+  const mr=new MediaRecorder(stream,mime?{mimeType:mime}:undefined),chunks=[];mr.ondataavailable=ev=>{if(ev.data&&ev.data.size)chunks.push(ev.data)};
+  rec={key,mr,start:Date.now()};buzz();
+  rec.tick=setInterval(()=>{if(!rec)return;const s=Math.floor((Date.now()-rec.start)/1000),el=document.querySelector('[data-rect]');if(el)el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;if(s>=120)rec.mr.stop()},300);
+  mr.onstop=async()=>{stream.getTracks().forEach(x=>x.stop());clearInterval(rec.tick);const dur=Date.now()-rec.start;rec=null;buzz();
+    const blob=new Blob(chunks,{type:(mr.mimeType||mime||'audio/mp4').split(';')[0]});if(dur<1200||blob.size<1500){toast('التسجيل قصير');paintKB();return}
+    let out=blob;try{out=await toWav16k(await blob.arrayBuffer())}catch(e){out=blob}
+    await sendAI({audio:await blobB64(out),mime:out.type||'audio/mp4'},d,f,'بيكتب كلامك…')};
+  mr.start(1000);paintKB()}
 function useLocation(){if(!navigator.geolocation){toast('الموقع مش متاح هنا');return}toast('بنجيب موقعك…');
   navigator.geolocation.getCurrentPosition(p=>{db.settings.loc={lat:+p.coords.latitude.toFixed(4),lng:+p.coords.longitude.toFixed(4),at:dayKey()};db.settings.useLoc=true;save();render();toast('المواقيت بقت على موقعك ✓')},
    ()=>toast('مقدرناش نجيب الموقع. اسمح بالموقع من إعدادات الموبايل'),{timeout:15000,maximumAge:3600e3})}
@@ -966,6 +1001,7 @@ document.addEventListener('click',ev=>{
   if(a==='pl-tog'){const x=plan(b.dataset.k)[b.dataset.i];x.done=!x.done;buzz();return upd()}
   if(a==='pl-del'){plan(b.dataset.k).splice(b.dataset.i,1);return upd()}
   if(a==='pl-add'){const inp=document.getElementById('pl-'+b.dataset.k),val=inp.value.trim();if(!val){toast('اكتب الخطوة الأول');return}plan(b.dataset.k).push({id:uid('p'),t:val,done:false});upd();const n2=document.getElementById('pl-'+b.dataset.k);n2&&n2.focus();return}
+  if(a==='mic'&&d){const f=findF(d,fid);if(f)toggleMic(d,f);return}
   if(a==='kbadd'&&d){const e=E(id);e.a=e.a||{};const arr=kbArr(e.a[fid]).filter(o=>(o.t||'').trim());const nid=uid('e');arr.push({id:nid,t:''});e.a[fid]=arr;save();if(sheetEl)paintSheet();else render();
     const el=document.querySelector(`[data-act="kbtext"][data-id="${id}"][data-f="${fid}"][data-e="${nid}"]`);if(el)el.focus();return}
   if(a==='kbdel'&&d){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}const e=E(id);e.a[fid]=kbArr(e.a[fid]).filter(o=>o.id!==b.dataset.e);save();if(sheetEl)paintSheet();else render();return}
