@@ -52,32 +52,40 @@ function compute(data){const st=data.settings||{},now=new Date();
   return {loc:loc[0],times,next,cur,nxt,upcoming,now,err:!!data.err,stale:!!data.stale}}
 
 /* ---------- widget ---------- */
-function txt(stack,s,size,color,bold){const t=stack.addText(s);t.font=bold?Font.boldSystemFont(size):Font.systemFont(size);t.textColor=color;t.rightAlignText();t.lineLimit=1;t.minimumScaleFactor=0.7;return t}
-function timer(stack,date,size,color){const t=stack.addDate(date);t.applyTimerStyle();t.font=Font.semiboldMonospacedSystemFont(size);t.textColor=color;t.rightAlignText();return t}
-function right(parent){const s=parent.addStack();s.layoutHorizontally();s.addSpacer();const inner=s.addStack();inner.layoutVertically();return inner}
-function block(parent,label,name,date,big){const v=right(parent);const l=v.addStack();l.addSpacer();txt(l,label,11,C.dim,false);
-  const n=v.addStack();n.addSpacer();txt(n,name,big?22:16,C.white,true);
-  if(date){const tr=v.addStack();tr.addSpacer();timer(tr,date,big?15:13,C.neon)}}
-function build(c,family,msg){const w=new ListWidget();w.backgroundColor=C.ink;w.setPadding(14,16,14,16);
-  if(msg){const s=right(w);txt(s,'وقفة',16,C.neon,true);s.addSpacer(6);const m=s.addText(msg);m.font=Font.systemFont(12);m.textColor=C.white;m.rightAlignText();return w}
-  const top=w.addStack();top.layoutHorizontally();top.centerAlignContent();
-  if(family!=='small'&&c.nxt){const L=top.addStack();L.layoutVertically();
-    const a=L.addStack();txt(a,'العمل الجاي',11,C.dim,false);const b=L.addStack();txt(b,c.nxt.name,15,C.white,true);const d=L.addStack();timer(d,c.nxt.at,13,C.neon)}
-  top.addSpacer();const Rt=top.addStack();Rt.layoutVertically();
-  const e=Rt.addStack();e.addSpacer();txt(e,'الصلاة الجاية',11,C.dim,false);
-  const f=Rt.addStack();f.addSpacer();txt(f,`${c.next.name} ${hm(c.next.at)}`,family==='small'?20:22,C.white,true);
-  const g=Rt.addStack();g.addSpacer();timer(g,c.next.at,15,C.neon);
-  w.addSpacer();
-  if(family==='small'){if(c.nxt){const s=right(w);const a=s.addStack();a.addSpacer();txt(a,'العمل الجاي',10,C.dim,false);const b=s.addStack();b.addSpacer();txt(b,c.nxt.name,13,C.white,true)}return w}
-  if(c.cur){const s=w.addStack();s.addSpacer();txt(s,`دلوقتي: ${c.cur.name}${c.cur.dur?` لحد ${hm(new Date(c.cur.at.getTime()+c.cur.dur*60000))}`:''}`,12,C.dim,false);w.addSpacer(6)}
-  const row=w.addStack();row.layoutHorizontally();row.spacing=5;
-  c.times.slice().reverse().forEach(t=>{const isN=t.id===c.next.id&&t.at.getDate()===c.next.at.getDate();const cell=row.addStack();cell.layoutVertically();cell.centerAlignContent();
-    cell.backgroundColor=isN?C.neon:C.faint;cell.cornerRadius=10;cell.setPadding(4,6,4,6);cell.size=new Size(0,40);
-    const a=cell.addStack();a.addSpacer();const x=a.addText(t.name);x.font=Font.systemFont(10);x.textColor=isN?C.ink:C.dim;a.addSpacer();
-    const b=cell.addStack();b.addSpacer();const y=b.addText(hm(t.at));y.font=Font.semiboldSystemFont(12);y.textColor=isN?C.ink:C.white;b.addSpacer()});
-  if(family==='large'&&c.upcoming.length){w.addSpacer(12);const h=w.addStack();h.addSpacer();txt(h,'الجاي في جدولك',12,C.dim,false);w.addSpacer(4);
-    c.upcoming.forEach(it=>{const r=w.addStack();r.layoutHorizontally();txt(r,hm(it.at),13,C.neon,true);r.addSpacer();txt(r,it.name,14,C.white,false);w.addSpacer(4)})}
-  const foot=w.addStack();foot.addSpacer();const fl=foot.addText(c.err?'مش قادر يوصل لحسابك. افتح Scriptable وشغّل وقفة':`المواقيت على ${c.loc}${c.stale?' · من غير نت':''}`);fl.font=Font.systemFont(9);fl.textColor=C.dim;
+const DAYS=['الأحد','الاتنين','التلات','الأربع','الخميس','الجمعة','السبت'];
+function hijri(d){try{return new Intl.DateTimeFormat('ar-EG-u-ca-islamic-umalqura-nu-latn',{day:'numeric',month:'long'}).format(d)}catch(e){return ''}}
+function T(stack,s,size,color,weight){const t=stack.addText(s);t.font=weight==='b'?Font.boldSystemFont(size):weight==='s'?Font.semiboldSystemFont(size):Font.systemFont(size);t.textColor=color;t.lineLimit=1;t.minimumScaleFactor=0.6;return t}
+function Tm(stack,date,size,color){const t=stack.addDate(date);t.applyTimerStyle();t.font=Font.semiboldMonospacedSystemFont(size);t.textColor=color;t.lineLimit=1;return t}
+function V(parent,alignRight){const s=parent.addStack();s.layoutVertically();s.spacing=1;return s}
+function line(parent,build,alignRight=true){const r=parent.addStack();r.layoutHorizontally();r.centerAlignContent();if(alignRight)r.addSpacer();build(r);if(!alignRight)r.addSpacer();return r}
+function bar(frac,w=300){const d=new DrawContext();d.size=new Size(w,8);d.opaque=false;d.respectScreenScale=true;
+  const bg=new Path();bg.addRoundedRect(new Rect(0,0,w,8),4,4);d.addPath(bg);d.setFillColor(C.faint);d.fillPath();
+  const fw=Math.max(8,Math.min(1,frac)*w),fg=new Path();fg.addRoundedRect(new Rect(w-fw,0,fw,8),4,4);d.addPath(fg);d.setFillColor(C.neon);d.fillPath();return d.getImage()}
+function header(w,c){const r=w.addStack();r.layoutHorizontally();r.centerAlignContent();T(r,`${DAYS[c.now.getDay()]} · ${hijri(c.now)}`,11,C.dim);r.addSpacer();T(r,'وقفة',12,C.neon,'b')}
+function hero(w,c,big){const r=w.addStack();r.layoutHorizontally();r.bottomAlignContent();
+  const L=V(r);Tm(L,c.next.at,big?26:22,C.neon);T(L,'باقي على الصلاة',10,C.dim);
+  r.addSpacer();const Rr=V(r);line(Rr,s=>T(s,'الصلاة الجاية',11,C.dim));line(Rr,s=>{T(s,hm(c.next.at),big?15:13,C.dim,'s');s.addSpacer(6);T(s,c.next.name,big?28:24,C.white,'b')})}
+function progress(w,c,width){const prev=[...c.times].reverse().find(t=>t.at<=c.now),start=prev?prev.at:new Date(c.next.at.getTime()-6*3600e3);
+  const frac=(c.now-start)/(c.next.at-start);const img=w.addImage(bar(frac,width));img.imageSize=new Size(width,8)}
+function cell(parent,label,name,date){const s=parent.addStack();s.layoutVertically();s.backgroundColor=C.faint;s.cornerRadius=14;s.setPadding(8,10,8,10);s.spacing=1;
+  line(s,r=>T(r,label,10,C.dim));line(s,r=>T(r,name||'وقت حر',13,C.white,'s'));if(date)line(s,r=>Tm(r,date,12,C.neon));else line(s,r=>T(r,' ',12,C.dim));return s}
+function schedRow(w,c){const r=w.addStack();r.layoutHorizontally();r.spacing=8;
+  cell(r,c.nxt?'العمل الجاي · باقي':'العمل الجاي',c.nxt&&c.nxt.name,c.nxt&&c.nxt.at);
+  cell(r,c.cur&&c.cur.dur?`دلوقتي · لحد ${hm(new Date(c.cur.at.getTime()+c.cur.dur*60000))}`:'دلوقتي',c.cur&&c.cur.name,null)}
+function timesRow(w,c){const r=w.addStack();r.layoutHorizontally();r.spacing=5;
+  c.times.slice().reverse().forEach(t=>{const on=t.id===c.next.id&&t.at.getDate()===c.next.at.getDate(),s=r.addStack();s.layoutVertically();s.backgroundColor=on?C.neon:C.faint;s.cornerRadius=10;s.setPadding(5,4,5,4);
+    line(s,x=>{T(x,t.name,10,on?C.ink:C.dim);x.addSpacer()},true);line(s,x=>{T(x,hm(t.at),12,on?C.ink:C.white,'s');x.addSpacer()},true)})}
+function build(c,family,msg){const w=new ListWidget();w.backgroundColor=C.ink;
+  if(msg){w.setPadding(16,16,16,16);line(w,s=>T(s,'وقفة',16,C.neon,'b'));w.addSpacer(6);const m=w.addText(msg);m.font=Font.systemFont(12);m.textColor=C.white;m.rightAlignText();return w}
+  if(family==='small'){w.setPadding(14,14,14,14);line(w,s=>T(s,'الصلاة الجاية',10,C.dim));line(w,s=>T(s,c.next.name,22,C.white,'b'));line(w,s=>T(s,hm(c.next.at),12,C.dim,'s'));
+    line(w,s=>Tm(s,c.next.at,18,C.neon));w.addSpacer();if(c.nxt){line(w,s=>T(s,'العمل الجاي',10,C.dim));line(w,s=>T(s,c.nxt.name,13,C.white,'s'))}return w}
+  const big=family==='large';w.setPadding(14,16,14,16);header(w,c);w.addSpacer(big?14:8);hero(w,c,big);w.addSpacer(8);progress(w,c,big?310:300);w.addSpacer(big?14:10);
+  if(c.nxt||c.cur)schedRow(w,c);else timesRow(w,c);
+  if(big){w.addSpacer(12);if(c.upcoming.length){line(w,s=>T(s,'الجاي في جدولك',11,C.dim));w.addSpacer(4);
+      c.upcoming.forEach((it,i)=>{const r=w.addStack();r.layoutHorizontally();T(r,hm(it.at),13,i?C.dim:C.neon,'s');r.addSpacer();T(r,it.name,14,i?C.white:C.neon,i?'r':'s');w.addSpacer(5)})}
+    w.addSpacer();if(c.nxt||c.cur)timesRow(w,c)}
+  else w.addSpacer();
+  const f=line(w,s=>{const x=T(s,c.err?'مش قادر يوصل لحسابك. افتح Scriptable وشغّل وقفة':`المواقيت على ${c.loc}${c.stale?' · من غير نت':''}`,9,C.dim)});
   return w}
 
 /* ---------- self-update ---------- */

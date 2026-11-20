@@ -14,8 +14,15 @@ main{max-width:560px;margin:0 auto;padding-top:28px;display:flex;flex-direction:
 .eyebrow{font-size:13px;font-weight:600;color:var(--muted)}
 h1{font-size:30px;margin:0;line-height:1.3}
 p{margin:0}.lead{color:var(--muted);font-size:15px}
-.preview{background:var(--ink);color:#fff;border-radius:24px;padding:18px;display:flex;justify-content:space-between;gap:12px}
-.preview span{display:block;font-size:11px;color:rgba(255,255,255,.55)}.preview b{font-size:18px}.preview i{font-style:normal;color:var(--neon);font-weight:600;font-size:14px}
+.wg{background:var(--ink);color:#fff;border-radius:26px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;font-variant-numeric:tabular-nums}
+.wg .hd{display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.55)}.wg .hd b{color:var(--neon)}
+.wg .hero{display:flex;justify-content:space-between;align-items:flex-end}
+.wg .hero .r span{display:block;font-size:11px;color:rgba(255,255,255,.55)}.wg .hero .r b{font-size:26px;line-height:1.2}.wg .hero .r small{font-size:14px;color:rgba(255,255,255,.55);font-weight:600;margin-inline-start:6px}
+.wg .hero .l{text-align:left}.wg .hero .l b{display:block;color:var(--neon);font-size:24px;font-family:ui-monospace,monospace;direction:ltr}.wg .hero .l span{font-size:10px;color:rgba(255,255,255,.55)}
+.wg .bar{height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;display:flex;justify-content:flex-start}.wg .bar i{width:72%;background:var(--neon);border-radius:4px}
+.wg .cells{display:grid;grid-template-columns:1fr 1fr;gap:8px}.wg .cells div{background:rgba(255,255,255,.08);border-radius:14px;padding:8px 10px;line-height:1.45}
+.wg .cells span{display:block;font-size:10px;color:rgba(255,255,255,.55)}.wg .cells b{font-size:14px}.wg .cells em{display:block;font-style:normal;color:var(--neon);font-size:12px;font-family:ui-monospace,monospace;direction:rtl;text-align:right}
+.wg .ft{font-size:9px;color:rgba(255,255,255,.55);text-align:right}
 ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;counter-reset:s}
 li{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:16px 16px 16px 16px;display:flex;gap:14px;counter-increment:s}
 li::before{content:counter(s);flex:0 0 30px;height:30px;border-radius:50%;background:var(--lime);color:var(--forest-deep);font-weight:700;display:grid;place-items:center}
@@ -34,7 +41,12 @@ textarea{width:100%;height:120px;border:1px solid var(--line);border-radius:14px
   <span class="eyebrow">وقفة</span>
   <h1>ويدجت للشاشة الرئيسية</h1>
   <p class="lead">الصلاة الجاية بعدّاد شغال، ودلوقتي إيه، والعمل الجاي من جدولك. وأي تعديل في جدولك جوه وقفة بيظهر فيها لوحده.</p>
-  <div class="preview"><div><span>العمل الجاي</span><b>حياة الصحابة</b><i>1:42:10</i></div><div style="text-align:left"><span>الصلاة الجاية</span><b>المغرب 4:57</b><i>0:38:05</i></div></div>
+  <div class="wg" aria-label="شكل الويدجت">
+    <div class="hd"><b>وقفة</b><span>الجمعة · 29 جمادى الأولى</span></div>
+    <div class="hero"><div class="r"><span>الصلاة الجاية</span><b>المغرب</b><small>4:57</small></div><div class="l"><b>0:31:12</b><span>باقي على الصلاة</span></div></div>
+    <div class="bar"><i></i></div>
+    <div class="cells"><div><span>دلوقتي · لحد 4:25</span><b>الزيارات</b></div><div><span>العمل الجاي · باقي</span><b>الأذكار</b><em>0:04:10</em></div></div>
+    <div class="ft">المواقيت على موقعك</div></div>
   <ol>
     <li><div><b>نزّل تطبيق Scriptable</b><p class="note">مجاني من App Store، وهو اللي بيشغّل الويدجت.</p><a class="btn ghost" href="https://apps.apple.com/app/scriptable/id1405459188">افتح Scriptable في App Store</a></div></li>
     <li><div><b>انسخ كود الويدجت</b><button class="btn" id="copy">انسخ الكود</button><p class="ok" id="done" hidden>اتنسخ ✓ روح للخطوة الجاية</p><textarea id="box" hidden readonly></textarea></div></li>
@@ -43,7 +55,7 @@ textarea{width:100%;height:120px;border:1px solid var(--line);border-radius:14px
     <li><div><b>حطّه على الشاشة الرئيسية</b><p class="note">اضغط مطوّل على مكان فاضي في الشاشة الرئيسية، وبعدين <b>+</b> فوق، واختار <b>Scriptable</b>، واختار الحجم <b>المتوسط</b>، واضغط <b>Add Widget</b>.</p>
       <p class="note">بعدين اضغط على الويدجت وهي بتتهز، وفي <b>Script</b> اختار <b>وقفة</b>.</p></div></li>
   </ol>
-  <p class="note">الآيفون بيحدّث الويدجت كل ربع ساعة تقريبًا، بس العدّاد بيعدّ لوحده كل ثانية. وفي حجم صغير وحجم كبير كمان: الكبير بيعرض الخمس أعمال الجاية من جدولك.</p>
+  <p class="note"><b>لو الويدجت لسه بالشكل القديم:</b> الآيفون بيحدّثها على مزاجه. امسحها من الشاشة وضيفها تاني، وهتتحدث على طول.</p><p class="note">العدّاد بيعدّ لوحده كل ثانية. وفي حجم صغير وحجم كبير كمان: الكبير بيعرض الخمس أعمال الجاية من جدولك ومواقيت الخمس صلوات.</p>
 </main>
 <script>
 let code='';fetch('widget.js',{cache:'no-store'}).then(r=>r.text()).then(t=>code=t).catch(()=>{});
