@@ -297,9 +297,20 @@ const ADAB=[
  ['adab5','نمتنع عن أربعة',['الإسراف','الإشراف','استعمال حاجة الغير بدون إذنه','السؤال لغير الله'],['أكتر من مرة','مرة','ولا مرة']],
  ['adab6','لا نتكلم في أربعة',['السياسة','الخلافات الفقهية','أمراض الأمة','الأفكار الأخرى'],['أكتر من مرة','مرة','ولا مرة']]];
 const DEFAULT_DEEDS=[
- prayer('fajr','الفجر','fajr',['سنة الفجر']),prayer('dhuhr','الظهر','dhuhr',['القبلية','البعدية']),prayer('asr','العصر','asr'),prayer('maghrib','المغرب','maghrib',['البعدية']),prayer('isha','العشاء','isha',['البعدية']),
+ prayer('fajr','الفجر','fajr',['سنة الفجر']),{...prayer('dhuhr','الظهر','dhuhr',['القبلية','البعدية']),notDays:[5]},
+ {id:'jumuah',name:'صلاة الجمعة',cat:'salah',slot:'dhuhr',days:[5],
+  perf:[{id:'perf',label:'الصلاة',type:'one',opts:['صليتها','فاتتني']},
+   {id:'early',label:'التبكير',type:'one',opts:['بدري قبل الأذان الأول','قبل دخول الخطيب','بعد دخول الخطيب'],when:[{f:'perf',in:['صليتها']}]},
+   {id:'prep',label:'التجهّز للجمعة',type:'many',opts:['الغسل','السواك','الطيب','أحسن الثياب','المشي للمسجد'],when:[{f:'perf',in:['صليتها']}]},
+   {id:'row',label:'الصف',type:'one',opts:['الصف الأول','الصفوف الأولى','متأخر'],when:[{f:'perf',in:['صليتها']}]},
+   {id:'listen',label:'الإنصات للخطبة',type:'one',opts:['انشغلت','أحيانًا','أنصتّ'],when:[{f:'perf',in:['صليتها']}]},
+   {id:'sunnah',label:'السنة البعدية',type:'many',opts:['البعدية']}],
+  heart:[...H('heart','khushu'),{id:'khutba',label:'أهم حاجة طلعت بيها من الخطبة',type:'text'},cp(Q.distract)],st:{f:'perf',map:{'صليتها':'done','فاتتني':'miss'}}},prayer('asr','العصر','asr'),prayer('maghrib','المغرب','maghrib',['البعدية']),prayer('isha','العشاء','isha',['البعدية']),
  {id:'qiyam',name:'قيام الليل والوتر',cat:'salah',slot:'night',perf:[{id:'n',label:'الركعات',type:'num',unit:'ركعة',goal:11},{id:'parts',label:'فيه إيه',type:'many',opts:['صلاة','قرآن','دعاء','استغفار']}],heart:H('heart','qdua'),st:{num:'n'}},
  {id:'duha',name:'صلاة الضحى',cat:'salah',slot:'duha',perf:[{id:'n',label:'الركعات',type:'num',unit:'ركعة',goal:8}],heart:H('heart','calm'),st:{num:'n'}},
+ {id:'kahf',name:'سورة الكهف',cat:'dhikr',slot:'duha',days:[5],perf:[PERF3('قريتها كاملة','بعضها','ما قريتهاش')],heart:H('tadabbur','tajweed'),st:{f:'perf',map:{'قريتها كاملة':'done','بعضها':'part','ما قريتهاش':'miss'}}},
+ {id:'salawat',name:'الإكثار من الصلاة على النبي ﷺ',cat:'dhikr',slot:'any',days:[5],perf:[{id:'n',label:'العدد',type:'num',unit:'مرة',goal:300,step:10}],heart:H('meaning','pace'),st:{num:'n'}},
+ {id:'ijaba',name:'ساعة الإجابة',cat:'dhikr',slot:'asr',days:[5],perf:[{id:'perf',label:'آخر ساعة بعد العصر',type:'one',opts:['دعوت فيها','دعوت شوية','ما لحقتهاش']},{id:'n',label:'المدة',type:'num',unit:'دقيقة',goal:30,step:5},{id:'whom',label:'دعيت لمين',type:'many',opts:['نفسي','أهلي','الأمة','اللي قابلتهم','الأحباب اللي شكّلناهم']}],heart:H('heart','yaqeen','tadarru'),st:{f:'perf',map:{'دعوت فيها':'done','دعوت شوية':'part','ما لحقتهاش':'miss'}}},
  {id:'am',name:'أذكار الصباح',cat:'dhikr',slot:'fajr',perf:[PERF3('كاملة','بعضها','ما قلتهاش'),{id:'time',label:'الوقت',type:'one',opts:['في وقتها','متأخر']}],heart:H('meaning','pace'),st:{f:'perf',map:{'كاملة':'done','بعضها':'part','ما قلتهاش':'miss'}}},
  {id:'pm',name:'أذكار المساء',cat:'dhikr',slot:'asr',perf:[PERF3('كاملة','بعضها','ما قلتهاش'),{id:'time',label:'الوقت',type:'one',opts:['في وقتها','متأخر']}],heart:H('meaning','pace'),st:{f:'perf',map:{'كاملة':'done','بعضها':'part','ما قلتهاش':'miss'}}},
  {id:'quran',name:'ورد القرآن',cat:'dhikr',slot:'any',perf:[{id:'n',label:'التلاوة',type:'num',unit:'صفحة',goal:20},{id:'hifz',label:'الحفظ',type:'num',unit:'آية',goal:5},{id:'ayah',label:'التدبّر: آية وقفت عندها، وفهمت منها إيه',type:'text'}],heart:H('tadabbur','tajweed'),st:{num:'n'}},
@@ -369,7 +380,10 @@ function migrate(d){const b=blank();
   if((d.version||1)<4){d.deeds=b.deeds;d.legacyLogs=d.logs;d.logs={}}
   ['p40','notes','journeys','people'].forEach(k=>d[k]=d[k]||b[k]);['logs','reviews','plans'].forEach(k=>d[k]=d[k]||{});
   d.faults=(d.faults||b.faults).map(f=>({detail:'',hist:[],g:'other',on:true,...f}));d.duas=d.duas||b.duas;d.goals=Object.assign({d3:[],d40:[],m4:[]},d.goals||{});
-  d.gsecs=d.gsecs||b.gsecs;d.settings=Object.assign(b.settings,d.settings||{});d.sched=d.sched||b.sched;d.noteCfg=d.noteCfg||b.noteCfg;d.meta=d.meta||b.meta;normNotes(d);d.version=4;return d}
+  d.gsecs=d.gsecs||b.gsecs;d.settings=Object.assign(b.settings,d.settings||{});d.sched=d.sched||b.sched;d.noteCfg=d.noteCfg||b.noteCfg;d.meta=d.meta||b.meta;normNotes(d);d.removed=d.removed||[];
+  DEFAULT_DEEDS.forEach((x,i)=>{if(d.deeds.some(y=>y.id===x.id)||d.removed.includes(x.id))return;const prev=DEFAULT_DEEDS.slice(0,i).reverse().find(p=>d.deeds.some(y=>y.id===p.id));const at=prev?d.deeds.findIndex(y=>y.id===prev.id)+1:d.deeds.length;d.deeds.splice(at,0,{...cp(x),on:true})});
+  if(!d.fri){const dh=d.deeds.find(y=>y.id==='dhuhr');if(dh)dh.notDays=[5];d.fri=1}
+  d.version=4;return d}
 function normNotes(d){d.notes.forEach(n=>{if(!n.topics){n.topics=n.tag?[n.tag]:[];delete n.tag}n.topics.forEach(x=>{if(!d.noteCfg.topics.includes(x))d.noteCfg.topics.push(x)});if(n.src==null)n.src=''})}
 function load(){try{const s=localStorage.getItem(KEY);if(s)return migrate(JSON.parse(s))}catch(e){}return blank()}
 function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
@@ -410,7 +424,8 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const byId=id=>db.deeds.find(x=>x.id===id);
 const jOn=k=>db.journeys.find(j=>k>=j.start&&(j.status==='active'||k<=j.end));
 const mode=k=>jOn(k)?'k':'m';
-const fits=(d,k)=>!d.modes||d.modes.includes(mode(k));
+const wd=k=>fromKey(k).getDay();
+const fits=(d,k)=>(!d.modes||d.modes.includes(mode(k)))&&(!d.days||d.days.includes(wd(k)))&&(!d.notDays||!d.notDays.includes(wd(k)));
 const daily=(k=view.day)=>db.deeds.filter(d=>d.on&&!d.period&&fits(d,k));
 const timeline=(k=view.day)=>daily(k).filter(d=>d.slot!=='review');
 const periodic=(k=view.day)=>db.deeds.filter(d=>d.on&&d.period&&fits(d,k));
@@ -676,7 +691,7 @@ const an=a=>(ANCH.find(x=>x[0]===a)||['',''])[1];
 const durTxt=m=>{const h=Math.floor(m/60),r=m%60;return h?`${num(h)} س${r?` و${num(r)} د`:''}`:`${num(r)} دقيقة`};
 const schedStart=(it,P)=>it.anchor==='clock'?it.off:Math.round(P[it.anchor]+it.off);
 const anchorText=it=>it.anchor==='clock'?'وقت ثابت':!it.off?`مع ${an(it.anchor)}`:`${it.off>0?'بعد':'قبل'} ${an(it.anchor)} بـ${durTxt(Math.abs(it.off))}`;
-function schedList(k){const P=timesFor(k);return db.sched.items.map((it,i)=>({...it,i,start:schedStart(it,P)})).sort((a,b)=>a.start-b.start)}
+function schedList(k){const P=timesFor(k),fr=wd(k)===5;return db.sched.items.map((it,i)=>({...it,...(fr&&it.link==='dhuhr'?{name:'صلاة الجمعة',link:'jumuah'}:{}),i,start:schedStart(it,P)})).sort((a,b)=>a.start-b.start)}
 function schedNow(){if(!db.sched.on||!db.sched.items.length)return null;const now=new Date(),k=keyOf(now),m=now.getHours()*60+now.getMinutes(),L=schedList(k);
   let cur=null,next=null;for(const it of L){if(it.start<=m)cur=it;else{next=it;break}}
   if(cur&&cur.dur&&m>=cur.start+cur.dur)cur=null;if(!next){const f=schedList(shift(k,1))[0];next={...f,start:f.start+1440}}return {cur,next,m}}
@@ -910,7 +925,7 @@ document.addEventListener('click',ev=>{
   if(a==='edit-deed')return openDeedEditor(id);
   if(a==='mv'&&d){const i=db.deeds.indexOf(d),same=db.deeds.map((x,j)=>[x,j]).filter(([x])=>x.cat===d.cat),pos=same.findIndex(([x])=>x===d),to=same[pos+Number(b.dataset.n)];if(!to)return;db.deeds[i]=to[0];db.deeds[to[1]]=d;return upd()}
   if(a==='d-on'&&d){d.on=v==='1';return upd()}
-  if(a==='d-del'&&d){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟ اضغط تاني';return}db.deeds=db.deeds.filter(x=>x!==d);db.p40.forEach(p=>{if(p.link===d.id)p.link=null});closeSheet();toast('اتمسح العمل');return}
+  if(a==='d-del'&&d){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟ اضغط تاني';return}db.deeds=db.deeds.filter(x=>x!==d);(db.removed=db.removed||[]).push(d.id);db.p40.forEach(p=>{if(p.link===d.id)p.link=null});closeSheet();toast('اتمسح العمل');return}
   if(a==='d-add'){const name=$('#nd-name').value.trim();if(!name){toast('اكتب اسم العمل');return}
     const nd={id:uid('c'),name,cat:v,slot:$('#nd-slot').value,on:true,perf:[{id:'perf',label:'الأداء',type:'one',opts:['اتعمل','جزء منه','ما اتعملش']}],heart:H('heart'),st:{f:'perf',map:{'اتعمل':'done','جزء منه':'part','ما اتعملش':'miss'}}};
     if(v==='adab'){nd.perf=[];nd.heart=[];nd.noClose=true;nd.st={avg:true};nd.slot='review'}
