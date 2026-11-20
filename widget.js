@@ -29,9 +29,9 @@ async function session(){const em=Keychain.contains(KC+'email')?Keychain.get(KC+
   if(Keychain.contains(KC+'rt')){try{const j=await call('/auth/v1/token?grant_type=refresh_token',{refresh_token:Keychain.get(KC+'rt')});Keychain.set(KC+'rt',j.refresh_token);return j}catch(e){}}
   const j=await call('/auth/v1/token?grant_type=password',{email:em,password:Keychain.get(KC+'pass')});Keychain.set(KC+'rt',j.refresh_token);return j}
 async function loadData(){try{const s=await session();if(!s)return {need:true};
-    const rows=await call(`/rest/v1/user_data?select=sched:data->sched,settings:data->settings&user_id=eq.${s.user.id}`,null,s.access_token);
+    const rows=await call(`/rest/v1/user_data?select=${encodeURIComponent('sched:data->sched,settings:data->settings')}&user_id=eq.${s.user.id}`,null,s.access_token);
     const d=rows&&rows[0]||{};fm.writeString(cachePath,JSON.stringify(d));return d}
-  catch(e){if(fm.fileExists(cachePath))return JSON.parse(fm.readString(cachePath));return {err:String(e.message||e)}}}
+  catch(e){if(fm.fileExists(cachePath))return {...JSON.parse(fm.readString(cachePath)),stale:true};return {err:String(e.message||e)}}}
 
 /* ---------- compute ---------- */
 const keyDate=(base,add)=>{const d=new Date(base);d.setDate(d.getDate()+add);d.setHours(12,0,0,0);return d};
@@ -49,7 +49,7 @@ function compute(data){const st=data.settings||{},now=new Date();
     for(const it of L){if(it.at<=now)cur=it;else{nxt=nxt||it}}
     if(cur&&cur.dur&&now>=new Date(cur.at.getTime()+cur.dur*60000))cur=null;
     const all=L.concat(L2).filter(it=>it.at>now);nxt=all[0]||null;upcoming=all.slice(0,5)}
-  return {loc:loc[0],times,next,cur,nxt,upcoming,now}}
+  return {loc:loc[0],times,next,cur,nxt,upcoming,now,err:!!data.err,stale:!!data.stale}}
 
 /* ---------- widget ---------- */
 function txt(stack,s,size,color,bold){const t=stack.addText(s);t.font=bold?Font.boldSystemFont(size):Font.systemFont(size);t.textColor=color;t.rightAlignText();t.lineLimit=1;t.minimumScaleFactor=0.7;return t}
@@ -77,9 +77,14 @@ function build(c,family,msg){const w=new ListWidget();w.backgroundColor=C.ink;w.
     const b=cell.addStack();b.addSpacer();const y=b.addText(hm(t.at));y.font=Font.semiboldSystemFont(12);y.textColor=isN?C.ink:C.white;b.addSpacer()});
   if(family==='large'&&c.upcoming.length){w.addSpacer(12);const h=w.addStack();h.addSpacer();txt(h,'الجاي في جدولك',12,C.dim,false);w.addSpacer(4);
     c.upcoming.forEach(it=>{const r=w.addStack();r.layoutHorizontally();txt(r,hm(it.at),13,C.neon,true);r.addSpacer();txt(r,it.name,14,C.white,false);w.addSpacer(4)})}
-  const foot=w.addStack();foot.addSpacer();const fl=foot.addText(`المواقيت على ${c.loc}`);fl.font=Font.systemFont(9);fl.textColor=C.dim;
+  const foot=w.addStack();foot.addSpacer();const fl=foot.addText(c.err?'مش قادر يوصل لحسابك. افتح Scriptable وشغّل وقفة':`المواقيت على ${c.loc}${c.stale?' · من غير نت':''}`);fl.font=Font.systemFont(9);fl.textColor=C.dim;
   return w}
 
+/* ---------- self-update ---------- */
+async function selfUpdate(force){try{const last=Keychain.contains(KC+'upd')?Number(Keychain.get(KC+'upd')):0;if(!force&&Date.now()-last<6*3600e3)return;
+  const r=new Request('https://designpple2-wq.github.io/waqfa-/widget.js?t='+Date.now());const code=await r.loadString();Keychain.set(KC+'upd',String(Date.now()));
+  if(r.response.statusCode!==200||!code.includes('// وقفة · ويدجت'))return;const f=module.filename,m=f.includes('Mobile Documents')?FileManager.iCloud():FileManager.local();
+  if(m.readString(f)!==code)m.writeString(f,code)}catch(e){}}
 /* ---------- run ---------- */
 async function setup(){const a=new Alert();a.title='وقفة';a.message='سجّل بنفس إيميل وباسورد حسابك في وقفة، عشان الويدجت تجيب جدولك.';
   a.addTextField('الإيميل',Keychain.contains(KC+'email')?Keychain.get(KC+'email'):'');a.addSecureTextField('الباسورد','');a.addAction('دخول');a.addCancelAction('إلغاء');
@@ -89,6 +94,7 @@ if(config.runsInApp){
   if(!Keychain.contains(KC+'email')){if(!await setup()){Script.complete();return}}
   else{const m=new Alert();m.title='وقفة';m.addAction('اعرض الويدجت');m.addAction('غيّر الحساب');m.addCancelAction('خروج');const i=await m.presentAlert();if(i===1)await setup();if(i===-1){Script.complete();return}}
 }
+await selfUpdate(config.runsInApp);
 const data=await loadData();let wd;
 if(data.need)wd=build(null,config.widgetFamily,'افتح تطبيق Scriptable وشغّل سكريبت "وقفة" مرة، وسجّل بحسابك.');
 else{const c=compute(data);wd=build(c,config.widgetFamily||'medium');
