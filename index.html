@@ -182,7 +182,7 @@ textarea.inp{min-height:84px;resize:vertical;line-height:1.7}
 .spark .base{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
 .insight{display:flex;flex-direction:column;gap:8px}
 .bar-row{display:grid;grid-template-columns:1fr 2fr auto;gap:10px;align-items:center;font-size:14px}
-.seg-tabs{display:flex;gap:20px;border-bottom:1px solid var(--line)}
+.seg-tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;white-space:nowrap}.seg-tabs::-webkit-scrollbar{display:none}
 .seg-tabs button{padding:8px 0;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
 .seg-tabs button[aria-pressed="true"]{color:var(--ink);border-color:var(--forest)}
 .note-c{display:flex;flex-direction:column;gap:6px;padding:14px 0;border-top:1px solid var(--line)}
@@ -275,6 +275,7 @@ const Q={
  jadab:{id:'jadab',label:'الالتزام بالآداب',type:'one',opts:['قصّرت','إلى حدٍّ ما','التزمت']},
  distract:{id:'distract',label:'إيه اللي شغلني؟',type:'many',opts:['الشغل','الأكل','الناس','همّ أو قلق','تعب ونوم','الموبايل']}
 };
+const KBF=[{id:'hadith',label:'حديث اليوم',type:'text',kb:'حديث',ph:'نص الحديث، ومين رواه'},{id:'ayah',label:'آية اليوم',type:'text',kb:'آية',ph:'الآية، والسورة، وفهمت منها إيه'},{id:'qissa',label:'قصة اليوم',type:'text',kb:'قصة',ph:'القصة باختصار، ومن أي كتاب'}];
 const CLOSE=[{id:'quality',label:'أديته زي ما نويت؟',type:'one',opts:['لا','إلى حدٍّ ما','نعم']},{id:'note',label:'إيه اللي ساعدني أو شتّتني؟',type:'text'},{id:'next',label:'خطوة أجرّبها المرة الجاية',type:'text'}];
 const cp=o=>JSON.parse(JSON.stringify(o));
 const H=(...ids)=>ids.map(i=>cp(Q[i]));
@@ -318,7 +319,7 @@ const DEFAULT_DEEDS=[
  {id:'muqayyad',name:'الأذكار المقيدة',cat:'dhikr',slot:'any',perf:[{id:'parts',label:'قلت إيه منها',type:'many',opts:['بعد الصلوات','النوم','دخول وخروج المسجد','الطعام','الخروج من البيت']}],heart:H('meaning'),st:{many:'parts',goal:4}},
  {id:'dua',name:'الدعاء',cat:'dhikr',slot:'any',link:'duas',perf:[{id:'n',label:'المدة',type:'num',unit:'دقيقة',goal:15,step:5},{id:'when',label:'إمتى',type:'many',opts:['آخر الليل','بين الأذان والإقامة','في السجود','بعد الصلوات','قبل المغرب']},{id:'whom',label:'دعيت لمين',type:'many',opts:['نفسي','أهلي','الأمة','اللي قابلتهم','الأحباب اللي شكّلناهم']}],heart:H('heart','yaqeen','tadarru'),st:{num:'n'}},
  {id:'dawah',name:'الدعوة الانفرادية',cat:'fardi',slot:'any',perf:[{id:'n',label:'كلمت كام واحد',type:'num',unit:'شخص',goal:25},{id:'res',label:'النتيجة',type:'many',opts:['اتكلمنا','وعد ييجي المسجد','جه المسجد','اتشكّل']}],heart:H('intent','gentle','listen'),st:{num:'n'}},
- {id:'taleem',name:'التعليم الانفرادي',cat:'fardi',slot:'dhuhr',perf:[{id:'n',label:'المدة',type:'num',unit:'دقيقة',goal:90,step:10},{id:'book',label:'في إيه',type:'many',opts:['رياض الصالحين','حياة الصحابة','منتخب الأحاديث','فضائل الأعمال','القرآن والتفسير']},{id:'topic',label:'الموضوع',type:'text'}],heart:H('focus','fahm'),st:{num:'n'}},
+ {id:'taleem',name:'التعليم الانفرادي',cat:'fardi',slot:'dhuhr',perf:[{id:'n',label:'المدة',type:'num',unit:'دقيقة',goal:90,step:10},{id:'book',label:'في إيه',type:'many',opts:['رياض الصالحين','حياة الصحابة','منتخب الأحاديث','فضائل الأعمال','القرآن والتفسير']},{id:'topic',label:'الموضوع',type:'text'},...KBF.map(cp)],link:'kb',heart:H('focus','fahm'),st:{num:'n',orText:['hadith','ayah','qissa']}},
  {id:'shura_d',name:'المشورة اليومية',cat:'jamaai',slot:'fajr',link:'shura',perf:[PERF3('حضرت','اتأخرت','غبت'),{id:'role',label:'مشاركتي',type:'one',opts:['كنت مستمع بس','شاركت برأي','بادرت']}],heart:H('jintent','jadab'),st:{f:'perf',map:{'حضرت':'done','اتأخرت':'part','غبت':'miss'}}},
  {id:'halaqa',name:'حلقة التعليم في المسجد',cat:'jamaai',slot:'duha',perf:[PERF3('حضرتها كلها','جزء منها','غبت')],heart:H('focus','fahm'),st:{f:'perf',map:{'حضرتها كلها':'done','جزء منها':'part','غبت':'miss'}}},
  {id:'halaqa_b',name:'التعليم في البيت',cat:'jamaai',slot:'isha',modes:['m'],perf:[{id:'perf',label:'الأداء',type:'one',opts:ONEOFF}],heart:H('focus'),st:{f:'perf',map:{'اتعمل':'done','ما اتعملش':'miss'}}},
@@ -382,6 +383,7 @@ function migrate(d){const b=blank();
   d.faults=(d.faults||b.faults).map(f=>({detail:'',hist:[],g:'other',on:true,...f}));d.duas=d.duas||b.duas;d.goals=Object.assign({d3:[],d40:[],m4:[]},d.goals||{});
   d.gsecs=d.gsecs||b.gsecs;d.settings=Object.assign(b.settings,d.settings||{});d.sched=d.sched||b.sched;d.noteCfg=d.noteCfg||b.noteCfg;d.meta=d.meta||b.meta;normNotes(d);d.removed=d.removed||[];
   DEFAULT_DEEDS.forEach((x,i)=>{if(d.deeds.some(y=>y.id===x.id)||d.removed.includes(x.id))return;const prev=DEFAULT_DEEDS.slice(0,i).reverse().find(p=>d.deeds.some(y=>y.id===p.id));const at=prev?d.deeds.findIndex(y=>y.id===prev.id)+1:d.deeds.length;d.deeds.splice(at,0,{...cp(x),on:true})});
+  if(!d.kb1){const tl=d.deeds.find(y=>y.id==='taleem');if(tl){const have=new Set((tl.perf||[]).map(f=>f.id));KBF.forEach(f=>{if(!have.has(f.id))(tl.perf=tl.perf||[]).push(cp(f))});tl.link=tl.link||'kb';if(tl.st&&tl.st.num)tl.st.orText=['hadith','ayah','qissa']}d.kb1=1}
   if(!d.fri){const dh=d.deeds.find(y=>y.id==='dhuhr');if(dh)dh.notDays=[5];d.fri=1}
   d.version=4;return d}
 function normNotes(d){d.notes.forEach(n=>{if(!n.topics){n.topics=n.tag?[n.tag]:[];delete n.tag}n.topics.forEach(x=>{if(!d.noteCfg.topics.includes(x))d.noteCfg.topics.push(x)});if(n.src==null)n.src=''})}
@@ -441,7 +443,7 @@ const score=(f,v)=>{if(f.type!=='one'||v==null)return null;const i=f.opts.indexO
 const avg=a=>{a=a.filter(x=>typeof x==='number'&&!isNaN(x));return a.length?a.reduce((s,x)=>s+x,0)/a.length:null};
 function status(d,e,k){if(!e)return null;if(e.miss)return 'miss';const st=d.st||{};
   if(st.f){const v=ans(e,st.f);return (st.map||{})[v]||null}
-  if(st.num){const f=findF(d,st.num),v=Number(ans(e,st.num)||0);if(!v)return null;return v>=(f&&f.goal||1)?'done':'part'}
+  if(st.num){const f=findF(d,st.num),v=Number(ans(e,st.num)||0);if(!v)return (st.orText||[]).some(x=>(ans(e,x)||'').trim())?'part':null;return v>=(f&&f.goal||1)?'done':'part'}
   if(st.counts){const f=findF(d,st.counts),c=ans(e,st.counts)||{};const vs=f.items.map(it=>Number(c[it.n]||0));if(!vs.some(Boolean))return null;return f.items.every((it,i)=>vs[i]>=(it.goal||1))?'done':'part'}
   if(st.many){const v=ans(e,st.many)||[];if(!v.length)return null;return v.length>=(st.goal||1)?'done':'part'}
   if(st.avg){const s=avg(d.perf.map(f=>score(f,ans(e,f.id))));if(s==null)return null;return s>=.75?'done':s>=.4?'part':'miss'}
@@ -499,7 +501,7 @@ function fieldHTML(d,f,e,k){if(!visible(f,e,k))return '';const v=ans(e,f.id),A=`
   else if(f.type==='many'){const arr=v||[];h+=`<div class="chips">${f.opts.map(o=>`<button class="chip" data-act="many" ${A} data-v="${esc(o)}" aria-pressed="${arr.includes(o)}">${esc(o)}</button>`).join('')}</div>`}
   else if(f.type==='num'){const n=Number(v||0),st=f.step||1;
     h+=`<div class="stepper"><button class="sb" data-act="inc" ${A} data-n="${-st}" aria-label="أقل">−</button><input type="number" inputmode="numeric" min="0" data-act="numin" ${A} value="${n||''}" placeholder="0"><button class="sb" data-act="inc" ${A} data-n="${st}" aria-label="أكتر">+</button><span class="u">${esc(f.unit||'')}${f.goal?` من ${num(f.goal)}`:''}</span></div>${f.goal?`<div class="meter"><i style="width:${Math.min(100,n/f.goal*100)}%"></i></div>`:''}`}
-  else if(f.type==='text'){h+=`<textarea class="inp" data-act="text" ${A} placeholder="اكتب هنا">${esc(v||'')}</textarea>`}
+  else if(f.type==='text'){h+=`<textarea class="inp" data-act="text" ${A} placeholder="${esc(f.ph||'اكتب هنا')}">${esc(v||'')}</textarea>`}
   else if(f.type==='counts'){const c=v||{};h+=`<div>${f.items.map(it=>{const n=Number(c[it.n]||0);return `<div class="crow"><span class="n">${esc(it.n)}</span><span class="mini"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="-10">−</button><input type="number" inputmode="numeric" data-act="cnt" ${A} data-k="${esc(it.n)}" value="${n||''}" placeholder="0"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="33">+</button></span><span class="g ${n>=it.goal?'ok':''}">/ ${num(it.goal)}</span></div>`}).join('')}</div><p class="small muted">+ بيزوّد ٣٣، و− بينقص ١٠. وتقدر تكتب الرقم بإيدك.</p>`}
   else if(f.type==='faults'){const c=v||{};const fl=db.faults.filter(x=>x.on);
     h+=fl.length?`<div>${fl.map(x=>{const n=Number(c[x.id]||0);return `<div class="crow"><span class="n">${esc(x.name)}</span><span class="mini"><button data-act="finc" ${A} data-k="${x.id}" data-n="-1">−</button><input type="number" inputmode="numeric" data-act="fcnt" ${A} data-k="${x.id}" value="${n||''}" placeholder="0"><button data-act="finc" ${A} data-k="${x.id}" data-n="1">+</button></span><span class="g">مرة</span></div>`}).join('')}</div>`:'<p class="small muted">مفيش عيوب مفعّلة. فعّلها من مرآة العيوب.</p>';
@@ -510,6 +512,7 @@ function deedBody(d,k){const e=(db.logs[k]||{})[d.id]||{a:{}};
   if((d.heart||[]).length)h+=`<div class="sec heart"><h3>وقفة القلب</h3>${d.heart.map(f=>fieldHTML(d,f,e,k)).join('')}</div>`;
   if(!d.noClose)h+=`<div class="sec"><h3>بعد العمل</h3>${CLOSE.map(f=>fieldHTML(d,f,e,k)).join('')}</div>`;
   if(d.link==='shura'&&activeJ())h+=`<button class="btn ghost" data-act="go" data-v="shura">افتح المشورة</button>`;
+  if(d.link==='kb')h+=`<button class="btn ghost" data-act="zad-go" data-v="kb">افتح بنك المعرفة</button>`;
   if(d.link==='duas')h+=`<button class="btn ghost" data-act="zad-go" data-v="duas">افتح أدعيتي</button>`;
   return h}
 
@@ -773,8 +776,8 @@ function useLocation(){if(!navigator.geolocation){toast('الموقع مش مت�
    ()=>toast('مقدرناش نجيب الموقع. اسمح بالموقع من إعدادات الموبايل'),{timeout:15000,maximumAge:3600e3})}
 
 /* ---------- zad ---------- */
-function renderZad(){const z=view.zad;let h=top('زادي',{goals:'أهدافي',duas:'أدعيتي',faults:'مرآة العيوب'}[z],gearBtn)+`<div class="seg-tabs">${[['goals','أهدافي'],['duas','أدعيتي'],['faults','مرآة العيوب']].map(([v,t])=>`<button data-act="zad" data-v="${v}" aria-pressed="${z===v}">${t}</button>`).join('')}</div>`;
-  return h+(z==='goals'?renderGoals():z==='duas'?renderDuas():renderFaults())}
+function renderZad(){const z=view.zad;let h=top('زادي',{goals:'أهدافي',kb:'بنك المعرفة',duas:'أدعيتي',faults:'مرآة العيوب'}[z],gearBtn)+`<div class="seg-tabs">${[['goals','أهدافي'],['kb','بنك المعرفة'],['duas','أدعيتي'],['faults','مرآة العيوب']].map(([v,t])=>`<button data-act="zad" data-v="${v}" aria-pressed="${z===v}">${t}</button>`).join('')}</div>`;
+  return h+(z==='goals'?renderGoals():z==='kb'?renderKB():z==='duas'?renderDuas():renderFaults())}
 const metricVal=(m,j,s)=>m==='people'?db.people.filter(p=>p.j===j.id).length:s[m];
 function renderGoals(){const j=activeJ(),gt=view.gtype||(j?j.type:'d40'),s=j&&j.type===gt?jStats(j):null,G=db.goals[gt];
   let h=`<section class="card rise"><h2>أرقام الخروج</h2><p class="lead">أهداف مربوطة بأرقام، وتقدّمها بيتحسب لوحده من تسجيلاتك.</p><div class="chips">${Object.entries(JTYPES).map(([id,t])=>`<button class="chip" data-act="gtype" data-v="${id}" aria-pressed="${gt===id}">${t.label}</button>`).join('')}</div>
@@ -783,6 +786,18 @@ function renderGoals(){const j=activeJ(),gt=view.gtype||(j?j.type:'d40'),s=j&&j.
   db.gsecs.forEach(sec=>{const d=sec.items.filter(x=>x.done).length;h+=`<section class="card rise"><div class="ch"><h2>${esc(sec.name)}</h2>${xbtn('gsec-del',`data-id="${sec.id}"`,'امسح القسم')}</div>${sec.items.map(g=>`<div class="check ${g.done?'done':''}">${tick('goal-done',`data-w="s:${sec.id}" data-id="${g.id}"`,g.done)}<div class="t"><span>${esc(g.text)}</span></div>${xbtn('goal-del',`data-w="s:${sec.id}" data-id="${g.id}"`)}</div>`).join('')||'<p class="lead">لسه فاضي.</p>'}
    <div class="row-in"><input class="inp" id="g-${sec.id}" placeholder="هدف جديد"><button class="btn sm" data-act="goal-add" data-w="s:${sec.id}">أضف</button></div></section>`});
   return h+`<div class="row-in"><input class="inp" id="gsec-new" placeholder="قسم جديد"><button class="btn ghost sm" data-act="gsec-add">أضف قسم</button></div>`}
+function kbItems(){const out=[];Object.keys(db.logs).sort().reverse().forEach(k=>{const l=db.logs[k];for(const id in l){const d=byId(id),e=l[id];if(!d||!e||!e.a)continue;
+    fieldsOf(d).filter(f=>f.kb).forEach(f=>{const v=(e.a[f.id]||'').trim();if(v)out.push({k,id,f:f.id,type:f.kb,text:v})})}});return out}
+function kbList(){const all=kbItems(),q=(view.kbq||'').trim(),L=all.filter(x=>(!view.kbt||x.type===view.kbt)&&(!q||x.text.includes(q)));
+  if(!L.length)return `<p class="empty">${all.length?'مفيش نتايج.':'لسه مكتبتش حاجة. افتح "التعليم الانفرادي" في يومك واكتب حديث اليوم وآيته وقصته.'}</p>`;
+  const G=new Map();L.forEach(x=>{if(!G.has(x.k))G.set(x.k,[]);G.get(x.k).push(x)});
+  return [...G].map(([k,arr])=>`<section class="slot"><div class="slot-h"><span>${fmt(k,{weekday:'long',day:'numeric',month:'long'})}</span></div><div class="ncards">${arr.map(x=>`<button class="ncard" data-act="kb-open" data-k="${x.k}" data-id="${x.id}"><span class="nm"><span class="badge done">${esc(x.type)}</span></span><p>${esc(x.text)}</p></button>`).join('')}</div></section>`).join('')}
+function renderKB(){const all=kbItems(),types=[...new Set(KBF.map(f=>f.kb).concat(all.map(x=>x.type)))],cnt=t2=>all.filter(x=>x.type===t2).length;
+  let h=`<p class="lead">كل حديث وآية وقصة كتبتهم في التعليم الانفرادي، متجمّعين هنا عشان تراجعهم كل فترة.</p>
+   <div class="stats">${types.map(t2=>`<button class="stat" data-act="kbt" data-v="${esc(t2)}" style="text-align:start;${view.kbt===t2?'outline:2px solid var(--forest)':''}"><b>${num(cnt(t2))}</b><span>${esc(t2==='آية'?'آيات':t2==='حديث'?'أحاديث':t2==='قصة'?'قصص':t2)}</span></button>`).join('')}</div>`;
+  if(all.length){const pick=view.kbPick!=null&&all[view.kbPick%all.length];
+    h+=`<section class="card fcard"><div class="ch"><span class="eyebrow">راجع واحدة</span><button class="link" data-act="kb-rand">${pick?'غيرها':'طلّع واحدة عشوائية'}</button></div>${pick?`<span class="badge done" style="align-self:flex-start">${esc(pick.type)}</span><p class="ftext">${esc(pick.text)}</p><span class="small muted">${fmt(pick.k,{weekday:'long',day:'numeric',month:'long'})}</span>`:'<p class="lead">اضغط وهيطلعلك حديث أو آية أو قصة من اللي كتبتهم.</p>'}</section>`}
+  return h+`<input class="inp" type="search" data-act="kbq" value="${esc(view.kbq||'')}" placeholder="دوّر في بنك المعرفة"><div class="filters"><button class="chip" data-act="kbt" data-v="" aria-pressed="${!view.kbt}">الكل · ${num(all.length)}</button>${types.map(t2=>`<button class="chip" data-act="kbt" data-v="${esc(t2)}" aria-pressed="${view.kbt===t2}">${esc(t2)}</button>`).join('')}</div><div id="kblist">${kbList()}</div>`}
 function renderDuas(){const sec=(k,t)=>{const L=db.duas.filter(x=>x.k===k);return `<section class="card rise"><h2>${t}</h2>${L.length?L.map(x=>`<div class="note-c"><p class="dua">${esc(x.text)}</p><div class="ch"><span></span>${xbtn('dua-del',`data-id="${x.id}"`)}</div></div>`).join(''):'<p class="lead">لسه فاضية.</p>'}</section>`};
   return sec('mine','أدعيتي')+sec('mathur','أدعية مأثورة')+`<section class="card rise"><h2>دعاء جديد</h2><textarea class="inp" id="duaText" placeholder="اكتب الدعاء"></textarea><div class="seg" id="duaKind">${[['mine','من أدعيتي'],['mathur','مأثور']].map(([v,t],i)=>`<button data-act="dkind" data-v="${v}" aria-pressed="${(view.dkind||'mine')===v}">${t}</button>`).join('')}</div><button class="btn block" data-act="dua-add">أضف الدعاء</button></section>`}
 function renderFaults(){const since=shift(dayKey(),-29),cnt=id=>Object.entries(db.logs).filter(([k])=>k>=since).reduce((s,[,l])=>s+Number((ans(l.tazkiya,'f')||{})[id]||0),0);
@@ -912,6 +927,9 @@ document.addEventListener('click',ev=>{
   if(a==='pl-tog'){const x=plan(b.dataset.k)[b.dataset.i];x.done=!x.done;buzz();return upd()}
   if(a==='pl-del'){plan(b.dataset.k).splice(b.dataset.i,1);return upd()}
   if(a==='pl-add'){const inp=document.getElementById('pl-'+b.dataset.k),val=inp.value.trim();if(!val){toast('اكتب الخطوة الأول');return}plan(b.dataset.k).push({id:uid('p'),t:val,done:false});upd();const n2=document.getElementById('pl-'+b.dataset.k);n2&&n2.focus();return}
+  if(a==='kbt'){view.kbt=view.kbt===v?'':v;return render()}
+  if(a==='kb-rand'){const n=kbItems().length;if(n)view.kbPick=Math.floor(Math.random()*n);return render()}
+  if(a==='kb-open')return openDeed(id,b.dataset.k);
   if(a==='p40-edit')return openP40();
   if(a==='p40-add'){const v2=$('#p40-new').value.trim();if(!v2){toast('اكتب البند الأول');return}db.p40.push({id:uid('p40'),text:v2,link:$('#p40-newlink').value||null});save();paintSheet();render();toast('اتضاف');return}
   if(a==='p40-del'){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}db.p40=db.p40.filter(x=>x.id!==id);save();paintSheet();return render()}
@@ -994,7 +1012,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   if(['numin','text','cmt','cnt','fcnt'].includes(a)&&d){const e=E(id);e.a=e.a||{};
     if(a==='numin')e.a[fid]=Math.max(0,Number(v||0));if(a==='text')e.a[fid]=v.trim();if(a==='cmt')(e.c||(e.c={}))[fid]=v.trim();
     if(a==='cnt'||a==='fcnt')(e.a[fid]||(e.a[fid]={}))[el.dataset.k]=Math.max(0,Number(v||0));
-    save();if(a!=='text'&&a!=='cmt')upd();return}
+    save();if(a!=='text'&&a!=='cmt')upd();else if(sheetEl){const hh=sheetEl.querySelector('.hh');if(hh)hh.innerHTML=sheetRender().head}return}
   const SI=el.dataset.i!=null?db.sched.items[Number(el.dataset.i)]:null;
   if(SI&&a.startsWith('sc-')){const P=timesFor(keyOf(new Date()));
     if(a==='sc-name')SI.name=v.trim()||SI.name;
@@ -1021,7 +1039,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   if(a==='shura'){const sh=shuraOf(j,view.day),[g,ff]=el.dataset.path.split('.');(sh[g]||(sh[g]={}))[ff]=v.trim();save();return}
   if(a==='assign'){const sh=shuraOf(j,view.day),x=sh.assign[el.dataset.v]||(sh.assign[el.dataset.v]={});x.who=v.trim();save();return}
 });
-document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='nd-text'&&view.nd)view.nd.text=ev.target.value;if(a==='nd-by'&&view.nd)view.nd.by=ev.target.value});
+document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='nd-text'&&view.nd)view.nd.text=ev.target.value;if(a==='nd-by'&&view.nd)view.nd.by=ev.target.value});
 document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id&&ev.target.id.startsWith('pl-')){ev.preventDefault();const b=document.querySelector(`[data-act="pl-add"][data-k="${ev.target.id.slice(3)}"]`);b&&b.click()}});
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 let lastTouch=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouch<300&&!e.target.closest('input,textarea,select'))e.preventDefault();lastTouch=n},{passive:false});
