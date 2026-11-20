@@ -563,7 +563,7 @@ function renderToday(){
     h+=`<section class="hero rise">${ring(m.pct)}<div class="np"><span class="eyebrow">الصلاة الجاية</span><b>${esc(w.next.name)} ${hm(w.next.at)}</b><span class="cd">بعد ${until(w.next.in)}</span><span class="small" style="color:rgba(255,255,255,.6)">سجّلت ${num(m.rec)} من ${num(m.n)} عمل</span></div>
      <div class="times">${[['fajr','الفجر'],['dhuhr','الظهر'],['asr','العصر'],['maghrib','المغرب'],['isha','العشاء']].map(([id,n])=>`<div class="${w.next.id===id?'cur':''}">${n}<b>${hm(P[id])}</b></div>`).join('')}</div>${schedHero()}${extra}${locLine()}</section>`}
   else h+=`<section class="hero rise">${ring(m.pct)}<div class="np"><span class="eyebrow">ملخص اليوم</span><b>سجّلت ${num(m.rec)} من ${num(m.n)}</b>${m.heart!=null?`<span class="cd">حضور القلب ${num(Math.round(m.heart*100),'%')}</span>`:''}</div></section>`;
-  h+=planCard(k)+fawaidCard(k)+p40Card(k);
+  h+=planCard(k)+reviewCard()+fawaidCard(k)+p40Card(k);
   h+=`<button class="card journey rise" data-act="go" data-v="khuruj" style="text-align:start"><span class="ic">${ico('map')}</span><span class="t"><b>${j?esc(JTYPES[j.type].label):'الخروج'}</b>${j?`<span class="small muted">اليوم ${num(Math.max(1,Math.min(jDay(j),j.days)))} من ${num(j.days)}</span><span class="meter"><i style="width:${Math.min(100,jDay(j)/j.days*100)}%"></i></span>`:'<span class="small muted">ابدأ خروج: ٣ أيام، أو ٤٠ يوم، أو ٤ شهور</span>'}</span>${ico('fwd')}</button>`;
   const cats=CATS.filter(c=>!['adab','nafs'].includes(c[0]));
   h+=`<div class="filters">${[['all','الكل']].concat(cats).map(([id,n])=>`<button class="chip" data-act="filter" data-v="${id}" aria-pressed="${view.filter===id}">${n}</button>`).join('')}</div>`;
@@ -788,10 +788,30 @@ function renderGoals(){const j=activeJ(),gt=view.gtype||(j?j.type:'d40'),s=j&&j.
   return h+`<div class="row-in"><input class="inp" id="gsec-new" placeholder="قسم جديد"><button class="btn ghost sm" data-act="gsec-add">أضف قسم</button></div>`}
 function kbItems(){const out=[];Object.keys(db.logs).sort().reverse().forEach(k=>{const l=db.logs[k];for(const id in l){const d=byId(id),e=l[id];if(!d||!e||!e.a)continue;
     fieldsOf(d).filter(f=>f.kb).forEach(f=>{const v=(e.a[f.id]||'').trim();if(v)out.push({k,id,f:f.id,type:f.kb,text:v})})}});return out}
+/* spaced repetition (Leitner): remembered well -> longer gap, forgot -> back tomorrow */
+const KB_INT=[1,1,3,7,14,30,60,120];
+const kbKey=x=>`${x.k}|${x.id}|${x.f}`;
+const kbAdd=(k,n)=>shift(k,n);
+function kbEligible(){const today=dayKey();db.kbr=db.kbr||{};return kbItems().filter(x=>x.k<today)}
+function kbDueSort(arr){const st=x=>db.kbr[kbKey(x)]||{};return arr.slice().sort((a,b)=>(st(a).due||a.k).localeCompare(st(b).due||b.k))}
+function kbToday(){const today=dayKey();db.kbr=db.kbr||{};db.kbDay=db.kbDay||{};if(db.kbDay[today])return db.kbDay[today];
+  const due=kbDueSort(kbEligible().filter(x=>{const s=db.kbr[kbKey(x)];return !s||s.due<=today}));if(!due.length)return null;
+  const pick=[];['حديث','آية','قصة'].forEach(ty=>{const x=due.find(y=>y.type===ty);if(x)pick.push(x)});due.forEach(x=>{if(pick.length<3&&!pick.includes(x))pick.push(x)});
+  db.kbDay[today]={keys:pick.map(kbKey),done:{}};saveLocal();return db.kbDay[today]}
+function reviewCard(){if(view.day!==dayKey())return '';const td=kbToday();if(!td)return '';const map=new Map(kbItems().map(x=>[kbKey(x),x]));
+  const keys=td.keys.filter(k=>map.has(k));if(!keys.length)return '';const dn=keys.filter(k=>td.done[k]!=null).length,cur=keys.find(k=>td.done[k]==null);
+  let h=`<section class="card rise"><div class="ch"><h2>مراجعة اليوم</h2><span class="badge ${cur?'':'done'}">${num(dn)} من ${num(keys.length)}</span></div>`;
+  if(cur){const x=map.get(cur),w=x.text.split(/\s+/),cue=w.slice(0,3).join(' ')+(w.length>3?' …':''),open=view.kbRev===cur;
+    h+=`<div class="ch"><span class="badge done">${esc(x.type)}</span><span class="small muted">كتبته ${fmt(x.k,{weekday:'long',day:'numeric',month:'long'})}</span></div>`;
+    h+=open?`<p class="ftext">${esc(x.text)}</p><span class="lb">فاكر قد إيه؟</span><div class="seg">${[['0','نسيت'],['1','بالعافية'],['2','فاكر كويس']].map(([v,l])=>`<button data-act="kb-rate" data-v="${v}" data-k="${esc(cur)}">${l}</button>`).join('')}</div>`
+      :`<p class="small muted">حاول تفتكره كله الأول، وبعدين اكشفه:</p><p class="ftext" style="color:var(--muted)">${esc(cue)}</p><button class="btn" data-act="kb-reveal" data-k="${esc(cur)}">اكشف</button>`}
+  else h+=`<p class="lead">خلّصت مراجعة النهارده. اللي فاكره كويس هيرجعلك بعد مدة أطول، واللي نسيته هيرجعلك بكرة.</p><button class="btn ghost" data-act="kb-more">راجع كمان واحدة</button>`;
+  return h+'</section>'}
+const kbNext=x=>{const s=(db.kbr||{})[kbKey(x)];if(!s)return 'لسه ماتراجعش';const d=diffDays(dayKey(),s.due);return d<=0?'عليه مراجعة':`المراجعة الجاية بعد ${num(d)} يوم`};
 function kbList(){const all=kbItems(),q=(view.kbq||'').trim(),L=all.filter(x=>(!view.kbt||x.type===view.kbt)&&(!q||x.text.includes(q)));
   if(!L.length)return `<p class="empty">${all.length?'مفيش نتايج.':'لسه مكتبتش حاجة. افتح "التعليم الانفرادي" في يومك واكتب حديث اليوم وآيته وقصته.'}</p>`;
   const G=new Map();L.forEach(x=>{if(!G.has(x.k))G.set(x.k,[]);G.get(x.k).push(x)});
-  return [...G].map(([k,arr])=>`<section class="slot"><div class="slot-h"><span>${fmt(k,{weekday:'long',day:'numeric',month:'long'})}</span></div><div class="ncards">${arr.map(x=>`<button class="ncard" data-act="kb-open" data-k="${x.k}" data-id="${x.id}"><span class="nm"><span class="badge done">${esc(x.type)}</span></span><p>${esc(x.text)}</p></button>`).join('')}</div></section>`).join('')}
+  return [...G].map(([k,arr])=>`<section class="slot"><div class="slot-h"><span>${fmt(k,{weekday:'long',day:'numeric',month:'long'})}</span></div><div class="ncards">${arr.map(x=>`<button class="ncard" data-act="kb-open" data-k="${x.k}" data-id="${x.id}"><span class="nm"><span class="badge done">${esc(x.type)}</span><span class="small muted">${kbNext(x)}</span></span><p>${esc(x.text)}</p></button>`).join('')}</div></section>`).join('')}
 function renderKB(){const all=kbItems(),types=[...new Set(KBF.map(f=>f.kb).concat(all.map(x=>x.type)))],cnt=t2=>all.filter(x=>x.type===t2).length;
   let h=`<p class="lead">كل حديث وآية وقصة كتبتهم في التعليم الانفرادي، متجمّعين هنا عشان تراجعهم كل فترة.</p>
    <div class="stats">${types.map(t2=>`<button class="stat" data-act="kbt" data-v="${esc(t2)}" style="text-align:start;${view.kbt===t2?'outline:2px solid var(--forest)':''}"><b>${num(cnt(t2))}</b><span>${esc(t2==='آية'?'آيات':t2==='حديث'?'أحاديث':t2==='قصة'?'قصص':t2)}</span></button>`).join('')}</div>`;
@@ -927,6 +947,11 @@ document.addEventListener('click',ev=>{
   if(a==='pl-tog'){const x=plan(b.dataset.k)[b.dataset.i];x.done=!x.done;buzz();return upd()}
   if(a==='pl-del'){plan(b.dataset.k).splice(b.dataset.i,1);return upd()}
   if(a==='pl-add'){const inp=document.getElementById('pl-'+b.dataset.k),val=inp.value.trim();if(!val){toast('اكتب الخطوة الأول');return}plan(b.dataset.k).push({id:uid('p'),t:val,done:false});upd();const n2=document.getElementById('pl-'+b.dataset.k);n2&&n2.focus();return}
+  if(a==='kb-reveal'){view.kbRev=b.dataset.k;return render()}
+  if(a==='kb-rate'){const key=b.dataset.k,today=dayKey(),r=Object.assign({box:0,reps:0},(db.kbr=db.kbr||{})[key]),q2=Number(v);
+    if(q2===0){r.box=1;r.due=kbAdd(today,1)}else if(q2===1){r.box=Math.max(1,r.box);r.due=kbAdd(today,Math.max(1,Math.round(KB_INT[r.box]/2)))}else{r.box=Math.min(7,r.box+1);r.due=kbAdd(today,KB_INT[r.box])}
+    r.last=today;r.reps++;db.kbr[key]=r;const td=kbToday();if(td)td.done[key]=q2;view.kbRev=null;buzz();save();render();toast(q2===0?'هيرجعلك بكرة':q2===1?`هيرجعلك بعد ${diffDays(today,r.due)} يوم`:`ممتاز. هيرجعلك بعد ${diffDays(today,r.due)} يوم`);return}
+  if(a==='kb-more'){const td=kbToday();if(!td)return;const nx=kbDueSort(kbEligible().filter(x=>!td.keys.includes(kbKey(x))))[0];if(!nx){toast('راجعت كل اللي عندك النهارده');return}td.keys.push(kbKey(nx));save();return render()}
   if(a==='kbt'){view.kbt=view.kbt===v?'':v;return render()}
   if(a==='kb-rand'){const n=kbItems().length;if(n)view.kbPick=Math.floor(Math.random()*n);return render()}
   if(a==='kb-open')return openDeed(id,b.dataset.k);
