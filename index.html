@@ -208,6 +208,22 @@ nav.tabs button[aria-current="page"]{color:var(--neon)}
 nav.tabs button.plus{flex:0 0 56px;height:48px;background:var(--forest);color:#fff;border-radius:18px;margin:0 4px}
 nav.tabs button.plus svg{width:26px;height:26px}
 body.wz nav.tabs{display:none}
+.hb{display:flex;align-items:center;gap:8px}
+.hero .sched{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:rgba(255,255,255,.07);border-radius:16px;padding:12px 14px;text-align:start;color:#fff}
+.hero .sched>span{display:flex;flex-direction:column;line-height:1.45}
+.hero .sched .eyebrow{color:rgba(255,255,255,.55)}.hero .sched b{font-size:15px;font-weight:600}
+.hero .sched .cd{color:var(--neon);font-size:13px;font-weight:600}
+.hero .locl{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:rgba(255,255,255,.55)}
+.hero .locl button{color:var(--neon);font-weight:600;font-size:12px}
+.ncards{display:flex;flex-direction:column;gap:10px}
+.ncard{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:14px 16px;text-align:start;display:flex;flex-direction:column;gap:8px;width:100%}
+.ncard p{font-size:15px;line-height:1.85;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap}
+.ncard .nm{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.star{color:#b77d00;font-size:16px;line-height:1}
+.fcard{background:var(--fog);border-color:transparent}
+.ftext{font-size:17px;line-height:1.9;font-weight:600;white-space:pre-wrap}
+.tmc{display:flex;flex-direction:column;align-items:center;min-width:54px;line-height:1.3}.tmc b{font-size:15px}.tmc span{font-size:11px;color:var(--muted)}
+.row.cur{background:var(--fog)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + var(--safe-b));background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;z-index:60;animation:up .3s var(--ease)}
 .rise{animation:rise .5s var(--ease) both}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}}
@@ -314,6 +330,16 @@ const DEF_FAULTS=[['lisan','الغيبة'],['lisan','النميمة'],['lisan','
 const DEF_DUAS=['﴿رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ﴾','﴿رَبِّ اشْرَحْ لِي صَدْرِي ۝ وَيَسِّرْ لِي أَمْرِي﴾','اللهم إني أسألك الهدى والتقى والعفاف والغنى','يا حيّ يا قيوم برحمتك أستغيث، أصلح لي شأني كله، ولا تكلني إلى نفسي طرفة عين'];
 const NTAGS=['مفاهيم','من البيانات','رسائل','من الأحباب'];
 const METRICS=[['juz','صفحات القرآن'],['qiyam','أيام قيام الليل'],['fajrM','الفجر في المسجد'],['dawah','الدعوة الفردية (شخص)'],['halaqa','أيام حلقة التعليم'],['people','الأحباب']];
+const SB='https://wlkkleutxulpzuwtvhnn.supabase.co',SBK='sb_publishable_gEfJkkL5K55-rN22u0QxNQ_ZlIc5etZ',AK='waqfa.auth';
+const NSRC=['بيان الفجر','حديثين الظهر','بيان العصر','الترغيب','بيان العشاء','حلقة التعليم','حياة الصحابة','المشورة','زيارة أو جولة','موقف','خاطرة'];
+const NTOPICS=['اليقين','الصلاة','العلم والذكر','إكرام المسلمين','الإخلاص','الدعوة والخروج','الأخلاق','النفس'];
+const ANCH=[['clock','وقت ثابت'],['fajr','الفجر'],['sunrise','الشروق'],['dhuhr','الظهر'],['asr','العصر'],['maghrib','المغرب'],['isha','العشاء']];
+const DEF_SCHED=[['قيام الليل','fajr',-107,107,'qiyam'],['صلاة الفجر','fajr',0,58,'fajr'],['الأذكار','fajr',58,20,'am'],['مشورة الفكر','fajr',78,82,'shura_d'],['وقت انفرادي','fajr',160,93,'taleem'],
+ ['الإفطار','fajr',253,30,''],['صلاة الضحى','fajr',283,19,'duha'],['التعليم الجماعي','fajr',302,86,'halaqa'],['صلاة الظهر','dhuhr',0,49,'dhuhr'],['تكملة التعليم','dhuhr',49,60,''],
+ ['أدب الطعام','dhuhr',109,11,''],['وجبة الغداء','dhuhr',120,29,''],['وقت انفرادي','dhuhr',149,32,'taleem'],['صلاة العصر','asr',0,41,'asr'],['مذاكرات','asr',41,30,''],['الزيارات','asr',71,37,'ziyarat'],
+ ['الأذكار','asr',108,30,'pm'],['صلاة المغرب','maghrib',0,0,'maghrib'],['صلاة العشاء','isha',0,69,'isha'],['أدب الطعام','isha',69,17,''],['وجبة العشاء','isha',86,18,''],['حياة الصحابة','isha',104,55,''],
+ ['مذاكرات','isha',159,15,''],['النوم','isha',174,0,'']];
+const defSched=()=>DEF_SCHED.map(([name,anchor,off,dur,link])=>({id:Math.random().toString(36).slice(2,9),name,anchor,off,dur,link}));
 const FTYPES=[['one','اختيار واحد'],['many','اختيارات متعددة'],['num','عدد'],['text','كتابة']];
 const JTYPES={
  d3:{label:'خروج ٣ أيام',days:3,stageKind:'مسجد',stages:['المسجد'],hint:'مسجد واحد غالبًا، وأعمال اليوم والليلة، والمشورة.'},
@@ -338,14 +364,17 @@ const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const defDeeds=()=>DEFAULT_DEEDS.map(d=>({...cp(d),on:true}));
 function blank(){return {version:4,deeds:defDeeds(),logs:{},reviews:{},plans:{},p40:[],notes:[],journeys:[],people:[],
   faults:DEF_FAULTS.map((f,i)=>({id:'flt'+i,g:f[0],name:f[1],on:true,detail:'',hist:[]})),duas:DEF_DUAS.map((t,i)=>({id:'dua'+i,text:t,k:'mathur'})),
-  goals:{d3:[],d40:[],m4:[]},gsecs:[{id:'life',name:'أهداف الحياة',items:[]},{id:'work',name:'أهداف العمل',items:[]}],settings:{dayStart:'03:30',city:'cairo',lastBackup:null}}}
+  goals:{d3:[],d40:[],m4:[]},gsecs:[{id:'life',name:'أهداف الحياة',items:[]},{id:'work',name:'أهداف العمل',items:[]}],settings:{dayStart:'03:30',city:'cairo',lastBackup:null,useLoc:false,loc:null},sched:{on:true,items:defSched()},noteCfg:{srcs:[...NSRC],topics:[...NTOPICS]},meta:{dirty:false,syncedAt:null}}}
 function migrate(d){const b=blank();
   if((d.version||1)<4){d.deeds=b.deeds;d.legacyLogs=d.logs;d.logs={}}
   ['p40','notes','journeys','people'].forEach(k=>d[k]=d[k]||b[k]);['logs','reviews','plans'].forEach(k=>d[k]=d[k]||{});
   d.faults=(d.faults||b.faults).map(f=>({detail:'',hist:[],g:'other',on:true,...f}));d.duas=d.duas||b.duas;d.goals=Object.assign({d3:[],d40:[],m4:[]},d.goals||{});
-  d.gsecs=d.gsecs||b.gsecs;d.settings=Object.assign(b.settings,d.settings||{});d.version=4;return d}
+  d.gsecs=d.gsecs||b.gsecs;d.settings=Object.assign(b.settings,d.settings||{});d.sched=d.sched||b.sched;d.noteCfg=d.noteCfg||b.noteCfg;d.meta=d.meta||b.meta;normNotes(d);d.version=4;return d}
+function normNotes(d){d.notes.forEach(n=>{if(!n.topics){n.topics=n.tag?[n.tag]:[];delete n.tag}n.topics.forEach(x=>{if(!d.noteCfg.topics.includes(x))d.noteCfg.topics.push(x)});if(n.src==null)n.src=''})}
 function load(){try{const s=localStorage.getItem(KEY);if(s)return migrate(JSON.parse(s))}catch(e){}return blank()}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
+let pushT=null;
+function save(){db.meta=db.meta||{};db.meta.dirty=true;db.meta.editAt=Date.now();saveLocal();if(auth){clearTimeout(pushT);pushT=setTimeout(syncNow,2500)}paintCloud()}
 
 /* ================= dates & prayer times ================= */
 const pad=n=>String(n).padStart(2,'0');
@@ -370,7 +399,7 @@ function prayerTimes(date,lat,lng){const jd=julian(date.getFullYear(),date.getMo
   let t={fajr:5,sunrise:6,dhuhr:12,asr:13,maghrib:18,isha:18};
   for(let i=0;i<2;i++)t={fajr:ang(19.5,t.fajr,true),sunrise:ang(0.833,t.sunrise,true),dhuhr:noon(t.dhuhr),asr:asr(t.asr),maghrib:ang(0.833,t.maghrib),isha:ang(17.5,t.isha)};
   const out={};for(const k in t)out[k]=(t[k]+tz-lng/15)*60+(k==='dhuhr'?2:0);return out}
-const city=()=>CITIES.find(c=>c[0]===db.settings.city)||CITIES[0];
+const city=()=>db.settings.useLoc&&db.settings.loc?['loc','موقعك',db.settings.loc.lat,db.settings.loc.lng]:(CITIES.find(c=>c[0]===db.settings.city)||CITIES[0]);
 const timesFor=k=>{const c=city();return prayerTimes(fromKey(k),c[2],c[3])};
 
 /* ================= model helpers ================= */
@@ -473,7 +502,12 @@ function deedBody(d,k){const e=(db.logs[k]||{})[d.id]||{a:{}};
 let sheetEl=null,sheetRender=null;
 function openSheet(renderFn,opts={}){closeSheet(true);sheetRender=renderFn;const s=document.createElement('div');s.className='scrim';
   s.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="sh-h"><div class="grab"></div><div class="hh"></div></div><div class="sh-b"></div><div class="sh-f"></div></div>`;
-  s.addEventListener('click',ev=>{if(ev.target===s)closeSheet()});document.body.appendChild(s);document.body.classList.add('lock');sheetEl=s;paintSheet()}
+  s.addEventListener('click',ev=>{if(ev.target===s)closeSheet()});document.body.appendChild(s);
+  const sh=s.querySelector('.sheet');let y0=null,x0=0,dy=0,drag=false;
+  sh.addEventListener('touchstart',e=>{const b=sh.querySelector('.sh-b');if(e.target.closest('input[type=range]')){y0=null;return}if(e.target.closest('.sh-h')||(e.target.closest('.sh-b')&&b.scrollTop<=0)){y0=e.touches[0].clientY;x0=e.touches[0].clientX;dy=0;drag=false}else y0=null},{passive:true});
+  sh.addEventListener('touchmove',e=>{if(y0==null)return;const d=e.touches[0].clientY-y0,dx=Math.abs(e.touches[0].clientX-x0);if(!drag){if(d>8&&d>dx){drag=true;sh.style.transition='none'}else if(d<-4||dx>8){y0=null;return}else return}
+    dy=Math.max(0,d);sh.style.transform=`translateY(${dy}px)`;s.style.background=`rgba(27,27,27,${Math.max(.05,.4-dy/900)})`;if(e.cancelable)e.preventDefault()},{passive:false});
+  sh.addEventListener('touchend',()=>{if(!drag){y0=null;return}sh.style.transition='transform .25s var(--ease)';if(dy>110){sh.style.transform='translateY(100%)';setTimeout(()=>closeSheet(),180)}else{sh.style.transform='';s.style.background=''}y0=null;drag=false});document.body.classList.add('lock');sheetEl=s;paintSheet()}
 function paintSheet(keepScroll=true){if(!sheetEl)return;const r=sheetRender();const b=sheetEl.querySelector('.sh-b'),st=b.scrollTop;
   sheetEl.querySelector('.hh').innerHTML=r.head;b.innerHTML=r.body;sheetEl.querySelector('.sh-f').innerHTML=r.foot||'<button class="btn" data-act="close-sheet">تمام</button>';if(keepScroll)b.scrollTop=st}
 function closeSheet(silent){if(sheetEl){sheetEl.remove();sheetEl=null;document.body.classList.remove('lock');if(!silent)render()}}
@@ -484,7 +518,7 @@ function openDeed(id,k=view.day){const d=byId(id);if(!d)return;
 function render(){
   document.querySelectorAll('nav.tabs [data-tab]').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===view.tab&&!view.sub?'page':'false'));
   const s=view.sub;let h;
-  if(s==='review')h=renderReview();else if(s==='khuruj')h=renderKhuruj();else if(s==='shura')h=renderShura();else if(s==='settings')h=renderSettings();else if(s==='custom')h=renderCustom();else if(s==='cat')h=renderCat();
+  if(s==='review')h=renderReview();else if(s==='khuruj')h=renderKhuruj();else if(s==='shura')h=renderShura();else if(s==='settings')h=renderSettings();else if(s==='custom')h=renderCustom();else if(s==='cat')h=renderCat();else if(s==='sched')h=renderSched();
   else h=view.tab==='today'?renderToday():view.tab==='progress'?renderProgress():view.tab==='notes'?renderNotes():renderZad();
   $('#app').innerHTML=h;
   document.querySelectorAll('.wz-nav').forEach(x=>{if(view.sub!=='review')x.remove()});
@@ -501,16 +535,17 @@ function p40Card(k){if(!db.p40.length)return '';const d=db.p40.filter(it=>p40don
    <div>${db.p40.map(it=>{const ok=p40done(it,k),auto=it.link&&byId(it.link);return `<div class="check ${ok?'done':''}">${tick('p40',`data-id="${it.id}"`,ok)}<div class="t"><span>${esc(it.text)}</span>${auto?`<span class="small muted">بيتعلّم لوحده لما تسجّل ${esc(auto.name)}</span>`:''}</div></div>`}).join('')}</div></section>`}
 function renderToday(){
   const k=view.day,today=dayKey(),isT=k===today,m=metrics(k),w=windowNow(),j=activeJ();
-  let h=top(`${fmt(k,{weekday:'long',day:'numeric',month:'long'})} · ${esc(hijri(k))}`,isT?'يومك':fmt(k,{weekday:'long'}),gearBtn);
+  let h=top(`${fmt(k,{weekday:'long',day:'numeric',month:'long'})} · ${esc(hijri(k))}`,isT?'يومك':fmt(k,{weekday:'long'}),`<div class="hb"><button data-act="settings" aria-label="الحفظ أونلاين">${cloudChip()}</button>${gearBtn}</div>`);
   if(!isT)h+=`<div class="notice"><span>بتعرض يوم ${fmt(k,{day:'numeric',month:'long'})}</span><button class="link" data-act="go-today">رجوع لليوم</button></div>`;
-  const lb=db.settings.lastBackup;if(isT&&Object.keys(db.logs).length>3&&(!lb||diffDays(lb,today)>=7))h+=`<div class="notice"><span>بقالك أسبوع من غير نسخة احتياطية</span><button class="link" data-act="backup">خدها</button></div>`;
+  if(isT&&!auth)h+=`<div class="notice"><span>بياناتك على الموبايل ده بس. احفظها أونلاين عشان متضيعش.</span><button class="link" data-act="settings">احفظها</button></div>`;
+  const lb=db.settings.lastBackup;if(isT&&auth&&0&&Object.keys(db.logs).length>3&&(!lb||diffDays(lb,today)>=7))h+=`<div class="notice"><span>بقالك أسبوع من غير نسخة احتياطية</span><button class="link" data-act="backup">خدها</button></div>`;
   if(isT){const P=w.P;let extra='';
     if(w.next.in<=10){const i=Math.min(view.ready,READY.length);extra+=`<div class="ready"><span>${i<READY.length?`${num(i+1)}. ${READY[i]}`:'جاهز، ربنا يتقبّل.'}</span>${i<READY.length?'<button class="btn sm" data-act="ready">تمام</button>':''}</div>`}
     if(j){const sh=(j.shura||{})[k];if(sh&&sh.assign){const mine=BAYANAT.concat(AMAL).filter(([id])=>sh.assign[id]&&sh.assign[id].mine);if(mine.length)extra+=`<div class="mine">عليك النهارده: <b>${mine.map(x=>x[1]).join('، ')}</b></div>`}}
     h+=`<section class="hero rise">${ring(m.pct)}<div class="np"><span class="eyebrow">الصلاة الجاية</span><b>${esc(w.next.name)} ${hm(w.next.at)}</b><span class="cd">بعد ${until(w.next.in)}</span><span class="small" style="color:rgba(255,255,255,.6)">سجّلت ${num(m.rec)} من ${num(m.n)} عمل</span></div>
-     <div class="times">${[['fajr','الفجر'],['dhuhr','الظهر'],['asr','العصر'],['maghrib','المغرب'],['isha','العشاء']].map(([id,n])=>`<div class="${w.next.id===id?'cur':''}">${n}<b>${hm(P[id])}</b></div>`).join('')}</div>${extra}</section>`}
+     <div class="times">${[['fajr','الفجر'],['dhuhr','الظهر'],['asr','العصر'],['maghrib','المغرب'],['isha','العشاء']].map(([id,n])=>`<div class="${w.next.id===id?'cur':''}">${n}<b>${hm(P[id])}</b></div>`).join('')}</div>${schedHero()}${extra}${locLine()}</section>`}
   else h+=`<section class="hero rise">${ring(m.pct)}<div class="np"><span class="eyebrow">ملخص اليوم</span><b>سجّلت ${num(m.rec)} من ${num(m.n)}</b>${m.heart!=null?`<span class="cd">حضور القلب ${num(Math.round(m.heart*100),'%')}</span>`:''}</div></section>`;
-  h+=planCard(k)+p40Card(k);
+  h+=planCard(k)+fawaidCard(k)+p40Card(k);
   h+=`<button class="card journey rise" data-act="go" data-v="khuruj" style="text-align:start"><span class="ic">${ico('map')}</span><span class="t"><b>${j?esc(JTYPES[j.type].label):'الخروج'}</b>${j?`<span class="small muted">اليوم ${num(Math.max(1,Math.min(jDay(j),j.days)))} من ${num(j.days)}</span><span class="meter"><i style="width:${Math.min(100,jDay(j)/j.days*100)}%"></i></span>`:'<span class="small muted">ابدأ خروج: ٣ أيام، أو ٤٠ يوم، أو ٤ شهور</span>'}</span>${ico('fwd')}</button>`;
   const cats=CATS.filter(c=>!['adab','nafs'].includes(c[0]));
   h+=`<div class="filters">${[['all','الكل']].concat(cats).map(([id,n])=>`<button class="chip" data-act="filter" data-v="${id}" aria-pressed="${view.filter===id}">${n}</button>`).join('')}</div>`;
@@ -596,14 +631,125 @@ function renderProgress(){const today=dayKey(),[y,mo]=view.month.split('-').map(
   h+=`<section class="card rise"><h2>بقع في إيه؟</h2><div class="insight"><span class="eyebrow">أكتر حاجة بتشغلني في الصلاة</span>${bars(dist,x=>x)}</div><div class="insight"><span class="eyebrow">أكتر عيوب بقع فيها</span>${bars(fl,id=>(db.faults.find(f=>f.id===id)||{name:'عيب اتمسح'}).name)}</div></section>`;
   return h}
 
-/* ---------- notes ---------- */
-function renderNotes(){const tags=[...new Set(NTAGS.concat(db.notes.map(n=>n.tag).filter(Boolean)))];
-  let h=top(`${num(db.notes.length)} نقطة`,'طلعت بإيه',gearBtn)+`<section class="card rise"><textarea class="inp" id="nText" placeholder="النقطة أو الرسالة اللي جاتلك"></textarea><div class="chips">${tags.map(t=>`<button class="chip" data-act="ntag" data-v="${esc(t)}" aria-pressed="${(view.newTag||tags[0])===t}">${esc(t)}</button>`).join('')}</div><button class="btn block" data-act="note-add">احفظ النقطة</button></section>
-   <input class="inp" type="search" data-act="nsearch" value="${esc(view.nq)}" placeholder="دوّر في نقطك">
-   <div class="filters"><button class="chip" data-act="nfilter" data-v="" aria-pressed="${!view.ntag}">الكل</button>${tags.map(t=>`<button class="chip" data-act="nfilter" data-v="${esc(t)}" aria-pressed="${view.ntag===t}">${esc(t)}</button>`).join('')}</div><div id="nlist">${notesList()}</div>`;
-  return h}
-function notesList(){const q=view.nq.trim(),list=db.notes.filter(n=>(!view.ntag||n.tag===view.ntag)&&(!q||n.text.includes(q))).slice().reverse();
-  return list.length?`<section class="card">${list.map(n=>`<div class="note-c"><p>${esc(n.text)}</p><div class="ch"><span class="small muted">${n.k?fmt(n.k,{day:'numeric',month:'long'}):''}${n.tag?' · '+esc(n.tag):''}${n.mosque?' · '+esc(n.mosque):''}</span>${xbtn('note-del',`data-id="${n.id}"`)}</div></div>`).join('')}</section>`:'<p class="empty">مفيش نقط هنا لسه.</p>'}
+/* ---------- notes (طلعت بإيه) ---------- */
+const noteMeta=n=>[n.src,...(n.topics||[])].filter(Boolean);
+const noteCard=n=>`<button class="ncard" data-act="note-open" data-id="${n.id}"><p>${esc(n.text)}</p><span class="nm">${n.star?'<span class="star">★</span>':''}${noteMeta(n).map(x=>`<span class="badge">${esc(x)}</span>`).join('')}${n.by?`<span class="small muted">— ${esc(n.by)}</span>`:''}</span></button>`;
+function renderNotes(){const v=view.nview||'days';
+  return top(`${num(db.notes.length)} فائدة`,'طلعت بإيه',gearBtn)+`<p class="lead">دفتر الفوايد: اللي بتطلع بيه من البيانات والحلقات والمواقف، عشان ترجعله وتعمل بيه.</p>
+   <button class="btn block" data-act="note-new">+ فائدة جديدة</button>
+   <input class="inp" type="search" data-act="nsearch" value="${esc(view.nq)}" placeholder="دوّر في فوايدك">
+   <div class="seg-tabs">${[['days','بالأيام'],['topic','بالموضوع'],['src','بالمصدر'],['star','المميّزة']].map(([x,l])=>`<button data-act="nview" data-v="${x}" aria-pressed="${v===x}">${l}</button>`).join('')}</div>
+   <div id="nlist">${notesList()}</div><button class="link" data-act="ncfg" style="align-self:center">تعديل المصادر والمواضيع</button>`}
+function notesList(){const q=view.nq.trim(),v=view.nview||'days',L=db.notes.filter(n=>!q||n.text.includes(q)||(n.by||'').includes(q)||noteMeta(n).some(x=>x.includes(q))).slice().reverse();
+  if(!L.length)return `<p class="empty">${q?'مفيش نتايج.':'لسه مفيش فوايد. اضغط "فائدة جديدة"، أو + من تحت من أي شاشة.'}</p>`;
+  const G=new Map(),add=(key,n)=>{if(!G.has(key))G.set(key,[]);G.get(key).push(n)};
+  if(v==='days')L.forEach(n=>add(n.k||'',n));
+  if(v==='topic')L.forEach(n=>((n.topics||[]).length?n.topics:['من غير موضوع']).forEach(x=>add(x,n)));
+  if(v==='src')L.forEach(n=>add(n.src||'من غير مصدر',n));
+  if(v==='star'){const s=L.filter(n=>n.star);if(!s.length)return '<p class="empty">افتح أي فائدة واضغط "ميّزها" عشان تلاقيها هنا.</p>';s.forEach(n=>add('',n))}
+  let keys=[...G.keys()];if(v==='topic'||v==='src')keys.sort((x,y)=>G.get(y).length-G.get(x).length);
+  return keys.map(key=>{const arr=G.get(key),lab=v==='days'?(key?fmt(key,{weekday:'long',day:'numeric',month:'long'}):'من غير تاريخ')+(arr[0].mosque?' · '+esc(arr[0].mosque):''):esc(key);
+    return `<section class="slot">${key||v!=='star'?`<div class="slot-h"><span>${lab}</span><span class="tm">${num(arr.length)}</span></div>`:''}<div class="ncards">${arr.map(noteCard).join('')}</div></section>`}).join('')}
+function autoSrc(){return ({fajr:'بيان الفجر',duha:'حلقة التعليم',dhuhr:'حديثين الظهر',asr:'بيان العصر',maghrib:'الترغيب',isha:'بيان العشاء',night:'خاطرة'})[windowNow().key]||''}
+function openNote(id,quick){const n=id&&db.notes.find(x=>x.id===id);
+  view.nd=n?{id,text:n.text,src:n.src||'',topics:[...(n.topics||[])],by:n.by||'',star:!!n.star,mode:'note'}:{text:'',src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():'',topics:[],by:'',star:false,mode:'note',quick:!!quick};
+  openSheet(()=>{const s=view.nd,cfg=db.noteCfg,chips=(arr,act,on)=>`<div class="chips">${arr.map(o=>`<button class="chip" data-act="${act}" data-v="${esc(o)}" aria-pressed="${on(o)}">${esc(o)}</button>`).join('')}</div>`;
+    return {head:`<span class="eyebrow">${n?fmt(n.k,{weekday:'long',day:'numeric',month:'long'})+(n.mosque?' · '+esc(n.mosque):''):'إضافة'}</span><h2 class="title">${n?'الفائدة':s.mode==='plan'?'خطوة في خطة النهارده':'فائدة جديدة'}</h2>`,
+     body:(s.quick?`<div class="seg">${[['note','فائدة'],['plan','خطوة في الخطة']].map(([x,l])=>`<button data-act="nd-mode" data-v="${x}" aria-pressed="${s.mode===x}">${l}</button>`).join('')}</div>`:'')
+      +`<textarea class="inp" data-act="nd-text" id="ndText" placeholder="${s.mode==='plan'?'الخطوة':'الفائدة أو الرسالة اللي جاتلك'}" style="min-height:130px">${esc(s.text)}</textarea>`
+      +(s.mode==='note'?`<div class="fld"><span class="lb">المصدر</span>${chips(cfg.srcs,'nd-src',o=>s.src===o)}<span class="small muted">بيتحدد لوحده حسب الوقت، وتقدر تغيّره.</span></div>
+       <div class="fld"><span class="lb">الموضوع</span>${chips(cfg.topics,'nd-top',o=>s.topics.includes(o))}</div>
+       <div class="fld"><span class="lb">مين قالها؟ (اختياري)</span><input class="inp" data-act="nd-by" value="${esc(s.by)}" placeholder="الاسم"></div>
+       <button class="chip" data-act="nd-star" aria-pressed="${s.star}" style="align-self:flex-start">${s.star?'★ مميّزة':'☆ ميّزها'}</button>
+       <button class="link" data-act="ncfg" style="align-self:flex-start">ضيف مصدر أو موضوع جديد</button>
+       ${n?'<button class="btn ghost" data-act="nd-plan">حوّلها لخطوة في خطة بكرة</button>':''}`:''),
+     foot:n?'<button class="btn danger" data-act="nd-del">امسح</button><button class="btn" data-act="nd-save">احفظ</button>':'<button class="btn ghost" data-act="close-sheet">إلغاء</button><button class="btn" data-act="nd-save">احفظ</button>'}});
+  if(!n)setTimeout(()=>{const x=$('#ndText');x&&x.focus()},350)}
+function openNoteCfg(){const back=view.nd&&sheetEl?view.nd:null;openSheet(()=>{const sec=(key,l)=>`<div class="fld"><span class="lb">${l}</span><div class="chips">${db.noteCfg[key].map((o,i)=>`<span class="tag">${esc(o)}${xbtn('cfg-del',`data-v="${key}" data-i="${i}"`)}</span>`).join('')}</div><div class="row-in"><input class="inp" id="cfg-${key}" placeholder="أضف"><button class="btn ghost sm" data-act="cfg-add" data-v="${key}">أضف</button></div></div>`;
+  return {head:'<span class="eyebrow">طلعت بإيه</span><h2 class="title">المصادر والمواضيع</h2>',body:sec('srcs','المصادر')+sec('topics','المواضيع'),foot:`<button class="btn" data-act="${back?'cfg-back':'close-sheet'}">تمام</button>`}})}
+function fawaidCard(k){const pool=db.notes.filter(n=>n.k!==dayKey());if(!pool.length)return '';let h=0;for(const c of k)h=(h*31+c.charCodeAt(0))>>>0;
+  const st=pool.filter(n=>n.star),P=st.length&&!((view.fseed||0)%2)?st:pool,n=P[(h+(view.fseed||0))%P.length];
+  return `<section class="card fcard rise"><div class="ch"><span class="eyebrow">فائدة من اللي فات</span><button class="link" data-act="fseed">غيّرها</button></div><p class="ftext">${esc(n.text)}</p><span class="small muted">${noteMeta(n).map(esc).join(' · ')}${n.k?' · '+fmt(n.k,{day:'numeric',month:'long'}):''}</span></section>`}
+
+/* ---------- schedule (جدول اليوم) ---------- */
+const an=a=>(ANCH.find(x=>x[0]===a)||['',''])[1];
+const durTxt=m=>{const h=Math.floor(m/60),r=m%60;return h?`${num(h)} س${r?` و${num(r)} د`:''}`:`${num(r)} دقيقة`};
+const schedStart=(it,P)=>it.anchor==='clock'?it.off:Math.round(P[it.anchor]+it.off);
+const anchorText=it=>it.anchor==='clock'?'وقت ثابت':!it.off?`مع ${an(it.anchor)}`:`${it.off>0?'بعد':'قبل'} ${an(it.anchor)} بـ${durTxt(Math.abs(it.off))}`;
+function schedList(k){const P=timesFor(k);return db.sched.items.map((it,i)=>({...it,i,start:schedStart(it,P)})).sort((a,b)=>a.start-b.start)}
+function schedNow(){if(!db.sched.on||!db.sched.items.length)return null;const now=new Date(),k=keyOf(now),m=now.getHours()*60+now.getMinutes(),L=schedList(k);
+  let cur=null,next=null;for(const it of L){if(it.start<=m)cur=it;else{next=it;break}}
+  if(cur&&cur.dur&&m>=cur.start+cur.dur)cur=null;if(!next){const f=schedList(shift(k,1))[0];next={...f,start:f.start+1440}}return {cur,next,m}}
+function schedHero(){const s=schedNow();if(!s)return '';
+  return `<button class="sched" data-act="go" data-v="sched"><span><span class="eyebrow">دلوقتي</span><b>${s.cur?esc(s.cur.name):'وقت حر'}</b>${s.cur&&s.cur.dur?`<span class="small" style="color:rgba(255,255,255,.55)">لحد ${hm(s.cur.start+s.cur.dur)}</span>`:''}</span><span><span class="eyebrow">العمل الجاي</span><b>${esc(s.next.name)}</b><span class="cd">بعد ${until(s.next.start-s.m)}</span></span></button>`}
+function locLine(){return `<div class="locl"><span>المواقيت على ${esc(city()[1])}</span><button data-act="${db.settings.useLoc?'loc-use':'settings'}">${db.settings.useLoc?'حدّث موقعي':'غيّر'}</button></div>`}
+function renderSched(){const k=keyOf(new Date()),s=schedNow(),L=schedList(k);
+  let h=backTop('جدول اليوم','برنامج الخروج')+`<section class="card"><div class="fld"><span class="lb">يظهر فوق في يومك</span><div class="seg">${[['1','يظهر'],['0','مخفي']].map(([v,l])=>`<button data-act="sc-on" data-v="${v}" aria-pressed="${db.sched.on===(v==='1')}">${l}</button>`).join('')}</div></div>
+   <p class="lead">كل عمل مربوط بصلاة، فوقته بيتحرك معاها كل يوم. اضغط على أي عمل تغيّر وقته ومدته وتفاصيله.</p></section>`;
+  h+=`<div class="list">${L.map(it=>`<button class="row ${s&&s.cur&&s.cur.i===it.i?'cur':''}" data-act="sc-open" data-i="${it.i}"><span class="tmc"><b>${hm(it.start)}</b>${it.dur?`<span>${hm(it.start+it.dur)}</span>`:''}</span><span class="t"><b>${esc(it.name)}</b><span>${anchorText(it)}${it.link&&byId(it.link)?' · مربوط بـ'+esc(byId(it.link).name):''}</span></span>${s&&s.cur&&s.cur.i===it.i?'<span class="badge done">دلوقتي</span>':''}</button>`).join('')}</div>
+   <div class="row-in"><button class="btn" data-act="sc-add">+ أضف عمل</button><button class="btn ghost" data-act="sc-reset">${view.scReset?'متأكد؟':'رجّع الأصلي'}</button></div>`;return h}
+function openSchedItem(i){openSheet(()=>{const it=db.sched.items[i];if(!it){closeSheet();return {head:'',body:''}}const P=timesFor(keyOf(new Date())),st=schedStart(it,P),lk=it.link&&byId(it.link);
+  return {head:`<span class="eyebrow">جدول اليوم · النهارده ${hm(st)}</span><h2 class="title">${esc(it.name)}</h2>`,
+   body:`<div class="fld"><span class="lb">الاسم</span><input class="inp" data-act="sc-name" data-i="${i}" value="${esc(it.name)}"></div>
+    <div class="fld"><span class="lb">مربوط بـ</span><select class="inp" data-act="sc-anchor" data-i="${i}">${ANCH.map(([v,l])=>`<option value="${v}"${it.anchor===v?' selected':''}>${l}</option>`).join('')}</select></div>
+    ${it.anchor==='clock'?`<div class="fld"><span class="lb">الوقت</span><input class="inp" type="time" data-act="sc-time" data-i="${i}" value="${pad(Math.floor(it.off/60))}:${pad(it.off%60)}"></div>`
+     :`<div class="fld"><span class="lb">${it.off<0?'قبل':'بعد'} ${an(it.anchor)} بكام دقيقة</span><div class="stepper"><button class="sb" data-act="sc-inc" data-i="${i}" data-n="-5">−</button><input type="number" inputmode="numeric" data-act="sc-off" data-i="${i}" value="${it.off}"><button class="sb" data-act="sc-inc" data-i="${i}" data-n="5">+</button></div><span class="small muted">بالسالب يعني قبل الصلاة.</span></div>`}
+    <div class="fld"><span class="lb">المدة بالدقايق</span><input class="inp" type="number" inputmode="numeric" data-act="sc-dur" data-i="${i}" value="${it.dur||''}" placeholder="لحد العمل اللي بعده"></div>
+    <div class="fld"><span class="lb">مربوط بعمل في يومك</span><select class="inp" data-act="sc-link" data-i="${i}"><option value="">مفيش</option>${db.deeds.map(d=>`<option value="${d.id}"${it.link===d.id?' selected':''}>${esc(d.name)}</option>`).join('')}</select><span class="small muted">لو ربطته، تقدر تسجّل العمل من الجدول على طول.</span></div>
+    ${lk?`<button class="btn ghost" data-act="sc-deed" data-v="${it.link}">سجّل ${esc(lk.name)}</button>`:''}`,
+   foot:`<button class="btn danger" data-act="sc-del" data-i="${i}">امسح</button><button class="btn" data-act="close-sheet">تمام</button>`}})}
+
+/* ---------- cloud sync (Supabase) ---------- */
+let auth=null;try{auth=JSON.parse(localStorage.getItem(AK)||'null')}catch(e){}
+const sync={state:'idle',msg:'',busy:false};
+const saveAuth=()=>{try{auth?localStorage.setItem(AK,JSON.stringify(auth)):localStorage.removeItem(AK)}catch(e){}};
+const errAr=m=>/Invalid login/i.test(m)?'الإيميل أو الباسورد غلط.':/not confirmed/i.test(m)?'لسه ما أكّدتش الإيميل. افتح الإيميل اللي وصلك واضغط على اللينك، وبعدين ارجع اضغط دخول.':/already registered/i.test(m)?'الإيميل ده عنده حساب. اضغط "دخول".':/rate limit|too many/i.test(m)?'محاولات كتير. استنى شوية وجرّب تاني.':/password/i.test(m)?'الباسورد لازم ٦ حروف على الأقل.':/fetch|network/i.test(m)?'مفيش نت دلوقتي.':'حصلت مشكلة: '+m;
+async function sbAuth(path,body){const r=await fetch(SB+'/auth/v1/'+path,{method:'POST',headers:{apikey:SBK,'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(j.msg||j.error_description||j.message||('HTTP '+r.status)),{status:r.status});return j}
+function setSession(j){auth={at:j.access_token,rt:j.refresh_token,exp:Date.now()+((j.expires_in||3600)-60)*1000,email:(j.user&&j.user.email)||(auth&&auth.email),uid:(j.user&&j.user.id)||(auth&&auth.uid)};saveAuth()}
+async function token(){if(Date.now()<auth.exp)return auth.at;try{setSession(await sbAuth('token?grant_type=refresh_token',{refresh_token:auth.rt}))}catch(e){if(e.status===400||e.status===401){auth=null;saveAuth();sync.msg='انتهت الجلسة. ادخل تاني.'}throw e}return auth.at}
+async function rest(path,opt={}){const tk=await token();const r=await fetch(SB+'/rest/v1/'+path,{...opt,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json',...(opt.headers||{})}});
+  if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||('HTTP '+r.status))}return r.status===204||r.status===201?null:r.json().catch(()=>null)}
+function mergeDB(a,b){const m=cp(a),ua=(x=[],y=[])=>{const ids=new Set(x.map(o=>o&&o.id));return x.concat((y||[]).filter(o=>o&&!ids.has(o.id)))};
+  ['notes','p40','journeys','people','duas','faults','deeds'].forEach(k=>m[k]=ua(a[k],b[k]));
+  m.gsecs=ua(a.gsecs,b.gsecs).map(s=>{const o=(b.gsecs||[]).find(x=>x.id===s.id);return o?{...s,items:ua(s.items,o.items)}:s});
+  for(const t2 in b.goals||{})m.goals[t2]=ua((a.goals||{})[t2],b.goals[t2]);
+  for(const k in b.plans||{})m.plans[k]=ua((a.plans||{})[k],b.plans[k]);
+  for(const k in b.reviews||{})m.reviews[k]={...b.reviews[k],...((a.reviews||{})[k]||{})};
+  for(const k in b.logs||{}){const la=m.logs[k]||(m.logs[k]={}),lb=b.logs[k];for(const id in lb){if(!la[id]||JSON.stringify(lb[id]).length>JSON.stringify(la[id]).length)la[id]=lb[id]}}
+  normNotes(m);return m}
+const cloudState=()=>!auth?['miss','مش محفوظ أونلاين']:sync.busy?['','بيحفظ…']:!navigator.onLine?['part','من غير نت']:sync.state==='error'?['miss','مشكلة في الحفظ']:db.meta.dirty?['part','لسه ما اتحفظش']:['done','✓ محفوظ'];
+const cloudChip=()=>{const [c,l]=cloudState();return `<span class="badge ${c}" data-cloud>${l}</span>`};
+function paintCloud(){document.querySelectorAll('[data-cloud]').forEach(el=>el.outerHTML=cloudChip())}
+function timeAgo(iso){const m=Math.round((Date.now()-Date.parse(iso))/60000);return m<1?'من شوية':m<60?`من ${num(m)} دقيقة`:m<1440?`من ${num(Math.round(m/60))} ساعة`:fmt(keyOf(new Date(iso)),{day:'numeric',month:'long'})}
+async function syncNow(){if(!auth||sync.busy)return paintCloud();if(!navigator.onLine){sync.state='offline';return paintCloud()}
+  sync.busy=true;paintCloud();
+  try{const rows=await rest(`user_data?select=data,updated_at&user_id=eq.${auth.uid}`),r=rows&&rows[0],lastT=Date.parse(db.meta.syncedAt||0)||0;
+    if(r&&Date.parse(r.updated_at)>lastT){const rem=migrate(r.data);
+      if(db.meta.dirty||!lastT){db=mergeDB(db,rem);db.meta.dirty=true}else{db=rem;db.meta={...db.meta,dirty:false,syncedAt:r.updated_at}}
+      saveLocal();if(sheetEl)paintSheet();else render()}
+    if(!r||db.meta.dirty){const ed=db.meta.editAt,now=new Date().toISOString();
+      await rest('user_data?on_conflict=user_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:auth.uid,data:db,updated_at:now,device:navigator.userAgent.slice(0,90)})});
+      db.meta.syncedAt=now;if(db.meta.editAt===ed)db.meta.dirty=false;
+      if(!db.meta.snapAt||Date.now()-db.meta.snapAt>30*60e3){await rest('snapshots?on_conflict=user_id,day',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:auth.uid,day:dayKey(),data:db})});db.meta.snapAt=Date.now()}
+      saveLocal()}
+    sync.state='ok';sync.msg=''}
+  catch(e){sync.state='error';if(!sync.msg)sync.msg=errAr(e.message)}
+  sync.busy=false;paintCloud();if(view.sub==='settings'&&!sheetEl&&!document.activeElement.matches('input,textarea'))render()}
+async function doLogin(signup){const email=$('#acc-email').value.trim(),password=$('#acc-pass').value;if(!email||password.length<6){toast('اكتب الإيميل وباسورد ٦ حروف على الأقل');return}
+  sync.msg='';toast(signup?'بنعمل الحساب…':'بندخّلك…');
+  try{const j=await sbAuth(signup?'signup':'token?grant_type=password',{email,password});
+    if(j.access_token){setSession(j);db.meta.syncedAt=null;toast('أهلًا بيك. بنحفظ بياناتك…');await syncNow();toast('بياناتك اتحفظت أونلاين ✓')}
+    else sync.msg=`بعتنالك إيميل تأكيد على ${email}. افتحه واضغط على اللينك (لو فتح صفحة مش شغالة تجاهلها)، وبعدين ارجع هنا واضغط "دخول".`}
+  catch(e){sync.msg=errAr(e.message)}render()}
+function accountCard(){if(!auth)return `<section class="card"><h2>احفظ بياناتك أونلاين</h2><p class="lead">بياناتك دلوقتي على الموبايل ده بس. سجّل بإيميلك، وكل حاجة هتتحفظ أونلاين لوحدها، وتلاقيها من أي موبايل. ومن غير نت بيفضل شغال عادي، وأول ما النت يرجع بيحفظ.</p>
+   <input class="inp" type="email" id="acc-email" placeholder="الإيميل" autocomplete="email" dir="ltr"><input class="inp" type="password" id="acc-pass" placeholder="الباسورد (٦ حروف على الأقل)" autocomplete="current-password" dir="ltr">
+   ${sync.msg?`<div class="notice"><span>${esc(sync.msg)}</span></div>`:''}<div class="row-in"><button class="btn" data-act="acc-login">دخول</button><button class="btn ghost" data-act="acc-signup">حساب جديد</button></div></section>`;
+  return `<section class="card"><div class="ch"><h2>الحفظ أونلاين</h2>${cloudChip()}</div><p class="lead"><bdi dir="ltr">${esc(auth.email||'')}</bdi>${db.meta.syncedAt?` · آخر حفظ ${timeAgo(db.meta.syncedAt)}`:''}</p>
+   <p class="small muted">بيتحفظ لوحده بعد كل تسجيل، وبيتعمل نسخة كاملة من يومك كل نص ساعة.</p>${sync.msg?`<div class="notice"><span>${esc(sync.msg)}</span></div>`:''}
+   <div class="row-in"><button class="btn" data-act="acc-sync">احفظ دلوقتي</button><button class="btn ghost" data-act="acc-logout">${view.logoutAsk?'متأكد؟':'خروج من الحساب'}</button></div></section>`}
+function useLocation(){if(!navigator.geolocation){toast('الموقع مش متاح هنا');return}toast('بنجيب موقعك…');
+  navigator.geolocation.getCurrentPosition(p=>{db.settings.loc={lat:+p.coords.latitude.toFixed(4),lng:+p.coords.longitude.toFixed(4),at:dayKey()};db.settings.useLoc=true;save();render();toast('المواقيت بقت على موقعك ✓')},
+   ()=>toast('مقدرناش نجيب الموقع. اسمح بالموقع من إعدادات الموبايل'),{timeout:15000,maximumAge:3600e3})}
 
 /* ---------- zad ---------- */
 function renderZad(){const z=view.zad;let h=top('زادي',{goals:'أهدافي',duas:'أدعيتي',faults:'مرآة العيوب'}[z],gearBtn)+`<div class="seg-tabs">${[['goals','أهدافي'],['duas','أدعيتي'],['faults','مرآة العيوب']].map(([v,t])=>`<button data-act="zad" data-v="${v}" aria-pressed="${z===v}">${t}</button>`).join('')}</div>`;
@@ -635,11 +781,16 @@ function openFault(id){openSheet(()=>{const f=db.faults.find(x=>x.id===id);if(!f
 
 /* ---------- settings & customize ---------- */
 function renderSettings(){const s=db.settings;
-  return backTop('الإعدادات','وقفة','back')+`<button class="card journey" data-act="go" data-v="custom" style="text-align:start"><span class="ic">${ico('gear')}</span><span class="t"><b>تخصيص الأعمال والأسئلة</b><span class="small muted">ضيف وامسح وعدّل أي عمل أو سؤال أو اختيار</span></span>${ico('fwd')}</button>
-  <section class="card"><h2>المواقيت</h2><div class="fld"><span class="lb">المحافظة</span><select class="inp" data-act="city">${CITIES.map(c=>`<option value="${c[0]}"${c[0]===s.city?' selected':''}>${c[1]}</option>`).join('')}</select></div>
+  return backTop('الإعدادات','وقفة','back')+accountCard()+`
+  <button class="card journey" data-act="go" data-v="sched" style="text-align:start"><span class="ic">${ico('salah')}</span><span class="t"><b>جدول اليوم</b><span class="small muted">برنامج الخروج ومواعيده، والعمل الجاي</span></span>${ico('fwd')}</button>
+  <button class="card journey" data-act="go" data-v="custom" style="text-align:start"><span class="ic">${ico('gear')}</span><span class="t"><b>تخصيص الأعمال والأسئلة</b><span class="small muted">ضيف وامسح وعدّل أي عمل أو سؤال أو اختيار</span></span>${ico('fwd')}</button>
+  <section class="card"><h2>مواقيت الصلاة</h2><p class="lead">بتتحسب لوحدها كل يوم على الموبايل من غير نت، بطريقة الهيئة المصرية العامة للمساحة.</p>
+   <div class="seg">${[['0','محافظة'],['1','موقعي بالظبط']].map(([v,l])=>`<button data-act="loc-mode" data-v="${v}" aria-pressed="${!!s.useLoc===(v==='1')}">${l}</button>`).join('')}</div>
+   ${s.useLoc?`<p class="small muted">${s.loc?`آخر تحديث للموقع: ${fmt(s.loc.at,{day:'numeric',month:'long'})}. لما تنتقل لمكان جديد اضغط "حدّث موقعي".`:'لسه ما جبناش موقعك.'}</p><button class="btn ghost" data-act="loc-use">حدّث موقعي</button>`
+    :`<select class="inp" data-act="city">${CITIES.map(c=>`<option value="${c[0]}"${c[0]===s.city?' selected':''}>${c[1]}</option>`).join('')}</select>`}
    <div class="fld"><span class="lb">بداية اليوم الجديد</span><input class="inp" type="time" value="${s.dayStart}" data-act="daystart"><span class="small muted">قيام الليل بعد نص الليل يتحسب لليلة نفسها. خليها قبل الفجر بشوية.</span></div></section>
-  <section class="card"><h2>النسخة الاحتياطية</h2><p class="lead">كل بياناتك على الموبايل ده بس. ابعت نسخة لنفسك كل أسبوع.${s.lastBackup?` آخر نسخة: ${fmt(s.lastBackup,{day:'numeric',month:'long'})}.`:''}</p>
-   <div class="row-in"><button class="btn" data-act="backup">ابعت النسخة</button><button class="btn ghost" data-act="copy">انسخها</button></div>
+  <section class="card"><h2>نسخة احتياطية يدوية</h2><p class="lead">احتياطي زيادة: تبعت نسخة لنفسك واتساب، أو ترجّع نسخة.</p>
+   <div class="row-in"><button class="btn ghost" data-act="backup">ابعت النسخة</button><button class="btn ghost" data-act="copy">انسخها</button></div>
    <textarea class="inp" id="importBox" placeholder="الصق نسخة احتياطية أو نص استيراد"></textarea><button class="btn ghost" data-act="import">استرجع أو استورد</button></section>
   <p class="ayah">﴿بَلِ الْإِنسَانُ عَلَىٰ نَفْسِهِ بَصِيرَةٌ﴾</p>`}
 function renderCustom(){return backTop('تخصيص الأعمال','الإعدادات','go-settings')+`<p class="lead">اختار القسم، وبعدين العمل، وعدّل أسئلته واختياراته. أي تغيير بيظهر في يومك على طول.</p><div class="list">${CATS.map(([id,n])=>`<button class="row" data-act="cat" data-v="${id}"><span class="ic">${ico(id)}</span><span class="t"><b>${n}</b><span>${num(db.deeds.filter(d=>d.cat===id).length)} عمل</span></span>${ico('fwd')}</button>`).join('')}</div>`}
@@ -662,19 +813,19 @@ function openDeedEditor(id){openSheet(()=>{const d=byId(id);if(!d){closeSheet();
    foot:`<button class="btn danger" data-act="d-del" data-id="${d.id}">امسح العمل</button><button class="btn" data-act="close-sheet">تمام</button>`}})}
 
 /* ---------- quick add ---------- */
-function openQuick(){view.qk=view.qk||'note';openSheet(()=>({head:`<span class="eyebrow">إضافة سريعة</span><h2 class="title">اكتب اللي في بالك</h2>`,
+function openQuickOld(){view.qk=view.qk||'note';openSheet(()=>({head:`<span class="eyebrow">إضافة سريعة</span><h2 class="title">اكتب اللي في بالك</h2>`,
   body:`<div class="seg">${[['note','نقطة في طلعت بإيه'],['plan','خطوة في خطة النهارده']].map(([v,t])=>`<button data-act="qk" data-v="${v}" aria-pressed="${view.qk===v}">${t}</button>`).join('')}</div><textarea class="inp" id="qText" placeholder="${view.qk==='note'?'النقطة أو الرسالة':'الخطوة'}" style="min-height:120px"></textarea>`,
   foot:`<button class="btn ghost" data-act="close-sheet">إلغاء</button><button class="btn" data-act="qk-save">احفظ</button>`}));setTimeout(()=>{const t=$('#qText');t&&t.focus()},300)}
 
 /* ================= import / backup ================= */
 const curMosque=()=>{const j=activeJ(),m=j&&(j.mosques||[]).slice(-1)[0];return m?m.name:''};
-const addNote=(text,tag)=>db.notes.push({id:uid('n'),k:dayKey(),text,tag,mosque:curMosque()});
+const addNote=(text,tag)=>db.notes.push({id:uid('n'),k:dayKey(),text,src:'',topics:tag?[tag]:[],mosque:curMosque()});
 function doImport(txt){const d=JSON.parse(txt);
-  if(d.waqfaImport){(d.notes||[]).forEach(n=>{if(!db.notes.some(x=>x.text===n.text))db.notes.push({id:uid('n'),k:n.k||dayKey(),text:n.text,tag:n.tag||NTAGS[0],mosque:''})});
+  if(d.waqfaImport){(d.notes||[]).forEach(n=>{if(!db.notes.some(x=>x.text===n.text))db.notes.push({id:uid('n'),k:n.k||dayKey(),text:n.text,tag:n.tag||'',mosque:''})});
     (d.faults||[]).forEach(f=>{const ex=db.faults.find(x=>x.name===f.name);const o=ex||{id:uid('flt'),g:f.g||'other',name:f.name,on:true,detail:'',hist:[]};if(f.detail)o.detail=f.detail;if(f.pct!=null)o.hist.push([dayKey(),f.pct]);if(!ex)db.faults.push(o)});
     (d.duas||[]).forEach(t=>{if(!db.duas.some(x=>x.text===t))db.duas.push({id:uid('dua'),text:t,k:'mine'})});
     (d.gsecs||[]).forEach(s=>{if(!db.gsecs.some(x=>x.name===s.name))db.gsecs.push({id:uid('s'),name:s.name,items:s.items.map(t=>({id:uid('g'),text:t,done:false}))})});
-    (d.p40||[]).forEach(p=>{const t=p.text||p;if(!db.p40.some(x=>x.text===t))db.p40.push({id:uid('p40'),text:t,link:p.link||null})});return 'اتضافت بياناتك'}
+    (d.p40||[]).forEach(p=>{const t=p.text||p;if(!db.p40.some(x=>x.text===t))db.p40.push({id:uid('p40'),text:t,link:p.link||null})});normNotes(db);return 'اتضافت بياناتك'}
   const d2=migrate(d);if(!d2.deeds)throw 0;db=d2;return 'اترجعت النسخة'}
 const markBackup=()=>{db.settings.lastBackup=dayKey();save();render()};
 function copyText(t){try{navigator.clipboard.writeText(t).then(()=>{toast('اتنسخت. الصقها في الواتساب أو الملاحظات');markBackup()},()=>toast('النسخ مش متاح هنا'))}catch(e){toast('النسخ مش متاح هنا')}}
@@ -697,7 +848,41 @@ document.addEventListener('click',ev=>{
     return upd()}
   if(a==='open')return openDeed(id);
   if(a==='close-sheet')return closeSheet();
-  if(a==='quick')return openQuick();
+  if(a==='quick')return openNote(null,true);
+  /* notes */
+  if(a==='note-new')return openNote(null);
+  if(a==='note-open')return openNote(id);
+  if(a==='nd-mode'){view.nd.mode=v;return paintSheet()}
+  if(a==='nd-src'){view.nd.src=view.nd.src===v?'':v;return paintSheet()}
+  if(a==='nd-top'){toggle(view.nd.topics,v);return paintSheet()}
+  if(a==='nd-star'){view.nd.star=!view.nd.star;return paintSheet()}
+  if(a==='nd-save'){const s=view.nd,txt=(s.text||'').trim();if(!txt){toast('اكتب الأول');return}
+    if(s.mode==='plan'){plan(dayKey()).push({id:uid('p'),t:txt,done:false});save();closeSheet();toast('اتضافت لخطة النهارده');return}
+    const o={text:txt,src:s.src,topics:s.topics,by:(s.by||'').trim(),star:s.star};if(s.id)Object.assign(db.notes.find(x=>x.id===s.id),o);else db.notes.push({id:uid('n'),k:dayKey(),mosque:curMosque(),...o});
+    save();closeSheet();toast(s.id?'اتحفظت':'اتحفظت الفائدة ✓');return}
+  if(a==='nd-del'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟';return}db.notes=db.notes.filter(x=>x.id!==view.nd.id);save();closeSheet();return}
+  if(a==='nd-plan'){plan(shift(dayKey(),1)).push({id:uid('p'),t:(view.nd.text||'').trim(),done:false});save();toast('اتضافت لخطة بكرة');return}
+  if(a==='nview'){view.nview=v;return render()}
+  if(a==='ncfg')return openNoteCfg();
+  if(a==='cfg-back'){const n=view.nd;openNote(n.id||null,n.quick);Object.assign(view.nd,n);return paintSheet()}
+  if(a==='cfg-add'){const inp=$('#cfg-'+v),val=inp.value.trim();if(!val)return;if(!db.noteCfg[v].includes(val))db.noteCfg[v].push(val);save();return paintSheet()}
+  if(a==='cfg-del'){db.noteCfg[v].splice(Number(b.dataset.i),1);save();return paintSheet()}
+  if(a==='fseed'){view.fseed=(view.fseed||0)+1;return render()}
+  /* account & location */
+  if(a==='acc-login')return doLogin(false);
+  if(a==='acc-signup')return doLogin(true);
+  if(a==='acc-sync'){sync.msg='';return syncNow()}
+  if(a==='acc-logout'){if(!view.logoutAsk){view.logoutAsk=true;return render()}view.logoutAsk=false;auth=null;saveAuth();sync.msg='';render();toast('خرجت من الحساب. بياناتك لسه على الموبايل.');return}
+  if(a==='loc-use')return useLocation();
+  if(a==='loc-mode'){if(v==='1'){if(db.settings.loc){db.settings.useLoc=true;save();return render()}return useLocation()}db.settings.useLoc=false;save();return render()}
+  /* schedule */
+  if(a==='sc-open')return openSchedItem(Number(b.dataset.i));
+  if(a==='sc-on'){db.sched.on=v==='1';save();return render()}
+  if(a==='sc-add'){const P=timesFor(keyOf(new Date())),n=new Date(),m=n.getHours()*60+n.getMinutes();db.sched.items.push({id:uid('s'),name:'عمل جديد',anchor:'clock',off:Math.ceil(m/15)*15%1440,dur:30,link:''});save();render();return openSchedItem(db.sched.items.length-1)}
+  if(a==='sc-del'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟';return}db.sched.items.splice(Number(b.dataset.i),1);save();closeSheet();return}
+  if(a==='sc-reset'){if(!view.scReset){view.scReset=true;return render()}view.scReset=false;db.sched.items=defSched();save();render();toast('رجع الجدول الأصلي');return}
+  if(a==='sc-inc'){const it=db.sched.items[Number(b.dataset.i)];it.off+=Number(b.dataset.n);save();return paintSheet()}
+  if(a==='sc-deed'){closeSheet(true);return openDeed(v,dayKey())}
   if(a==='qk'){view.qk=v;const t=$('#qText').value;paintSheet();$('#qText').value=t;return}
   if(a==='qk-save'){const t=$('#qText').value.trim();if(!t){toast('اكتب الأول');return}if(view.qk==='note')addNote(t,NTAGS[0]);else plan(dayKey()).push({id:uid('p'),t,done:false});save();closeSheet();toast('اتحفظ');return}
   /* plans */
@@ -783,6 +968,13 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
     if(a==='numin')e.a[fid]=Math.max(0,Number(v||0));if(a==='text')e.a[fid]=v.trim();if(a==='cmt')(e.c||(e.c={}))[fid]=v.trim();
     if(a==='cnt'||a==='fcnt')(e.a[fid]||(e.a[fid]={}))[el.dataset.k]=Math.max(0,Number(v||0));
     save();if(a!=='text'&&a!=='cmt')upd();return}
+  const SI=el.dataset.i!=null?db.sched.items[Number(el.dataset.i)]:null;
+  if(SI&&a.startsWith('sc-')){const P=timesFor(keyOf(new Date()));
+    if(a==='sc-name')SI.name=v.trim()||SI.name;
+    if(a==='sc-anchor'){const st=schedStart(SI,P);SI.anchor=v;SI.off=v==='clock'?((st%1440)+1440)%1440:Math.round(st-P[v])}
+    if(a==='sc-time'){const [hh,mm]=v.split(':').map(Number);if(!isNaN(hh))SI.off=hh*60+mm}
+    if(a==='sc-off')SI.off=Number(v||0);if(a==='sc-dur')SI.dur=Math.max(0,Number(v||0));if(a==='sc-link')SI.link=v;
+    save();paintSheet();return}
   if(a==='rv'){(db.reviews[view.day]||(db.reviews[view.day]={}))[el.dataset.f]=v.trim();save();return}
   const F=d&&el.dataset.s?secArr(d,el.dataset.s).find(f=>f.id===fid):null;
   if(a==='fl-label'&&F){F.label=v.trim()||F.label;return upd()}
@@ -801,12 +993,16 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   if(a==='shura'){const sh=shuraOf(j,view.day),[g,ff]=el.dataset.path.split('.');(sh[g]||(sh[g]={}))[ff]=v.trim();save();return}
   if(a==='assign'){const sh=shuraOf(j,view.day),x=sh.assign[el.dataset.v]||(sh.assign[el.dataset.v]={});x.who=v.trim();save();return}
 });
-document.addEventListener('input',ev=>{if(ev.target.dataset.act==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}});
+document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='nd-text'&&view.nd)view.nd.text=ev.target.value;if(a==='nd-by'&&view.nd)view.nd.by=ev.target.value});
 document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id&&ev.target.id.startsWith('pl-')){ev.preventDefault();const b=document.querySelector(`[data-act="pl-add"][data-k="${ev.target.id.slice(3)}"]`);b&&b.click()}});
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 let lastTouch=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouch<300&&!e.target.closest('input,textarea,select'))e.preventDefault();lastTouch=n},{passive:false});
+window.addEventListener('online',syncNow);window.addEventListener('offline',paintCloud);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncNow()});
+setInterval(()=>{if(auth&&db.meta.dirty)syncNow()},120000);
 setInterval(()=>{if(view.tab==='today'&&!view.sub&&!sheetEl&&!document.activeElement.matches('input,textarea,select')){const k=dayKey();if(view.day!==k&&view.day===shift(k,-1))view.day=k;render()}},60000);
 render();
+if(auth)syncNow();
 })();
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}</script>
