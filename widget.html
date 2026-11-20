@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>ويدجت وقفة</title>
+<meta name="theme-color" content="#faf8f2">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap">
+<style>
+:root{--ink:#1b1b1b;--cream:#faf8f2;--fog:#edf1e7;--white:#fffdf7;--forest:#1c9151;--forest-deep:#0a4f2c;--lime:#d3ecdc;--line:#dde2d6;--muted:#5a675e;--neon:#7fdca6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;line-height:1.75;padding:env(safe-area-inset-top,0) 16px 40px}
+main{max-width:560px;margin:0 auto;padding-top:28px;display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-size:13px;font-weight:600;color:var(--muted)}
+h1{font-size:30px;margin:0;line-height:1.3}
+p{margin:0}.lead{color:var(--muted);font-size:15px}
+.preview{background:var(--ink);color:#fff;border-radius:24px;padding:18px;display:flex;justify-content:space-between;gap:12px}
+.preview span{display:block;font-size:11px;color:rgba(255,255,255,.55)}.preview b{font-size:18px}.preview i{font-style:normal;color:var(--neon);font-weight:600;font-size:14px}
+ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;counter-reset:s}
+li{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:16px 16px 16px 16px;display:flex;gap:14px;counter-increment:s}
+li::before{content:counter(s);flex:0 0 30px;height:30px;border-radius:50%;background:var(--lime);color:var(--forest-deep);font-weight:700;display:grid;place-items:center}
+li div{display:flex;flex-direction:column;gap:8px;min-width:0}
+li b{font-size:16px}
+.btn{display:block;text-align:center;border:0;border-radius:999px;background:var(--forest);color:#fff;font:inherit;font-weight:600;font-size:15px;padding:12px 20px;text-decoration:none}
+.btn.ghost{background:var(--white);color:var(--ink);border:1px solid var(--line)}
+.ok{background:var(--lime);color:var(--forest-deep);border-radius:14px;padding:10px 14px;font-size:14px;font-weight:600}
+textarea{width:100%;height:120px;border:1px solid var(--line);border-radius:14px;padding:10px;font-size:12px;direction:ltr}
+.note{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+  <a class="btn ghost" href="./" style="align-self:flex-start;padding:8px 16px">→ رجوع لوقفة</a>
+  <span class="eyebrow">وقفة</span>
+  <h1>ويدجت للشاشة الرئيسية</h1>
+  <p class="lead">الصلاة الجاية بعدّاد شغال، ودلوقتي إيه، والعمل الجاي من جدولك. وأي تعديل في جدولك جوه وقفة بيظهر فيها لوحده.</p>
+  <div class="preview"><div><span>العمل الجاي</span><b>حياة الصحابة</b><i>1:42:10</i></div><div style="text-align:left"><span>الصلاة الجاية</span><b>المغرب 4:57</b><i>0:38:05</i></div></div>
+  <ol>
+    <li><div><b>نزّل تطبيق Scriptable</b><p class="note">مجاني من App Store، وهو اللي بيشغّل الويدجت.</p><a class="btn ghost" href="https://apps.apple.com/app/scriptable/id1405459188">افتح Scriptable في App Store</a></div></li>
+    <li><div><b>انسخ كود الويدجت</b><button class="btn" id="copy">انسخ الكود</button><p class="ok" id="done" hidden>اتنسخ ✓ روح للخطوة الجاية</p><textarea id="box" hidden readonly></textarea></div></li>
+    <li><div><b>الصقه في Scriptable</b><p class="note">افتح Scriptable، واضغط <b>+</b> فوق، والصق الكود. اضغط على العنوان فوق وسمّيه <b>وقفة</b>، وبعدين اضغط <b>Done</b>.</p></div></li>
+    <li><div><b>شغّله مرة وسجّل دخول</b><p class="note">اضغط على سكريبت "وقفة" عشان يشتغل، واكتب نفس الإيميل والباسورد بتوع حسابك في وقفة. هيوريك شكل الويدجت.</p></div></li>
+    <li><div><b>حطّه على الشاشة الرئيسية</b><p class="note">اضغط مطوّل على مكان فاضي في الشاشة الرئيسية، وبعدين <b>+</b> فوق، واختار <b>Scriptable</b>، واختار الحجم <b>المتوسط</b>، واضغط <b>Add Widget</b>.</p>
+      <p class="note">بعدين اضغط على الويدجت وهي بتتهز، وفي <b>Script</b> اختار <b>وقفة</b>.</p></div></li>
+  </ol>
+  <p class="note">الآيفون بيحدّث الويدجت كل ربع ساعة تقريبًا، بس العدّاد بيعدّ لوحده كل ثانية. وفي حجم صغير وحجم كبير كمان: الكبير بيعرض الخمس أعمال الجاية من جدولك.</p>
+</main>
+<script>
+let code='';fetch('widget.js',{cache:'no-store'}).then(r=>r.text()).then(t=>code=t).catch(()=>{});
+document.getElementById('copy').addEventListener('click',async()=>{
+  if(!code){try{code=await (await fetch('widget.js',{cache:'no-store'})).text()}catch(e){}}
+  try{await navigator.clipboard.writeText(code);document.getElementById('done').hidden=false}
+  catch(e){const b=document.getElementById('box');b.hidden=false;b.value=code;b.focus();b.select();document.getElementById('done').hidden=false;document.getElementById('done').textContent='حدّد الكود اللي في الخانة وانسخه'}});
+</script>
+</body>
+</html>

@@ -798,6 +798,7 @@ function openFault(id){openSheet(()=>{const f=db.faults.find(x=>x.id===id);if(!f
 function renderSettings(){const s=db.settings;
   return backTop('الإعدادات','وقفة','back')+accountCard()+`
   <button class="card journey" data-act="go" data-v="sched" style="text-align:start"><span class="ic">${ico('salah')}</span><span class="t"><b>جدول اليوم</b><span class="small muted">برنامج الخروج ومواعيده، والعمل الجاي</span></span>${ico('fwd')}</button>
+  <a class="card journey" href="widget.html" style="text-align:start;color:inherit;text-decoration:none"><span class="ic">${ico('map')}</span><span class="t"><b>ويدجت للشاشة الرئيسية</b><span class="small muted">الصلاة الجاية والعمل الجاي على شاشة الآيفون</span></span>${ico('fwd')}</a>
   <button class="card journey" data-act="go" data-v="custom" style="text-align:start"><span class="ic">${ico('gear')}</span><span class="t"><b>تخصيص الأعمال والأسئلة</b><span class="small muted">ضيف وامسح وعدّل أي عمل أو سؤال أو اختيار</span></span>${ico('fwd')}</button>
   <section class="card"><h2>مواقيت الصلاة</h2><p class="lead">بتتحسب لوحدها كل يوم على الموبايل من غير نت، بطريقة الهيئة المصرية العامة للمساحة.</p>
    <div class="seg">${[['0','محافظة'],['1','موقعي بالظبط']].map(([v,l])=>`<button data-act="loc-mode" data-v="${v}" aria-pressed="${!!s.useLoc===(v==='1')}">${l}</button>`).join('')}</div>
