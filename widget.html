@@ -49,7 +49,7 @@ textarea{width:100%;height:120px;border:1px solid var(--line);border-radius:14px
     <div class="ft">المواقيت على موقعك</div></div>
   <ol>
     <li><div><b>نزّل تطبيق Scriptable</b><p class="note">مجاني من App Store، وهو اللي بيشغّل الويدجت.</p><a class="btn ghost" href="https://apps.apple.com/app/scriptable/id1405459188">افتح Scriptable في App Store</a></div></li>
-    <li><div><b>انسخ كود الويدجت</b><button class="btn" id="copy">انسخ الكود</button><p class="ok" id="done" hidden>اتنسخ ✓ روح للخطوة الجاية</p><textarea id="box" hidden readonly></textarea></div></li>
+    <li><div><b>انسخ كود الويدجت</b><button class="btn" id="copy">انسخ الكود</button><p class="note" id="ver">بنجيب الكود…</p><p class="ok" id="done" hidden>اتنسخ ✓ روح للخطوة الجاية</p><textarea id="box" hidden readonly></textarea></div></li>
     <li><div><b>الصقه في Scriptable</b><p class="note">افتح Scriptable، واضغط <b>+</b> فوق، والصق الكود. اضغط على العنوان فوق وسمّيه <b>وقفة</b>، وبعدين اضغط <b>Done</b>.</p></div></li>
     <li><div><b>شغّله مرة وسجّل دخول</b><p class="note">اضغط على سكريبت "وقفة" عشان يشتغل، واكتب نفس الإيميل والباسورد بتوع حسابك في وقفة. هيوريك شكل الويدجت.</p></div></li>
     <li><div><b>حطّه على الشاشة الرئيسية</b><p class="note">اضغط مطوّل على مكان فاضي في الشاشة الرئيسية، وبعدين <b>+</b> فوق، واختار <b>Scriptable</b>، واختار الحجم <b>المتوسط</b>، واضغط <b>Add Widget</b>.</p>
@@ -58,9 +58,9 @@ textarea{width:100%;height:120px;border:1px solid var(--line);border-radius:14px
   <p class="note"><b>لو الويدجت لسه بالشكل القديم:</b> الآيفون بيحدّثها على مزاجه. امسحها من الشاشة وضيفها تاني، وهتتحدث على طول.</p><p class="note">العدّاد بيعدّ لوحده كل ثانية. وفي حجم صغير وحجم كبير كمان: الكبير بيعرض الخمس أعمال الجاية من جدولك ومواقيت الخمس صلوات.</p>
 </main>
 <script>
-let code='';fetch('widget.js',{cache:'no-store'}).then(r=>r.text()).then(t=>code=t).catch(()=>{});
+let code='';const U=()=>'widget.js?v='+Date.now();fetch(U(),{cache:'no-store'}).then(r=>r.text()).then(t=>{code=t;const m=t.match(/const VER=(\d+);/);document.getElementById('ver').textContent=m?'نسخة الكود: '+m[1]:'نسخة الكود: قديمة، اقفل الصفحة وافتحها تاني بعد دقيقة'}).catch(()=>{});
 document.getElementById('copy').addEventListener('click',async()=>{
-  if(!code){try{code=await (await fetch('widget.js',{cache:'no-store'})).text()}catch(e){}}
+  if(!code){try{code=await (await fetch(U(),{cache:'no-store'})).text()}catch(e){}}
   try{await navigator.clipboard.writeText(code);document.getElementById('done').hidden=false}
   catch(e){const b=document.getElementById('box');b.hidden=false;b.value=code;b.focus();b.select();document.getElementById('done').hidden=false;document.getElementById('done').textContent='حدّد الكود اللي في الخانة وانسخه'}});
 </script>

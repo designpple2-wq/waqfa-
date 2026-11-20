@@ -1,5 +1,6 @@
 // وقفة · ويدجت الشاشة الرئيسية (Scriptable)
 // الصلاة الجاية، ودلوقتي إيه، والعمل الجاي من جدولك في وقفة.
+const VER=3; // رقم نسخة الويدجت
 const SB='https://wlkkleutxulpzuwtvhnn.supabase.co',SBK='sb_publishable_gEfJkkL5K55-rN22u0QxNQ_ZlIc5etZ';
 const C={ink:new Color('#1b1b1b'),neon:new Color('#7fdca6'),white:new Color('#ffffff'),dim:new Color('#ffffff',0.55),faint:new Color('#ffffff',0.08),forest:new Color('#1c9151')};
 const CITIES={cairo:['القاهرة',30.0444,31.2357],giza:['الجيزة',30.0131,31.2089],alex:['الإسكندرية',31.2001,29.9187],qalyubia:['القليوبية',30.466,31.1848],sharqia:['الشرقية',30.5877,31.502],
@@ -91,16 +92,16 @@ function build(c,family,msg){const w=new ListWidget();w.backgroundColor=C.ink;
 /* ---------- self-update ---------- */
 async function selfUpdate(force){try{const last=Keychain.contains(KC+'upd')?Number(Keychain.get(KC+'upd')):0;if(!force&&Date.now()-last<6*3600e3)return;
   const r=new Request('https://designpple2-wq.github.io/waqfa-/widget.js?t='+Date.now());const code=await r.loadString();Keychain.set(KC+'upd',String(Date.now()));
-  if(r.response.statusCode!==200||!code.includes('// وقفة · ويدجت'))return;const f=module.filename,m=f.includes('Mobile Documents')?FileManager.iCloud():FileManager.local();
+  const mv=code.match(/const VER=(\d+);/);if(r.response.statusCode!==200||!code.includes('// وقفة · ويدجت')||!mv||Number(mv[1])<=VER)return;const f=module.filename,m=f.includes('Mobile Documents')?FileManager.iCloud():FileManager.local();
   if(m.readString(f)!==code)m.writeString(f,code)}catch(e){}}
 /* ---------- run ---------- */
-async function setup(){const a=new Alert();a.title='وقفة';a.message='سجّل بنفس إيميل وباسورد حسابك في وقفة، عشان الويدجت تجيب جدولك.';
+async function setup(){const a=new Alert();a.title='وقفة · نسخة '+VER;a.message='سجّل بنفس إيميل وباسورد حسابك في وقفة، عشان الويدجت تجيب جدولك.';
   a.addTextField('الإيميل',Keychain.contains(KC+'email')?Keychain.get(KC+'email'):'');a.addSecureTextField('الباسورد','');a.addAction('دخول');a.addCancelAction('إلغاء');
   if(await a.presentAlert()===-1)return false;Keychain.set(KC+'email',a.textFieldValue(0).trim());Keychain.set(KC+'pass',a.textFieldValue(1));if(Keychain.contains(KC+'rt'))Keychain.remove(KC+'rt');
   try{await session();return true}catch(e){const x=new Alert();x.title='مقدرناش ندخل';x.message='اتأكد من الإيميل والباسورد، وجرّب تاني.';x.addAction('تمام');await x.presentAlert();return false}}
 if(config.runsInApp){
   if(!Keychain.contains(KC+'email')){if(!await setup()){Script.complete();return}}
-  else{const m=new Alert();m.title='وقفة';m.addAction('اعرض الويدجت');m.addAction('غيّر الحساب');m.addCancelAction('خروج');const i=await m.presentAlert();if(i===1)await setup();if(i===-1){Script.complete();return}}
+  else{const m=new Alert();m.title='وقفة · نسخة '+VER;m.addAction('اعرض الويدجت');m.addAction('غيّر الحساب');m.addCancelAction('خروج');const i=await m.presentAlert();if(i===1)await setup();if(i===-1){Script.complete();return}}
 }
 await selfUpdate(config.runsInApp);
 const data=await loadData();let wd;
