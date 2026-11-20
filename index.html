@@ -545,8 +545,9 @@ function openSheet(renderFn,opts={}){closeSheet(true);sheetRender=renderFn;const
   sh.addEventListener('touchmove',e=>{if(y0==null)return;const d=e.touches[0].clientY-y0,dx=Math.abs(e.touches[0].clientX-x0);if(!drag){if(d>8&&d>dx){drag=true;sh.style.transition='none'}else if(d<-4||dx>8){y0=null;return}else return}
     dy=Math.max(0,d);sh.style.transform=`translateY(${dy}px)`;s.style.background=`rgba(27,27,27,${Math.max(.05,.4-dy/900)})`;if(e.cancelable)e.preventDefault()},{passive:false});
   sh.addEventListener('touchend',()=>{if(!drag){y0=null;return}sh.style.transition='transform .25s var(--ease)';if(dy>110){sh.style.transform='translateY(100%)';setTimeout(()=>closeSheet(),180)}else{sh.style.transform='';s.style.background=''}y0=null;drag=false});document.body.classList.add('lock');sheetEl=s;paintSheet()}
+const fitTA=(root=document)=>root.querySelectorAll('textarea.inp').forEach(x=>{x.style.height='auto';x.style.height=(x.scrollHeight+2)+'px'});
 function paintSheet(keepScroll=true){if(!sheetEl)return;const r=sheetRender();const b=sheetEl.querySelector('.sh-b'),st=b.scrollTop;
-  sheetEl.querySelector('.hh').innerHTML=r.head;b.innerHTML=r.body;sheetEl.querySelector('.sh-f').innerHTML=r.foot||'<button class="btn" data-act="close-sheet">تمام</button>';if(keepScroll)b.scrollTop=st}
+  sheetEl.querySelector('.hh').innerHTML=r.head;b.innerHTML=r.body;sheetEl.querySelector('.sh-f').innerHTML=r.foot||'<button class="btn" data-act="close-sheet">تمام</button>';fitTA(b);if(keepScroll)b.scrollTop=st}
 function closeSheet(silent){if(sheetEl){sheetEl.remove();sheetEl=null;document.body.classList.remove('lock');if(!silent)render()}}
 function openDeed(id,k=view.day){const d=byId(id);if(!d)return;
   openSheet(()=>{const s=stOf(d,k);return {head:`<div class="ch"><span class="eyebrow">${esc((CATS.find(c=>c[0]===d.cat)||[])[1]||'')}${k!==dayKey()?' · '+fmt(k,{weekday:'long',day:'numeric',month:'long'}):''}</span>${badge(s)}</div><h2 class="title">${esc(dname(d,k))}</h2>`,body:deedBody(d,k)}})}
@@ -808,7 +809,7 @@ async function sendAI(payload,d,f,label){if(!auth){toast('سجّل دخول ال
     if(!r.ok)throw new Error(j.error==='no_key'?'لسه مفتاح Gemini ما اتحطّش في Supabase':j.error==='rate'?'استنى دقيقة وجرّب تاني':j.error==='key'?'مفتاح Gemini فيه مشكلة':j.error==='too_big'?'التسجيل طويل. خليه أقل من دقيقتين':'حصلت مشكلة. جرّب تاني');
     const txt=(j.text||'').trim();if(!txt||txt==='لا يوجد نص')throw new Error(payload.image?'مش لاقي نص واضح. قرّب الكاميرا وخلّي الإضاءة كويسة':'مسمعتش كلام واضح. جرّب تاني');
     const e=E(d.id);e.a=e.a||{};const arr=kbArr(e.a[f.id]).filter(o=>(o.t||'').trim()),nid=uid('e');arr.push({id:nid,t:txt});e.a[f.id]=arr;delete e.miss;save();
-    view.aiBusy=null;paintKB();const el=document.querySelector(`[data-act="kbtext"][data-e="${nid}"]`);if(el){el.scrollIntoView({block:'center'});el.style.height=Math.min(420,el.scrollHeight+4)+'px'}
+    view.aiBusy=null;paintKB();const el=document.querySelector(`[data-act="kbtext"][data-e="${nid}"]`);if(el)el.scrollIntoView({block:'center'})
     toast('اتكتب ✓ راجعه وعدّل لو محتاج')}
   catch(err){view.aiBusy=null;paintKB();toast(err.message||'حصلت مشكلة')}}
 async function ocrImage(file,d,f){try{const image=await shrinkImage(file);await sendAI({image,mime:'image/jpeg'},d,f,'بيقرا الصفحة…')}catch(e){toast('مقدرناش نفتح الصورة')}}
@@ -1126,7 +1127,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   if(a==='shura'){const sh=shuraOf(j,view.day),[g,ff]=el.dataset.path.split('.');(sh[g]||(sh[g]={}))[ff]=v.trim();save();return}
   if(a==='assign'){const sh=shuraOf(j,view.day),x=sh.assign[el.dataset.v]||(sh.assign[el.dataset.v]={});x.who=v.trim();save();return}
 });
-document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='nd-text'&&view.nd)view.nd.text=ev.target.value;if(a==='nd-by'&&view.nd)view.nd.by=ev.target.value});
+document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(ev.target.matches('textarea.inp'))fitTA(ev.target.parentNode);if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='nd-text'&&view.nd)view.nd.text=ev.target.value;if(a==='nd-by'&&view.nd)view.nd.by=ev.target.value});
 document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id&&ev.target.id.startsWith('pl-')){ev.preventDefault();const b=document.querySelector(`[data-act="pl-add"][data-k="${ev.target.id.slice(3)}"]`);b&&b.click()}});
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 let lastTouch=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouch<300&&!e.target.closest('input,textarea,select'))e.preventDefault();lastTouch=n},{passive:false});
@@ -1138,6 +1139,6 @@ render();
 if(auth)syncNow();
 })();
 </script>
-<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}</script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').then(r=>{r.update();document.addEventListener('visibilitychange',()=>{if(!document.hidden)r.update()})}).catch(()=>{})});let had=!!navigator.serviceWorker.controller,done=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!done){done=true;location.reload()}had=true})}</script>
 </body>
 </html>
