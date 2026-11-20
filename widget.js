@@ -1,6 +1,6 @@
 // وقفة · ويدجت الشاشة الرئيسية (Scriptable)
 // الصلاة الجاية، ودلوقتي إيه، والعمل الجاي من جدولك في وقفة.
-const VER=3; // رقم نسخة الويدجت
+const VER=4; // رقم نسخة الويدجت
 const SB='https://wlkkleutxulpzuwtvhnn.supabase.co',SBK='sb_publishable_gEfJkkL5K55-rN22u0QxNQ_ZlIc5etZ';
 const C={ink:new Color('#1b1b1b'),neon:new Color('#7fdca6'),white:new Color('#ffffff'),dim:new Color('#ffffff',0.55),faint:new Color('#ffffff',0.08),forest:new Color('#1c9151')};
 const CITIES={cairo:['القاهرة',30.0444,31.2357],giza:['الجيزة',30.0131,31.2089],alex:['الإسكندرية',31.2001,29.9187],qalyubia:['القليوبية',30.466,31.1848],sharqia:['الشرقية',30.5877,31.502],
@@ -24,7 +24,7 @@ function prayerTimes(date,lat,lng){const jd=julian(date.getFullYear(),date.getMo
 
 /* ---------- data from your Waqfa account ---------- */
 const KC='waqfa.widget.',fm=FileManager.local(),cachePath=fm.joinPath(fm.documentsDirectory(),'waqfa-widget-cache.json');
-async function call(path,body,token){const r=new Request(SB+path);r.method=body?'POST':'GET';r.headers={apikey:SBK,'Content-Type':'application/json'};if(token)r.headers.Authorization='Bearer '+token;if(body)r.body=JSON.stringify(body);
+async function call(path,body,token){const r=new Request(SB+path);r.method=body?'POST':'GET';const h={apikey:SBK,'Content-Type':'application/json'};if(token)h.Authorization='Bearer '+token;r.headers=h;if(body)r.body=JSON.stringify(body);
   const j=await r.loadJSON();if(r.response.statusCode>=300)throw new Error(j.msg||j.error_description||j.message||('HTTP '+r.response.statusCode));return j}
 async function session(){const em=Keychain.contains(KC+'email')?Keychain.get(KC+'email'):null;if(!em)return null;
   if(Keychain.contains(KC+'rt')){try{const j=await call('/auth/v1/token?grant_type=refresh_token',{refresh_token:Keychain.get(KC+'rt')});Keychain.set(KC+'rt',j.refresh_token);return j}catch(e){}}
