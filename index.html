@@ -276,6 +276,8 @@ const Q={
  distract:{id:'distract',label:'إيه اللي شغلني؟',type:'many',opts:['الشغل','الأكل','الناس','همّ أو قلق','تعب ونوم','الموبايل']}
 };
 const KBF=[{id:'hadith',label:'حديث اليوم',type:'text',kb:'حديث',ph:'نص الحديث، ومين رواه'},{id:'ayah',label:'آية اليوم',type:'text',kb:'آية',ph:'الآية، والسورة، وفهمت منها إيه'},{id:'qissa',label:'قصة اليوم',type:'text',kb:'قصة',ph:'القصة باختصار، ومن أي كتاب'}];
+const kbArr=v=>Array.isArray(v)?v:(v&&String(v).trim()?[{id:'0',t:String(v)}]:[]);
+const hasText=v=>kbArr(v).some(o=>(o.t||'').trim());
 const CLOSE=[{id:'quality',label:'أديته زي ما نويت؟',type:'one',opts:['لا','إلى حدٍّ ما','نعم']},{id:'note',label:'إيه اللي ساعدني أو شتّتني؟',type:'text'},{id:'next',label:'خطوة أجرّبها المرة الجاية',type:'text'}];
 const cp=o=>JSON.parse(JSON.stringify(o));
 const H=(...ids)=>ids.map(i=>cp(Q[i]));
@@ -443,7 +445,7 @@ const score=(f,v)=>{if(f.type!=='one'||v==null)return null;const i=f.opts.indexO
 const avg=a=>{a=a.filter(x=>typeof x==='number'&&!isNaN(x));return a.length?a.reduce((s,x)=>s+x,0)/a.length:null};
 function status(d,e,k){if(!e)return null;if(e.miss)return 'miss';const st=d.st||{};
   if(st.f){const v=ans(e,st.f);return (st.map||{})[v]||null}
-  if(st.num){const f=findF(d,st.num),v=Number(ans(e,st.num)||0);if(!v)return (st.orText||[]).some(x=>(ans(e,x)||'').trim())?'part':null;return v>=(f&&f.goal||1)?'done':'part'}
+  if(st.num){const f=findF(d,st.num),v=Number(ans(e,st.num)||0);if(!v)return (st.orText||[]).some(x=>hasText(ans(e,x)))?'part':null;return v>=(f&&f.goal||1)?'done':'part'}
   if(st.counts){const f=findF(d,st.counts),c=ans(e,st.counts)||{};const vs=f.items.map(it=>Number(c[it.n]||0));if(!vs.some(Boolean))return null;return f.items.every((it,i)=>vs[i]>=(it.goal||1))?'done':'part'}
   if(st.many){const v=ans(e,st.many)||[];if(!v.length)return null;return v.length>=(st.goal||1)?'done':'part'}
   if(st.avg){const s=avg(d.perf.map(f=>score(f,ans(e,f.id))));if(s==null)return null;return s>=.75?'done':s>=.4?'part':'miss'}
@@ -501,6 +503,9 @@ function fieldHTML(d,f,e,k){if(!visible(f,e,k))return '';const v=ans(e,f.id),A=`
   else if(f.type==='many'){const arr=v||[];h+=`<div class="chips">${f.opts.map(o=>`<button class="chip" data-act="many" ${A} data-v="${esc(o)}" aria-pressed="${arr.includes(o)}">${esc(o)}</button>`).join('')}</div>`}
   else if(f.type==='num'){const n=Number(v||0),st=f.step||1;
     h+=`<div class="stepper"><button class="sb" data-act="inc" ${A} data-n="${-st}" aria-label="أقل">−</button><input type="number" inputmode="numeric" min="0" data-act="numin" ${A} value="${n||''}" placeholder="0"><button class="sb" data-act="inc" ${A} data-n="${st}" aria-label="أكتر">+</button><span class="u">${esc(f.unit||'')}${f.goal?` من ${num(f.goal)}`:''}</span></div>${f.goal?`<div class="meter"><i style="width:${Math.min(100,n/f.goal*100)}%"></i></div>`:''}`}
+  else if(f.type==='text'&&f.kb){const arr=kbArr(v),more=f.kb==='حديث'?'تاني':'تانية';
+    h+=(arr.length?arr:[{id:'new',t:''}]).map((o,i)=>`<div class="row-in" style="align-items:flex-start"><textarea class="inp" data-act="kbtext" ${A} data-e="${o.id}" placeholder="${esc(i?f.kb+' '+more:(f.ph||'اكتب هنا'))}">${esc(o.t||'')}</textarea>${arr.length>1?xbtn('kbdel',`${A} data-e="${o.id}"`):''}</div>`).join('')
+      +`<button class="link" data-act="kbadd" ${A} style="align-self:flex-start">+ ${esc(f.kb)} ${more}</button>`}
   else if(f.type==='text'){h+=`<textarea class="inp" data-act="text" ${A} placeholder="${esc(f.ph||'اكتب هنا')}">${esc(v||'')}</textarea>`}
   else if(f.type==='counts'){const c=v||{};h+=`<div>${f.items.map(it=>{const n=Number(c[it.n]||0);return `<div class="crow"><span class="n">${esc(it.n)}</span><span class="mini"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="-10">−</button><input type="number" inputmode="numeric" data-act="cnt" ${A} data-k="${esc(it.n)}" value="${n||''}" placeholder="0"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="33">+</button></span><span class="g ${n>=it.goal?'ok':''}">/ ${num(it.goal)}</span></div>`}).join('')}</div><p class="small muted">+ بيزوّد ٣٣، و− بينقص ١٠. وتقدر تكتب الرقم بإيدك.</p>`}
   else if(f.type==='faults'){const c=v||{};const fl=db.faults.filter(x=>x.on);
@@ -787,10 +792,10 @@ function renderGoals(){const j=activeJ(),gt=view.gtype||(j?j.type:'d40'),s=j&&j.
    <div class="row-in"><input class="inp" id="g-${sec.id}" placeholder="هدف جديد"><button class="btn sm" data-act="goal-add" data-w="s:${sec.id}">أضف</button></div></section>`});
   return h+`<div class="row-in"><input class="inp" id="gsec-new" placeholder="قسم جديد"><button class="btn ghost sm" data-act="gsec-add">أضف قسم</button></div>`}
 function kbItems(){const out=[];Object.keys(db.logs).sort().reverse().forEach(k=>{const l=db.logs[k];for(const id in l){const d=byId(id),e=l[id];if(!d||!e||!e.a)continue;
-    fieldsOf(d).filter(f=>f.kb).forEach(f=>{const v=(e.a[f.id]||'').trim();if(v)out.push({k,id,f:f.id,type:f.kb,text:v})})}});return out}
+    fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{const v=(o.t||'').trim();if(v)out.push({k,id,f:f.id,eid:o.id,type:f.kb,text:v})}))}});return out}
 /* spaced repetition (Leitner): remembered well -> longer gap, forgot -> back tomorrow */
 const KB_INT=[1,1,3,7,14,30,60,120];
-const kbKey=x=>`${x.k}|${x.id}|${x.f}`;
+const kbKey=x=>`${x.k}|${x.id}|${x.f}`+(x.eid&&x.eid!=='0'?'|'+x.eid:'');
 const kbAdd=(k,n)=>shift(k,n);
 function kbEligible(){const today=dayKey();db.kbr=db.kbr||{};return kbItems().filter(x=>x.k<today)}
 function kbDueSort(arr){const st=x=>db.kbr[kbKey(x)]||{};return arr.slice().sort((a,b)=>(st(a).due||a.k).localeCompare(st(b).due||b.k))}
@@ -947,6 +952,9 @@ document.addEventListener('click',ev=>{
   if(a==='pl-tog'){const x=plan(b.dataset.k)[b.dataset.i];x.done=!x.done;buzz();return upd()}
   if(a==='pl-del'){plan(b.dataset.k).splice(b.dataset.i,1);return upd()}
   if(a==='pl-add'){const inp=document.getElementById('pl-'+b.dataset.k),val=inp.value.trim();if(!val){toast('اكتب الخطوة الأول');return}plan(b.dataset.k).push({id:uid('p'),t:val,done:false});upd();const n2=document.getElementById('pl-'+b.dataset.k);n2&&n2.focus();return}
+  if(a==='kbadd'&&d){const e=E(id);e.a=e.a||{};const arr=kbArr(e.a[fid]).filter(o=>(o.t||'').trim());const nid=uid('e');arr.push({id:nid,t:''});e.a[fid]=arr;save();if(sheetEl)paintSheet();else render();
+    const el=document.querySelector(`[data-act="kbtext"][data-id="${id}"][data-f="${fid}"][data-e="${nid}"]`);if(el)el.focus();return}
+  if(a==='kbdel'&&d){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}const e=E(id);e.a[fid]=kbArr(e.a[fid]).filter(o=>o.id!==b.dataset.e);save();if(sheetEl)paintSheet();else render();return}
   if(a==='kb-reveal'){view.kbRev=b.dataset.k;return render()}
   if(a==='kb-rate'){const key=b.dataset.k,today=dayKey(),r=Object.assign({box:0,reps:0},(db.kbr=db.kbr||{})[key]),q2=Number(v);
     if(q2===0){r.box=1;r.due=kbAdd(today,1)}else if(q2===1){r.box=Math.max(1,r.box);r.due=kbAdd(today,Math.max(1,Math.round(KB_INT[r.box]/2)))}else{r.box=Math.min(7,r.box+1);r.due=kbAdd(today,KB_INT[r.box])}
@@ -1034,6 +1042,9 @@ document.addEventListener('click',ev=>{
   if(a==='import'){try{toast(doImport($('#importBox').value));save();render()}catch(e){toast('النص ده مش نسخة سليمة')}return}
 });
 document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!a)return;const id=el.dataset.id,d=id&&byId(id),fid=el.dataset.f,v=el.value;
+  if(a==='kbtext'&&d){const e=E(id);e.a=e.a||{};const arr=kbArr(e.a[fid]),eid=el.dataset.e,o=arr.find(x=>x.id===eid);
+    if(o)o.t=v.trim();else if(v.trim()){const nid=uid('e');arr.push({id:nid,t:v.trim()});el.dataset.e=nid}e.a[fid]=arr;delete e.miss;save();
+    if(sheetEl){const hh=sheetEl.querySelector('.hh');if(hh)hh.innerHTML=sheetRender().head}return}
   if(['numin','text','cmt','cnt','fcnt'].includes(a)&&d){const e=E(id);e.a=e.a||{};
     if(a==='numin')e.a[fid]=Math.max(0,Number(v||0));if(a==='text')e.a[fid]=v.trim();if(a==='cmt')(e.c||(e.c={}))[fid]=v.trim();
     if(a==='cnt'||a==='fcnt')(e.a[fid]||(e.a[fid]={}))[el.dataset.k]=Math.max(0,Number(v||0));
