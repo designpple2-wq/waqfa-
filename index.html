@@ -546,7 +546,7 @@ function planCard(k,title='خطة النهارده',editable=true){const pl=plan
    ${pl.length?`<div>${pl.map((x,i)=>`<div class="check ${x.done?'done':''}">${tick('pl-tog',`data-k="${k}" data-i="${i}"`,x.done)}<div class="t"><span>${esc(x.t)}</span></div>${editable?xbtn('pl-del',`data-k="${k}" data-i="${i}"`):''}</div>`).join('')}</div>`:'<p class="lead">مفيش خطوات لسه. اكتبها هنا، أو في محاسبة الليلة.</p>'}
    ${editable?`<div class="row-in"><input class="inp" id="pl-${k}" placeholder="أضف خطوة" enterkeyhint="done"><button class="btn sm" data-act="pl-add" data-k="${k}">أضف</button></div>`:''}</section>`}
 function p40Card(k){if(!db.p40.length)return '';const d=db.p40.filter(it=>p40done(it,k)).length;
-  return `<section class="card rise"><div class="ch"><h2>خطة الأربعين</h2><span class="badge ${d===db.p40.length?'done':''}">${num(d)} من ${num(db.p40.length)}</span></div><div class="meter"><i style="width:${d/db.p40.length*100}%"></i></div>
+  return `<section class="card rise"><div class="ch"><h2>خطة الأربعين</h2><span class="hb"><span class="badge ${d===db.p40.length?'done':''}">${num(d)} من ${num(db.p40.length)}</span><button class="link" data-act="p40-edit">تعديل</button></span></div><div class="meter"><i style="width:${d/db.p40.length*100}%"></i></div>
    <div>${db.p40.map(it=>{const ok=p40done(it,k),auto=it.link&&byId(it.link);return `<div class="check ${ok?'done':''}">${tick('p40',`data-id="${it.id}"`,ok)}<div class="t"><span>${esc(it.text)}</span>${auto?`<span class="small muted">بيتعلّم لوحده لما تسجّل ${esc(auto.name)}</span>`:''}</div></div>`}).join('')}</div></section>`}
 function renderToday(){
   const k=view.day,today=dayKey(),isT=k===today,m=metrics(k),w=windowNow(),j=activeJ();
@@ -573,6 +573,12 @@ function renderToday(){
   h+=`<section class="hero rise" style="grid-template-columns:1fr"><div class="np"><span class="eyebrow">قبل النوم</span><b>محاسبة الليلة</b><span class="small" style="color:rgba(255,255,255,.7)">${r.done?'خلّصت محاسبة اليوم ده ✓':'الآداب، وتزكية النفس، والمعاملات، وخطة بكرة'}</span></div><button class="btn" data-act="go" data-v="review" style="background:var(--neon);color:var(--ink)">${r.done?'راجع المحاسبة':'ابدأ المحاسبة'}</button></section>`;
   return h}
 
+function openP40(){openSheet(()=>{const opts=sel=>`<option value="">مش مربوط بعمل</option>${db.deeds.map(x=>`<option value="${x.id}"${sel===x.id?' selected':''}>${esc(x.name)}</option>`).join('')}`;
+  return {head:'<span class="eyebrow">بنودك اليومية طول الخروج</span><h2 class="title">خطة الأربعين</h2>',
+   body:`${db.p40.length?'':'<p class="lead">لسه مفيش بنود. ضيف أول بند من تحت.</p>'}${db.p40.map((it,i)=>`<div class="ed-f"><div class="row-in"><input class="inp" data-act="p40-text" data-id="${it.id}" value="${esc(it.text)}">
+     <button class="x" data-act="p40-mv" data-id="${it.id}" data-n="-1" aria-label="لفوق">${ico('up')}</button><button class="x" data-act="p40-mv" data-id="${it.id}" data-n="1" aria-label="لتحت">${ico('down')}</button>${xbtn('p40-del',`data-id="${it.id}"`)}</div>
+     <select class="inp" data-act="p40-link" data-id="${it.id}">${opts(it.link)}</select></div>`).join('')}
+    <div class="sec"><h3>بند جديد</h3><input class="inp" id="p40-new" placeholder="مثلًا: ورد رياض الصالحين"><select class="inp" id="p40-newlink">${opts('')}</select><span class="small muted">لو ربطته بعمل، بيتعلّم لوحده لما تسجّل العمل ده.</span><button class="btn" data-act="p40-add">أضف البند</button></div>`}})}
 /* ---------- review wizard ---------- */
 const STEPS=[['day','مراجعة اليوم'],['adab','الآداب وأصول العمل'],['tazkiya','تزكية النفس'],['nafs','المعاملات والوقت'],['plans','الخطط'],['tomorrow','خطة بكرة'],['close','الختام']];
 function renderReview(){const k=view.day,i=view.step,[sid,st]=STEPS[i],m=metrics(k),l=db.logs[k]||{};
@@ -799,6 +805,7 @@ function renderSettings(){const s=db.settings;
   return backTop('الإعدادات','وقفة','back')+accountCard()+`
   <button class="card journey" data-act="go" data-v="sched" style="text-align:start"><span class="ic">${ico('salah')}</span><span class="t"><b>جدول اليوم</b><span class="small muted">برنامج الخروج ومواعيده، والعمل الجاي</span></span>${ico('fwd')}</button>
   <a class="card journey" href="widget.html" style="text-align:start;color:inherit;text-decoration:none"><span class="ic">${ico('map')}</span><span class="t"><b>ويدجت للشاشة الرئيسية</b><span class="small muted">الصلاة الجاية والعمل الجاي على شاشة الآيفون</span></span>${ico('fwd')}</a>
+  <button class="card journey" data-act="p40-edit" style="text-align:start"><span class="ic">${ico('adab')}</span><span class="t"><b>خطة الأربعين</b><span class="small muted">${db.p40.length?`${num(db.p40.length)} بند يومي`:'بنودك اليومية طول الخروج'}</span></span>${ico('fwd')}</button>
   <button class="card journey" data-act="go" data-v="custom" style="text-align:start"><span class="ic">${ico('gear')}</span><span class="t"><b>تخصيص الأعمال والأسئلة</b><span class="small muted">ضيف وامسح وعدّل أي عمل أو سؤال أو اختيار</span></span>${ico('fwd')}</button>
   <section class="card"><h2>مواقيت الصلاة</h2><p class="lead">بتتحسب لوحدها كل يوم على الموبايل من غير نت، بطريقة الهيئة المصرية العامة للمساحة.</p>
    <div class="seg">${[['0','محافظة'],['1','موقعي بالظبط']].map(([v,l])=>`<button data-act="loc-mode" data-v="${v}" aria-pressed="${!!s.useLoc===(v==='1')}">${l}</button>`).join('')}</div>
@@ -905,6 +912,10 @@ document.addEventListener('click',ev=>{
   if(a==='pl-tog'){const x=plan(b.dataset.k)[b.dataset.i];x.done=!x.done;buzz();return upd()}
   if(a==='pl-del'){plan(b.dataset.k).splice(b.dataset.i,1);return upd()}
   if(a==='pl-add'){const inp=document.getElementById('pl-'+b.dataset.k),val=inp.value.trim();if(!val){toast('اكتب الخطوة الأول');return}plan(b.dataset.k).push({id:uid('p'),t:val,done:false});upd();const n2=document.getElementById('pl-'+b.dataset.k);n2&&n2.focus();return}
+  if(a==='p40-edit')return openP40();
+  if(a==='p40-add'){const v2=$('#p40-new').value.trim();if(!v2){toast('اكتب البند الأول');return}db.p40.push({id:uid('p40'),text:v2,link:$('#p40-newlink').value||null});save();paintSheet();render();toast('اتضاف');return}
+  if(a==='p40-del'){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}db.p40=db.p40.filter(x=>x.id!==id);save();paintSheet();return render()}
+  if(a==='p40-mv'){const i=db.p40.findIndex(x=>x.id===id),j=i+Number(b.dataset.n);if(j<0||j>=db.p40.length)return;[db.p40[i],db.p40[j]]=[db.p40[j],db.p40[i]];save();paintSheet();return render()}
   if(a==='p40'){const l=logOf(k);l._p40=toggle(l._p40||[],id);buzz();return upd()}
   /* navigation */
   if(a==='go'){view.sub=v;if(v==='review')view.step=0;view.endAsk=false;closeSheet(true);render();scrollTo(0,0);return}
@@ -991,6 +1002,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
     if(a==='sc-time'){const [hh,mm]=v.split(':').map(Number);if(!isNaN(hh))SI.off=hh*60+mm}
     if(a==='sc-off')SI.off=Number(v||0);if(a==='sc-dur')SI.dur=Math.max(0,Number(v||0));if(a==='sc-link')SI.link=v;
     save();paintSheet();return}
+  if(a==='p40-text'||a==='p40-link'){const it=db.p40.find(x=>x.id===id);if(!it)return;if(a==='p40-text')it.text=v.trim()||it.text;else it.link=v||null;save();return render()}
   if(a==='rv'){(db.reviews[view.day]||(db.reviews[view.day]={}))[el.dataset.f]=v.trim();save();return}
   const F=d&&el.dataset.s?secArr(d,el.dataset.s).find(f=>f.id===fid):null;
   if(a==='fl-label'&&F){F.label=v.trim()||F.label;return upd()}
