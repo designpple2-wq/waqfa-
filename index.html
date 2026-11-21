@@ -192,6 +192,15 @@ textarea.inp{min-height:84px;resize:vertical;line-height:1.7}
 .spark .area{fill:var(--lime);opacity:.6;stroke:none}
 .spark .base{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
 .insight{display:flex;flex-direction:column;gap:8px}
+.hbtns{display:flex;flex-direction:column;align-items:center;gap:6px}
+.stats.s4{grid-template-columns:repeat(2,1fr)}
+.dl{font-size:12px;font-weight:600}.dl.up{color:var(--forest)}.dl.dn{color:var(--alert)}
+.sum{background:var(--ink);color:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.sum p{font-size:15px;line-height:1.9;color:rgba(255,255,255,.92)}.sum .eyebrow{color:var(--neon)}
+.cat-h{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:16px}.cat-m{margin:8px 0 4px}
+.drow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;font-size:14px;padding:8px 0;border-top:1px solid var(--line)}
+.drow .pc{font-weight:600;font-variant-numeric:tabular-nums}.pc.lo{color:var(--alert)}.pc.md{color:#9a6200}.pc.hi{color:var(--forest)}
+.cats{display:flex;flex-direction:column;gap:18px}
 .bar-row{display:grid;grid-template-columns:1fr 2fr auto;gap:10px;align-items:center;font-size:14px}
 .seg-tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;white-space:nowrap}.seg-tabs::-webkit-scrollbar{display:none}
 .seg-tabs button{padding:8px 0;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
@@ -556,7 +565,7 @@ function openDeed(id,k=view.day){const d=byId(id);if(!d)return;
 function render(){
   document.querySelectorAll('nav.tabs [data-tab]').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===view.tab&&!view.sub?'page':'false'));
   const s=view.sub;let h;
-  if(s==='review')h=renderReview();else if(s==='khuruj')h=renderKhuruj();else if(s==='shura')h=renderShura();else if(s==='settings')h=renderSettings();else if(s==='custom')h=renderCustom();else if(s==='cat')h=renderCat();else if(s==='sched')h=renderSched();
+  if(s==='review')h=renderReview();else if(s==='khuruj')h=renderKhuruj();else if(s==='shura')h=renderShura();else if(s==='settings')h=renderSettings();else if(s==='custom')h=renderCustom();else if(s==='cat')h=renderCat();else if(s==='sched')h=renderSched();else if(s==='harvest')h=renderHarvest();
   else h=view.tab==='today'?renderToday():view.tab==='progress'?renderProgress():view.tab==='notes'?renderNotes():renderZad();
   $('#app').innerHTML=h;
   document.querySelectorAll('.wz-nav').forEach(x=>{if(view.sub!=='review')x.remove()});
@@ -593,7 +602,7 @@ function renderToday(){
   const per=periodic(k).filter(d=>view.filter==='all'||d.cat===view.filter);
   if(per.length)h+=`<section class="slot rise"><div class="slot-h"><span>أعمال الأسبوع والشهر</span></div><div class="list">${per.map(d=>deedRow(d,k)).join('')}</div></section>`;
   const r=db.reviews[k]||{};
-  h+=`<section class="hero rise" style="grid-template-columns:1fr"><div class="np"><span class="eyebrow">قبل النوم</span><b>محاسبة الليلة</b><span class="small" style="color:rgba(255,255,255,.7)">${r.done?'خلّصت محاسبة اليوم ده ✓':'الآداب، وتزكية النفس، والمعاملات، وخطة بكرة'}</span></div><button class="btn" data-act="go" data-v="review" style="background:var(--neon);color:var(--ink)">${r.done?'راجع المحاسبة':'ابدأ المحاسبة'}</button></section>`;
+  h+=`<section class="hero rise" style="grid-template-columns:1fr"><div class="np"><span class="eyebrow">قبل النوم</span><b>محاسبة الليلة</b><span class="small" style="color:rgba(255,255,255,.7)">${r.done?'خلّصت محاسبة اليوم ده ✓':'الآداب، وتزكية النفس، والمعاملات، وخطة بكرة'}</span></div><div class="hbtns"><button class="btn" data-act="go" data-v="${r.done?'harvest':'review'}" style="background:var(--neon);color:var(--ink)">${r.done?'حصاد اليوم':'ابدأ المحاسبة'}</button>${r.done?'<button class="link" data-act="go" data-v="review" style="color:rgba(255,255,255,.75)">راجع المحاسبة</button>':''}</div></section>`;
   return h}
 
 function openP40(){openSheet(()=>{const opts=sel=>`<option value="">مش مربوط بعمل</option>${db.deeds.map(x=>`<option value="${x.id}"${sel===x.id?' selected':''}>${esc(x.name)}</option>`).join('')}`;
@@ -658,6 +667,35 @@ function renderShura(){const j=activeJ();if(!j){view.sub='khuruj';return renderK
 function spark(vals,max){const h=56,pts=vals.map((v,i)=>v==null?null:[vals.length>1?i/(vals.length-1)*100:50,h-4-(Math.min(v,max)/max)*(h-10)]);
   const segs=[];let c=[];pts.forEach(p=>{if(p)c.push(p);else if(c.length){segs.push(c);c=[]}});if(c.length)segs.push(c);
   return `<svg class="spark" viewBox="0 0 100 ${h}" preserveAspectRatio="none" aria-hidden="true"><line x1="0" x2="100" y1="${h-4}" y2="${h-4}" class="base"/>${segs.map(s=>{const q=s.length>1?s:[s[0],s[0]];return `${s.length>1?`<polygon class="area" points="${q[0][0]},${h-4} ${q.map(p=>p.join(',')).join(' ')} ${q[q.length-1][0]},${h-4}"/>`:''}<polyline points="${q.map(p=>p.join(',')).join(' ')}"/>`}).join('')}</svg>`}
+/* ---------- حصاد اليوم ---------- */
+function dScore(d,k){const e=(db.logs[k]||{})[d.id],s=stOf(d,k);
+  const parts=d.cat==='adab'?d.perf.map(f=>score(f,ans(e,f.id))):[s?W(s):0,...(s&&s!=='miss'?(d.heart||[]).map(f=>score(f,ans(e,f.id))):[])];
+  const v=avg(parts);return {s,v:v==null?(s?W(s):0):v}}
+function harvest(k){const m=metrics(k),list=daily(k),cats=CATS.map(([c,n])=>{const ds=list.filter(d=>d.cat===c).map(d=>({d,...dScore(d,k)}));return {c,n,ds,v:ds.length?avg(ds.map(x=>x.v)):null}}).filter(x=>x.ds.length);
+  return {m,cats}}
+const pcs=v=>v==null?'–':Math.round(v*100);
+function summaryText(k,H){const {m,cats}=H,y=metrics(shift(k,-1)),S=[];const P=v=>`${Math.round(v*100)}%`;
+  let s=`يومك ${P(m.pct)}`;if(y.rec){const d=Math.round((m.pct-y.pct)*100);s+=Math.abs(d)<3?'، قريب من إمبارح':d>0?`، أحسن من إمبارح بـ ${d} نقطة`:`، أقل من إمبارح بـ ${-d} نقطة`}S.push(s+'.');
+  const rk=cats.filter(c=>c.v!=null).sort((a,b)=>b.v-a.v);if(rk.length>1&&rk[0].v-rk[rk.length-1].v>.1)S.push(`أقوى حاجة كانت ${rk[0].n} (${P(rk[0].v)})، وأضعف حاجة ${rk[rk.length-1].n} (${P(rk[rk.length-1].v)}).`);
+  const miss=cats.flatMap(c=>c.ds).filter(x=>!x.s||x.s==='miss').map(x=>dname(x.d,k));if(miss.length)S.push(`فاتك: ${miss.slice(0,4).join('، ')}${miss.length>4?` و${miss.length-4} كمان`:''}.`);else S.push('سجّلت كل أعمال اليوم.');
+  if(m.heart!=null){const c={};m.distract.forEach(x=>c[x]=(c[x]||0)+1);const tp=Object.entries(c).sort((a,b)=>b[1]-a[1])[0];S.push(`حضور قلبك في الصلاة ${P(m.heart)}${tp?`، وأكتر حاجة شغلتك: ${tp[0]}`:''}.`)}
+  if(m.faults>0){const tp=Object.entries(m.fc).sort((a,b)=>b[1]-a[1])[0],nm=tp&&(db.faults.find(f=>f.id===tp[0])||{}).name;S.push(`وقعت في العيوب ${m.faults} ${m.faults>2&&m.faults<11?'مرات':'مرة'}${nm?`، أكترها: ${nm}`:''}.`)}
+  if(m.pn)S.push(`نفّذت ${m.pd} من ${m.pn} من خطة النهارده.`);
+  return S}
+function renderHarvest(){const k=view.day,H=harvest(k),{m,cats}=H,y=metrics(shift(k,-1)),r=db.reviews[k]||{},j=jOn(k);
+  const dl=(a,b)=>{if(a==null||b==null||!y.rec)return '';const d=Math.round((a-b)*100);return d===0?'<span class="dl">زي إمبارح</span>':`<span class="dl ${d>0?'up':'dn'}">${d>0?'↑':'↓'} <bdi>${Math.abs(d)}</bdi> عن إمبارح</span>`};
+  const st=(v,l,yv)=>`<div class="stat"><b>${v==null?'–':num(Math.round(v*100),'%')}</b><span>${l}</span>${dl(v,yv)}</div>`;
+  const cls=v=>v<.5?'lo':v<.8?'md':'hi';
+  let h=backTop('حصاد اليوم',fmt(k,{weekday:'long',day:'numeric',month:'long'}));
+  h+=`<section class="sum rise"><span class="eyebrow">الخلاصة</span>${summaryText(k,H).map(s=>`<p>${esc(s)}</p>`).join('')}</section>`;
+  h+=`<div class="stats s4 rise">${st(m.pct,'من يومك',y.pct)}${st(m.heart,'حضور القلب في الصلاة',y.heart)}${st(m.quality,'جودة الأعمال',y.quality)}${st(m.adab,'الآداب وأصول العمل',y.adab)}</div>`;
+  h+=`<section class="card rise"><h2>كل عمل بنسبته</h2><p class="small muted">النسبة بتجمع إنك عملته، وإجاباتك في وقفة القلب.</p><div class="cats">${cats.map(c=>`<div><div class="cat-h"><span>${esc(c.n)}</span><b>${num(pcs(c.v),'%')}</b></div><div class="meter cat-m"><i style="width:${Math.round((c.v||0)*100)}%"></i></div>
+     ${c.ds.map(x=>`<div class="drow"><span>${esc(dname(x.d,k))}</span><span class="pc ${cls(x.v)}">${x.s?num(pcs(x.v),'%'):'فاتك'}</span></div>`).join('')}</div>`).join('')}</div></section>`;
+  if(j){const n=Math.max(1,Math.min(jDay(j,k),j.days)),ks=Array.from({length:n},(_,i)=>shift(j.start,i)),A=avg(ks.map(x=>{const q=metrics(x);return q.rec?q.pct:null}));
+    h+=`<section class="card rise"><div class="ch"><h2>الخروج</h2><span class="badge">اليوم ${num(n)} من ${num(j.days)}</span></div><div class="meter"><i style="width:${n/j.days*100}%"></i></div><p class="small muted">متوسط أيامك من أول الخروج: ${A==null?'–':num(Math.round(A*100),'%')}</p></section>`}
+  const tp=plan(shift(k,1));if(tp.length)h+=`<section class="card rise"><h2>خطة بكرة</h2>${tp.map(x=>`<p>• ${esc(x.t)}</p>`).join('')}</section>`;
+  if((r.thanks||'').trim())h+=`<section class="card rise"><span class="eyebrow">الحمد لله على</span><p>${esc(r.thanks)}</p></section>`;
+  return h+`<p class="ayah">﴿بَلِ الْإِنسَانُ عَلَىٰ نَفْسِهِ بَصِيرَةٌ﴾</p><div style="height:90px"></div>`}
 function renderProgress(){const today=dayKey(),[y,mo]=view.month.split('-').map(Number),first=new Date(y,mo-1,1,12),days=new Date(y,mo,0).getDate(),off=(first.getDay()+1)%7;
   let h=top('التقدّم','تطوري',gearBtn);
   h+=`<section class="card rise"><div class="ch"><button class="iconbtn" data-act="month" data-n="-1" aria-label="الشهر اللي فات">${ico('back')}</button><h2>${new Intl.DateTimeFormat('ar-EG-u-nu-latn',{month:'long',year:'numeric'}).format(first)}</h2><button class="iconbtn" data-act="month" data-n="1" aria-label="الشهر الجاي" style="transform:scaleX(-1)">${ico('back')}</button></div>
@@ -804,14 +842,15 @@ async function toWav16k(ab){const AC=window.AudioContext||window.webkitAudioCont
   for(let i=0;i<ch.length;i++){const s=Math.max(-1,Math.min(1,ch[i]));v.setInt16(44+i*2,s<0?s*0x8000:s*0x7fff,true)}return new Blob([buf],{type:'audio/wav'})}
 async function sendAI(payload,d,f,label){if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
   view.aiBusy={key:d.id+f.id,label};paintKB();
-  try{const tk=await token();const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({...payload,kind:f.kb})});
+  const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),130000);
+  try{const tk=await token();const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({...payload,kind:f.kb})});
     const j=await r.json().catch(()=>({}));
-    if(!r.ok)throw new Error(j.error==='no_key'?'لسه مفتاح Gemini ما اتحطّش في Supabase':j.error==='rate'?'استنى دقيقة وجرّب تاني':j.error==='key'?'مفتاح Gemini فيه مشكلة':j.error==='too_big'?'التسجيل طويل. خليه أقل من دقيقتين':'حصلت مشكلة. جرّب تاني');
+    if(!r.ok)throw new Error(j.error==='no_key'?'لسه مفتاح Gemini ما اتحطّش في Supabase':j.error==='rate'?'استنى دقيقة وجرّب تاني':j.error==='key'?'مفتاح Gemini فيه مشكلة':j.error==='too_big'?'التسجيل طويل. خليه أقل من دقيقتين':j.error==='model'?'الخدمة زحمة دلوقتي. جرّب كمان دقيقة':'حصلت مشكلة. جرّب تاني');
     const txt=(j.text||'').trim();if(!txt||txt==='لا يوجد نص')throw new Error(payload.image?'مش لاقي نص واضح. قرّب الكاميرا وخلّي الإضاءة كويسة':'مسمعتش كلام واضح. جرّب تاني');
     const e=E(d.id);e.a=e.a||{};const arr=kbArr(e.a[f.id]).filter(o=>(o.t||'').trim()),nid=uid('e');arr.push({id:nid,t:txt});e.a[f.id]=arr;delete e.miss;save();
     view.aiBusy=null;paintKB();const el=document.querySelector(`[data-act="kbtext"][data-e="${nid}"]`);if(el)el.scrollIntoView({block:'center'})
     toast('اتكتب ✓ راجعه وعدّل لو محتاج')}
-  catch(err){view.aiBusy=null;paintKB();toast(err.message||'حصلت مشكلة')}}
+  catch(err){view.aiBusy=null;paintKB();toast(err.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':err.message||'حصلت مشكلة')}finally{clearTimeout(tm)}}
 async function ocrImage(file,d,f){try{const image=await shrinkImage(file);await sendAI({image,mime:'image/jpeg'},d,f,'بيقرا الصفحة…')}catch(e){toast('مقدرناش نفتح الصورة')}}
 async function toggleMic(d,f){const key=d.id+f.id;if(rec&&rec.key===key){rec.mr.stop();return}if(rec)return;
   if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
@@ -1032,7 +1071,7 @@ document.addEventListener('click',ev=>{
   if(a==='open-day'){view.day=b.dataset.k;view.tab='today';view.sub=null;render();scrollTo(0,0);return}
   if(a==='ready'){view.ready++;return render()}
   if(a==='wz'){view.step=Math.max(0,Math.min(STEPS.length-1,view.step+Number(b.dataset.n)));render();scrollTo(0,0);return}
-  if(a==='rv-done'){(db.reviews[k]||(db.reviews[k]={})).done=true;save();view.sub=null;render();scrollTo(0,0);toast('ربنا يتقبّل');return}
+  if(a==='rv-done'){(db.reviews[k]||(db.reviews[k]={})).done=true;save();view.sub='harvest';render();scrollTo(0,0);return}
   if(a==='month'){const [y,m]=view.month.split('-').map(Number),dt=new Date(y,m-1+Number(b.dataset.n),1);view.month=dt.getFullYear()+'-'+pad(dt.getMonth()+1);return render()}
   if(a==='range'){view.range=Number(v);return render()}
   /* customize */
