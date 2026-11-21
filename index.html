@@ -192,6 +192,11 @@ textarea.inp{min-height:84px;resize:vertical;line-height:1.7}
 .spark .area{fill:var(--lime);opacity:.6;stroke:none}
 .spark .base{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
 .insight{display:flex;flex-direction:column;gap:8px}
+.tagrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tg{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 10px;font-size:12px;background:var(--fog);color:var(--forest-deep);border:1px solid transparent}
+.tg.add{background:transparent;border-color:var(--line);color:var(--muted);cursor:pointer}.tg svg{width:13px;height:13px}
+.tagbox{display:flex;flex-direction:column;gap:10px;background:var(--fog);border-radius:16px;padding:12px}
+.tagf{display:flex;flex-direction:column;gap:6px}
 .hbtns{display:flex;flex-direction:column;align-items:center;gap:6px}
 .stats.s4{grid-template-columns:repeat(2,1fr)}
 .dl{font-size:12px;font-weight:600}.dl.up{color:var(--forest)}.dl.dn{color:var(--alert)}
@@ -267,7 +272,7 @@ const P={salah:'<path d="M4 20h16M6 20v-8a6 6 0 0 1 12 0v8M12 6V3"/>',dhikr:'<ci
  jamaai:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15.5 14.2c2.9.3 5.5 2.6 5.5 5.8"/>',adab:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
  nafs:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',ok:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
- back:'<path d="M9 6l6 6-6 6"/>',fwd:'<path d="M15 6l-6 6 6 6"/>',up:'<path d="M6 15l6-6 6 6"/>',down:'<path d="M6 9l6 6 6-6"/>',map:'<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',cam:'<path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.2l1.6-2.2h6.4L16.8 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.4"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',stop:'<rect x="7" y="7" width="10" height="10" rx="2.5" fill="currentColor" stroke="none"/>'};
+ back:'<path d="M9 6l6 6-6 6"/>',fwd:'<path d="M15 6l-6 6 6 6"/>',up:'<path d="M6 15l6-6 6 6"/>',down:'<path d="M6 9l6 6 6-6"/>',map:'<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',cam:'<path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.2l1.6-2.2h6.4L16.8 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.4"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/>',stop:'<rect x="7" y="7" width="10" height="10" rx="2.5" fill="currentColor" stroke="none"/>'};
 const ico=(n,cls='')=>`<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]||''}</svg>`;
 /* ================= question bank (from the original app, kept word for word) ================= */
 const HEART=['كان غائبًا غالبًا','حاضرًا أحيانًا','حاضرًا غالبًا'];
@@ -359,7 +364,7 @@ const DEFAULT_DEEDS=[
 const SLOTS=[['night','آخر الليل'],['fajr','الفجر'],['duha','الضحى'],['dhuhr','الظهر'],['asr','العصر'],['maghrib','المغرب'],['isha','العشاء'],['any','طول اليوم']];
 const STL={done:'تم',part:'جزئي',miss:'فاتني'};
 const DISCLAIMER='ما يظهر هنا وصفٌ لما سجّلته أنت، وليس حكمًا على الإخلاص أو القبول؛ فذلك إلى الله وحده.';
-const FGROUPS=[['lisan','آفات اللسان'],['qalb','آفات القلب'],['nafs','آفات النفس'],['other','عيوب تانية']];
+const FGROUPS=[['lisan','آفات اللسان'],['qalb','آفات القلب والنفس'],['other','عيوب تانية']];
 const DEF_FAULTS=[['lisan','الغيبة'],['lisan','النميمة'],['lisan','الجدال'],['qalb','الكِبر'],['qalb','العُجب'],['qalb','حب الظهور'],['nafs','شُحّ النفس'],['nafs','الأنانية'],['nafs','حب الراحة']];
 const DEF_DUAS=['﴿رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ﴾','﴿رَبِّ اشْرَحْ لِي صَدْرِي ۝ وَيَسِّرْ لِي أَمْرِي﴾','اللهم إني أسألك الهدى والتقى والعفاف والغنى','يا حيّ يا قيوم برحمتك أستغيث، أصلح لي شأني كله، ولا تكلني إلى نفسي طرفة عين'];
 const NTAGS=['مفاهيم','من البيانات','رسائل','من الأحباب'];
@@ -396,13 +401,13 @@ const CITIES=[['cairo','القاهرة',30.0444,31.2357],['giza','الجيزة',
 let db=null;
 const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const defDeeds=()=>DEFAULT_DEEDS.map(d=>({...cp(d),on:true}));
-function blank(){return {version:4,deeds:defDeeds(),logs:{},reviews:{},plans:{},p40:[],notes:[],journeys:[],people:[],
+function blank(){return {version:4,deeds:defDeeds(),logs:{},reviews:{},plans:{},tags:[],p40:[],notes:[],journeys:[],people:[],
   faults:DEF_FAULTS.map((f,i)=>({id:'flt'+i,g:f[0],name:f[1],on:true,detail:'',hist:[]})),duas:DEF_DUAS.map((t,i)=>({id:'dua'+i,text:t,k:'mathur'})),
   goals:{d3:[],d40:[],m4:[]},gsecs:[{id:'life',name:'أهداف الحياة',items:[]},{id:'work',name:'أهداف العمل',items:[]}],settings:{dayStart:'03:30',city:'cairo',lastBackup:null,useLoc:false,loc:null},sched:{on:true,items:defSched()},noteCfg:{srcs:[...NSRC],topics:[...NTOPICS]},meta:{dirty:false,syncedAt:null}}}
 function migrate(d){const b=blank();
   if((d.version||1)<4){d.deeds=b.deeds;d.legacyLogs=d.logs;d.logs={}}
   ['p40','notes','journeys','people'].forEach(k=>d[k]=d[k]||b[k]);['logs','reviews','plans'].forEach(k=>d[k]=d[k]||{});
-  d.faults=(d.faults||b.faults).map(f=>({detail:'',hist:[],g:'other',on:true,...f}));d.duas=d.duas||b.duas;d.goals=Object.assign({d3:[],d40:[],m4:[]},d.goals||{});
+  d.faults=(d.faults||b.faults).map(f=>{const x={detail:'',hist:[],g:'other',on:true,...f};if(x.g==='nafs')x.g='qalb';return x});d.tags=d.tags||[];d.duas=d.duas||b.duas;d.goals=Object.assign({d3:[],d40:[],m4:[]},d.goals||{});
   d.gsecs=d.gsecs||b.gsecs;d.settings=Object.assign(b.settings,d.settings||{});d.sched=d.sched||b.sched;d.noteCfg=d.noteCfg||b.noteCfg;d.meta=d.meta||b.meta;normNotes(d);d.removed=d.removed||[];
   DEFAULT_DEEDS.forEach((x,i)=>{if(d.deeds.some(y=>y.id===x.id)||d.removed.includes(x.id))return;const prev=DEFAULT_DEEDS.slice(0,i).reverse().find(p=>d.deeds.some(y=>y.id===p.id));const at=prev?d.deeds.findIndex(y=>y.id===prev.id)+1:d.deeds.length;d.deeds.splice(at,0,{...cp(x),on:true})});
   if(!d.kb1){const tl=d.deeds.find(y=>y.id==='taleem');if(tl){const have=new Set((tl.perf||[]).map(f=>f.id));KBF.forEach(f=>{if(!have.has(f.id))(tl.perf=tl.perf||[]).push(cp(f))});tl.link=tl.link||'kb';if(tl.st&&tl.st.num)tl.st.orText=['hadith','ayah','qissa']}d.kb1=1}
@@ -524,7 +529,7 @@ function fieldHTML(d,f,e,k){if(!visible(f,e,k))return '';const v=ans(e,f.id),A=`
   else if(f.type==='num'){const n=Number(v||0),st=f.step||1;
     h+=`<div class="stepper"><button class="sb" data-act="inc" ${A} data-n="${-st}" aria-label="أقل">−</button><input type="number" inputmode="numeric" min="0" data-act="numin" ${A} value="${n||''}" placeholder="0"><button class="sb" data-act="inc" ${A} data-n="${st}" aria-label="أكتر">+</button><span class="u">${esc(f.unit||'')}${f.goal?` من ${num(f.goal)}`:''}</span></div>${f.goal?`<div class="meter"><i style="width:${Math.min(100,n/f.goal*100)}%"></i></div>`:''}`}
   else if(f.type==='text'&&f.kb){const arr=kbArr(v),more=f.kb==='حديث'?'تاني':'تانية';
-    h+=(arr.length?arr:[{id:'new',t:''}]).map((o,i)=>`<div class="row-in" style="align-items:flex-start"><textarea class="inp" data-act="kbtext" ${A} data-e="${o.id}" placeholder="${esc(i?f.kb+' '+more:(f.ph||'اكتب هنا'))}">${esc(o.t||'')}</textarea>${arr.length>1?xbtn('kbdel',`${A} data-e="${o.id}"`):''}</div>`).join('')
+    h+=(arr.length?arr:[{id:'new',t:''}]).map((o,i)=>`<div class="row-in" style="align-items:flex-start"><textarea class="inp" data-act="kbtext" ${A} data-e="${o.id}" placeholder="${esc(i?f.kb+' '+more:(f.ph||'اكتب هنا'))}">${esc(o.t||'')}</textarea>${arr.length>1?xbtn('kbdel',`${A} data-e="${o.id}"`):''}</div>${o.id!=='new'&&(o.t||'').trim()?tagRow(o,A,d.id+f.id+o.id):''}`).join('')
       +(()=>{const key=d.id+f.id,busy=view.aiBusy&&view.aiBusy.key===key,isRec=rec&&rec.key===key;
       return `<div class="kbt"><button class="link" data-act="kbadd" ${A}>+ ${esc(f.kb)} ${more}</button><span class="tools">${busy?`<span class="busytxt"><i class="spin"></i>${esc(view.aiBusy.label)}</span>`:isRec?`<span class="busytxt rect" data-rect>0:00</span>`:''}
         <label class="tool ${busy||rec?'off':''}" aria-label="صوّر الصفحة" title="صوّر الصفحة">${ico('cam')}<input type="file" accept="image/*" data-act="ocr" ${A} hidden></label>
@@ -792,7 +797,7 @@ async function token(){if(Date.now()<auth.exp)return auth.at;try{setSession(awai
 async function rest(path,opt={}){const tk=await token();const r=await fetch(SB+'/rest/v1/'+path,{...opt,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json',...(opt.headers||{})}});
   if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||('HTTP '+r.status))}return r.status===204||r.status===201?null:r.json().catch(()=>null)}
 function mergeDB(a,b){const m=cp(a),ua=(x=[],y=[])=>{const ids=new Set(x.map(o=>o&&o.id));return x.concat((y||[]).filter(o=>o&&!ids.has(o.id)))};
-  ['notes','p40','journeys','people','duas','faults','deeds'].forEach(k=>m[k]=ua(a[k],b[k]));
+  ['notes','p40','journeys','people','duas','faults','deeds'].forEach(k=>m[k]=ua(a[k],b[k]));m.tags=[...new Set([...(a.tags||[]),...(b.tags||[])])];
   m.gsecs=ua(a.gsecs,b.gsecs).map(s=>{const o=(b.gsecs||[]).find(x=>x.id===s.id);return o?{...s,items:ua(s.items,o.items)}:s});
   for(const t2 in b.goals||{})m.goals[t2]=ua((a.goals||{})[t2],b.goals[t2]);
   for(const k in b.plans||{})m.plans[k]=ua((a.plans||{})[k],b.plans[k]);
@@ -880,8 +885,18 @@ function renderGoals(){const j=activeJ(),gt=view.gtype||(j?j.type:'d40'),s=j&&j.
   db.gsecs.forEach(sec=>{const d=sec.items.filter(x=>x.done).length;h+=`<section class="card rise"><div class="ch"><h2>${esc(sec.name)}</h2>${xbtn('gsec-del',`data-id="${sec.id}"`,'امسح القسم')}</div>${sec.items.map(g=>`<div class="check ${g.done?'done':''}">${tick('goal-done',`data-w="s:${sec.id}" data-id="${g.id}"`,g.done)}<div class="t"><span>${esc(g.text)}</span></div>${xbtn('goal-del',`data-w="s:${sec.id}" data-id="${g.id}"`)}</div>`).join('')||'<p class="lead">لسه فاضي.</p>'}
    <div class="row-in"><input class="inp" id="g-${sec.id}" placeholder="هدف جديد"><button class="btn sm" data-act="goal-add" data-w="s:${sec.id}">أضف</button></div></section>`});
   return h+`<div class="row-in"><input class="inp" id="gsec-new" placeholder="قسم جديد"><button class="btn ghost sm" data-act="gsec-add">أضف قسم</button></div>`}
+/* tags, like Google Keep: several per entry, filter by any of them */
+function tagRow(o,A,key){const tg=o.tags||[],open=view.tagFor===key;
+  let h=`<div class="tagrow">${tg.map(x=>`<span class="tg">${esc(x)}</span>`).join('')}<button class="tg add" data-act="tag-open" data-key="${esc(key)}">${ico('tag')}${tg.length?'تعديل':'تصنيف'}</button></div>`;
+  if(open){const all=[...new Set([...(db.tags||[]),...tg])];
+    h+=`<div class="tagbox">${all.length?`<div class="tagrow">${all.map(x=>`<button class="chip" data-act="tag-tog" ${A} data-e="${o.id}" data-v="${esc(x)}" aria-pressed="${tg.includes(x)}">${esc(x)}</button>`).join('')}</div>`:'<p class="small muted">لسه معندكش تصنيفات. اكتب أول واحد.</p>'}
+      <div class="row-in"><input class="inp" id="tagnew" placeholder="تصنيف جديد، زي: الصبر"><button class="btn ghost sm" data-act="tag-new" ${A} data-e="${o.id}">أضف</button></div>
+      <button class="link" data-act="tag-open" data-key="" style="align-self:flex-start">تمام</button></div>`}
+  return h}
+function setTag(d,fid,eid,tag,on){const e=E(d.id);e.a=e.a||{};const arr=kbArr(e.a[fid]),o=arr.find(x=>x.id===eid);if(!o)return;
+  o.tags=(o.tags||[]).filter(x=>x!==tag);if(on)o.tags.push(tag);db.tags=db.tags||[];if(!db.tags.includes(tag))db.tags.push(tag);e.a[fid]=arr;save()}
 function kbItems(){const out=[];Object.keys(db.logs).sort().reverse().forEach(k=>{const l=db.logs[k];for(const id in l){const d=byId(id),e=l[id];if(!d||!e||!e.a)continue;
-    fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{const v=(o.t||'').trim();if(v)out.push({k,id,f:f.id,eid:o.id,type:f.kb,text:v})}))}});return out}
+    fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{const v=(o.t||'').trim();if(v)out.push({k,id,f:f.id,eid:o.id,type:f.kb,text:v,tags:o.tags||[]})}))}});return out}
 /* spaced repetition (Leitner): remembered well -> longer gap, forgot -> back tomorrow */
 const KB_INT=[1,1,3,7,14,30,60,120];
 const kbKey=x=>`${x.k}|${x.id}|${x.f}`+(x.eid&&x.eid!=='0'?'|'+x.eid:'');
@@ -902,16 +917,16 @@ function reviewCard(){if(view.day!==dayKey())return '';const td=kbToday();if(!td
   else h+=`<p class="lead">خلّصت مراجعة النهارده. اللي فاكره كويس هيرجعلك بعد مدة أطول، واللي نسيته هيرجعلك بكرة.</p><button class="btn ghost" data-act="kb-more">راجع كمان واحدة</button>`;
   return h+'</section>'}
 const kbNext=x=>{const s=(db.kbr||{})[kbKey(x)];if(!s)return 'لسه ماتراجعش';const d=diffDays(dayKey(),s.due);return d<=0?'عليه مراجعة':`المراجعة الجاية بعد ${num(d)} يوم`};
-function kbList(){const all=kbItems(),q=(view.kbq||'').trim(),L=all.filter(x=>(!view.kbt||x.type===view.kbt)&&(!q||x.text.includes(q)));
+function kbList(){const all=kbItems(),q=(view.kbq||'').trim(),sel=view.kbtags||[],L=all.filter(x=>(!view.kbt||x.type===view.kbt)&&sel.every(s=>x.tags.includes(s))&&(!q||x.text.includes(q)||x.tags.some(s=>s.includes(q))));
   if(!L.length)return `<p class="empty">${all.length?'مفيش نتايج.':'لسه مكتبتش حاجة. افتح "التعليم الانفرادي" في يومك واكتب حديث اليوم وآيته وقصته.'}</p>`;
   const G=new Map();L.forEach(x=>{if(!G.has(x.k))G.set(x.k,[]);G.get(x.k).push(x)});
-  return [...G].map(([k,arr])=>`<section class="slot"><div class="slot-h"><span>${fmt(k,{weekday:'long',day:'numeric',month:'long'})}</span></div><div class="ncards">${arr.map(x=>`<button class="ncard" data-act="kb-open" data-k="${x.k}" data-id="${x.id}"><span class="nm"><span class="badge done">${esc(x.type)}</span><span class="small muted">${kbNext(x)}</span></span><p>${esc(x.text)}</p></button>`).join('')}</div></section>`).join('')}
+  return [...G].map(([k,arr])=>`<section class="slot"><div class="slot-h"><span>${fmt(k,{weekday:'long',day:'numeric',month:'long'})}</span></div><div class="ncards">${arr.map(x=>`<button class="ncard" data-act="kb-open" data-k="${x.k}" data-id="${x.id}"><span class="nm"><span class="badge done">${esc(x.type)}</span><span class="small muted">${kbNext(x)}</span></span><p>${esc(x.text)}</p>${x.tags.length?`<span class="tagrow">${x.tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}</span>`:''}</button>`).join('')}</div></section>`).join('')}
 function renderKB(){const all=kbItems(),types=[...new Set(KBF.map(f=>f.kb).concat(all.map(x=>x.type)))],cnt=t2=>all.filter(x=>x.type===t2).length;
   let h=`<p class="lead">كل حديث وآية وقصة كتبتهم في التعليم الانفرادي، متجمّعين هنا عشان تراجعهم كل فترة.</p>
    <div class="stats">${types.map(t2=>`<button class="stat" data-act="kbt" data-v="${esc(t2)}" style="text-align:start;${view.kbt===t2?'outline:2px solid var(--forest)':''}"><b>${num(cnt(t2))}</b><span>${esc(t2==='آية'?'آيات':t2==='حديث'?'أحاديث':t2==='قصة'?'قصص':t2)}</span></button>`).join('')}</div>`;
   if(all.length){const pick=view.kbPick!=null&&all[view.kbPick%all.length];
     h+=`<section class="card fcard"><div class="ch"><span class="eyebrow">راجع واحدة</span><button class="link" data-act="kb-rand">${pick?'غيرها':'طلّع واحدة عشوائية'}</button></div>${pick?`<span class="badge done" style="align-self:flex-start">${esc(pick.type)}</span><p class="ftext">${esc(pick.text)}</p><span class="small muted">${fmt(pick.k,{weekday:'long',day:'numeric',month:'long'})}</span>`:'<p class="lead">اضغط وهيطلعلك حديث أو آية أو قصة من اللي كتبتهم.</p>'}</section>`}
-  return h+`<input class="inp" type="search" data-act="kbq" value="${esc(view.kbq||'')}" placeholder="دوّر في بنك المعرفة"><div class="filters"><button class="chip" data-act="kbt" data-v="" aria-pressed="${!view.kbt}">الكل · ${num(all.length)}</button>${types.map(t2=>`<button class="chip" data-act="kbt" data-v="${esc(t2)}" aria-pressed="${view.kbt===t2}">${esc(t2)}</button>`).join('')}</div><div id="kblist">${kbList()}</div>`}
+  return h+`<input class="inp" type="search" data-act="kbq" value="${esc(view.kbq||'')}" placeholder="دوّر في بنك المعرفة"><div class="filters"><button class="chip" data-act="kbt" data-v="" aria-pressed="${!view.kbt}">الكل · ${num(all.length)}</button>${types.map(t2=>`<button class="chip" data-act="kbt" data-v="${esc(t2)}" aria-pressed="${view.kbt===t2}">${esc(t2)}</button>`).join('')}</div>${(()=>{const used=[...new Set(all.flatMap(x=>x.tags))];return used.length?`<div class="tagf"><span class="small muted">التصنيفات</span><div class="filters">${used.map(s=>`<button class="chip" data-act="kbtag" data-v="${esc(s)}" aria-pressed="${(view.kbtags||[]).includes(s)}">${esc(s)} · ${num(all.filter(x=>x.tags.includes(s)).length)}</button>`).join('')}</div></div>`:''})()}<div id="kblist">${kbList()}</div>`}
 function renderDuas(){const sec=(k,t)=>{const L=db.duas.filter(x=>x.k===k);return `<section class="card rise"><h2>${t}</h2>${L.length?L.map(x=>`<div class="note-c"><p class="dua">${esc(x.text)}</p><div class="ch"><span></span>${xbtn('dua-del',`data-id="${x.id}"`)}</div></div>`).join(''):'<p class="lead">لسه فاضية.</p>'}</section>`};
   return sec('mine','أدعيتي')+sec('mathur','أدعية مأثورة')+`<section class="card rise"><h2>دعاء جديد</h2><textarea class="inp" id="duaText" placeholder="اكتب الدعاء"></textarea><div class="seg" id="duaKind">${[['mine','من أدعيتي'],['mathur','مأثور']].map(([v,t],i)=>`<button data-act="dkind" data-v="${v}" aria-pressed="${(view.dkind||'mine')===v}">${t}</button>`).join('')}</div><button class="btn block" data-act="dua-add">أضف الدعاء</button></section>`}
 function renderFaults(){const since=shift(dayKey(),-29),cnt=id=>Object.entries(db.logs).filter(([k])=>k>=since).reduce((s,[,l])=>s+Number((ans(l.tazkiya,'f')||{})[id]||0),0);
@@ -1051,6 +1066,10 @@ document.addEventListener('click',ev=>{
     r.last=today;r.reps++;db.kbr[key]=r;const td=kbToday();if(td)td.done[key]=q2;view.kbRev=null;buzz();save();render();toast(q2===0?'هيرجعلك بكرة':q2===1?`هيرجعلك بعد ${diffDays(today,r.due)} يوم`:`ممتاز. هيرجعلك بعد ${diffDays(today,r.due)} يوم`);return}
   if(a==='kb-more'){const td=kbToday();if(!td)return;const nx=kbDueSort(kbEligible().filter(x=>!td.keys.includes(kbKey(x))))[0];if(!nx){toast('راجعت كل اللي عندك النهارده');return}td.keys.push(kbKey(nx));save();return render()}
   if(a==='kbt'){view.kbt=view.kbt===v?'':v;return render()}
+  if(a==='kbtag'){const s=view.kbtags||[];view.kbtags=s.includes(v)?s.filter(x=>x!==v):[...s,v];return render()}
+  if(a==='tag-open'){view.tagFor=view.tagFor===b.dataset.key?'':b.dataset.key;return sheetEl?paintSheet():render()}
+  if(a==='tag-tog'&&d){setTag(d,fid,b.dataset.e,v,b.getAttribute('aria-pressed')!=='true');return sheetEl?paintSheet():render()}
+  if(a==='tag-new'&&d){const inp=$('#tagnew'),s=(inp&&inp.value||'').trim().replace(/^#/,'');if(!s)return;setTag(d,fid,b.dataset.e,s,true);return sheetEl?paintSheet():render()}
   if(a==='kb-rand'){const n=kbItems().length;if(n)view.kbPick=Math.floor(Math.random()*n);return render()}
   if(a==='kb-open')return openDeed(id,b.dataset.k);
   if(a==='p40-edit')return openP40();
@@ -1167,7 +1186,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   if(a==='assign'){const sh=shuraOf(j,view.day),x=sh.assign[el.dataset.v]||(sh.assign[el.dataset.v]={});x.who=v.trim();save();return}
 });
 document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(ev.target.matches('textarea.inp'))fitTA(ev.target.parentNode);if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='nd-text'&&view.nd)view.nd.text=ev.target.value;if(a==='nd-by'&&view.nd)view.nd.by=ev.target.value});
-document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id&&ev.target.id.startsWith('pl-')){ev.preventDefault();const b=document.querySelector(`[data-act="pl-add"][data-k="${ev.target.id.slice(3)}"]`);b&&b.click()}});
+document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='tagnew'){ev.preventDefault();const b=document.querySelector('[data-act="tag-new"]');if(b)b.click();return}if(ev.key==='Enter'&&ev.target.id&&ev.target.id.startsWith('pl-')){ev.preventDefault();const b=document.querySelector(`[data-act="pl-add"][data-k="${ev.target.id.slice(3)}"]`);b&&b.click()}});
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 let lastTouch=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouch<300&&!e.target.closest('input,textarea,select'))e.preventDefault();lastTouch=n},{passive:false});
 window.addEventListener('online',syncNow);window.addEventListener('offline',paintCloud);
