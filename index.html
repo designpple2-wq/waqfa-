@@ -211,12 +211,12 @@ input[type=range]{width:100%;accent-color:var(--forest)}
 .journey .t{flex:1;display:flex;flex-direction:column;gap:6px}
 .journey>svg,.row>svg{width:20px;height:20px;flex:0 0 20px;color:var(--muted)}
 /* nav */
-nav.tabs{position:fixed;inset:auto 0 0 0;z-index:40;padding:0 max(12px,env(safe-area-inset-right,0px)) calc(8px + var(--safe-b)) max(12px,env(safe-area-inset-left,0px));display:flex;justify-content:center;pointer-events:none}
+nav.tabs{position:fixed;inset:auto 0 0 0;z-index:40;padding:0 max(12px,env(safe-area-inset-right,0px)) max(8px,calc(var(--safe-b) - 14px)) max(12px,env(safe-area-inset-left,0px));display:flex;justify-content:center;pointer-events:none}
 nav.tabs>div{pointer-events:auto;width:100%;max-width:520px;background:var(--ink);border-radius:26px;display:flex;align-items:center;padding:6px;box-shadow:0 10px 30px rgba(27,27,27,.18)}
 nav.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:rgba(255,255,255,.62);font-size:11px;font-weight:600;padding:6px 0;border-radius:18px}
 nav.tabs button svg{width:22px;height:22px}
 nav.tabs button[aria-current="page"]{color:var(--neon)}
-nav.tabs button.plus{flex:0 0 56px;height:48px;background:var(--forest);color:#fff;border-radius:18px;margin:0 4px}
+nav.tabs button.plus{flex:0 0 52px;height:52px;padding:0;justify-content:center;background:var(--forest);color:#fff;border-radius:18px;margin:0 6px}
 nav.tabs button.plus svg{width:26px;height:26px}
 body.wz nav.tabs{display:none}
 .hb{display:flex;align-items:center;gap:8px}
