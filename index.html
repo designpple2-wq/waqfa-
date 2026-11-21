@@ -192,6 +192,16 @@ textarea.inp{min-height:84px;resize:vertical;line-height:1.7}
 .spark .area{fill:var(--lime);opacity:.6;stroke:none}
 .spark .base{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
 .insight{display:flex;flex-direction:column;gap:8px}
+.tgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.tcell{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:start;display:flex;flex-direction:column;gap:2px}.tcell b{font-size:16px}
+.fbox{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--white)}
+.fcard2{display:flex;flex-direction:column;gap:8px;width:100%}
+.wk{width:100%;height:64px;display:block}.dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-inline:2px 4px}
+.sdots{display:inline-flex;gap:4px}.sdots i{width:16px;height:6px;border-radius:3px;background:var(--fog)}.sdots i.on{background:var(--forest)}
+.stages{display:flex;flex-direction:column;gap:6px}
+.stages button{display:flex;align-items:center;gap:10px;text-align:start;border:1px solid var(--line);background:var(--white);border-radius:14px;padding:10px 12px;font-size:15px}
+.stages button i{font-style:normal;width:26px;height:26px;border-radius:50%;background:var(--fog);display:grid;place-items:center;font-size:13px;font-weight:700;flex:0 0 26px}
+.stages button[aria-pressed="true"]{border-color:var(--forest);background:var(--lime);font-weight:600}.stages button[aria-pressed="true"] i{background:var(--forest);color:#fff}
 .tagrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .tg{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 10px;font-size:12px;background:var(--fog);color:var(--forest-deep);border:1px solid transparent}
 .tg.add{background:transparent;border-color:var(--line);color:var(--muted);cursor:pointer}.tg svg{width:13px;height:13px}
@@ -261,7 +271,7 @@ body.wz nav.tabs{display:none}
   <button data-tab="today" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-5h4v5"/></svg>اليوم</button>
   <button data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>التقدّم</button>
   <button class="plus" data-act="quick" aria-label="إضافة سريعة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
-  <button data-tab="notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>طلعت بإيه</button>
+  <button data-tab="ilm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13"/></svg>علمي</button>
   <button data-tab="zad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>زادي</button>
 </div></nav>
 <script>
@@ -365,6 +375,17 @@ const SLOTS=[['night','آخر الليل'],['fajr','الفجر'],['duha','الض
 const STL={done:'تم',part:'جزئي',miss:'فاتني'};
 const DISCLAIMER='ما يظهر هنا وصفٌ لما سجّلته أنت، وليس حكمًا على الإخلاص أو القبول؛ فذلك إلى الله وحده.';
 const FGROUPS=[['lisan','آفات اللسان'],['qalb','آفات القلب والنفس'],['other','عيوب تانية']];
+const FSTG=['مش واخد بالي منه','باخد بالي بعد ما أقع','باخد بالي وأنا بقع','باخد بالي قبلها وبمنع نفسي','تقريبًا اختفى'];
+const FMODES=[['focus','تركيز'],['watch','كل أسبوع'],['off','مش دلوقتي']];
+const FCURE={'الغيبة':['لما حد يتكلم عن غايب قدامك، دافع عنه أو غيّر الموضوع، واذكر له حسنة.','استغفر له، وادعيله باسمه.'],
+ 'النميمة':['متنقلش كلام بين اتنين حتى لو صحيح. قول: خلّيها بينكم.','أصلح بين اللي نقلت بينهم.'],
+ 'الجدال':['لما تحس إنك داخل في نقاش للغلبة، اسكت وسيبها وانت محق، واحتسب ترك المراء.','ابدأ اللي جادلته بالسلام وكلمة طيبة.'],
+ 'الكِبر':['اقبل الحق والنصيحة من أي حد مهما كان سنه، وابدأ بالسلام، واخدم إخوانك بنفسك.','اعتذر للي تعاليت عليه.'],
+ 'العُجب':['انسب أي توفيق لربنا، وأخفي عملك، وافتكر تقصيرك وذنوبك.','ركعتين لله في السر، وقول: اللهم لك الحمد.'],
+ 'حب الظهور':['اعمل كل يوم عمل في السر محدش يعرفه، وسيب الصدارة في الكلام والمكان لغيرك.','عمل خفي زيادة النهارده.'],
+ 'شُحّ النفس':['اتصدّق كل يوم بحاجة ولو صغيرة، واعطي من حاجة بتحبها.','صدقة على قد اللي بخلت بيه.'],
+ 'الأنانية':['قدّم غيرك في الأكل والمكان والدور، واسأل نفسك: إيه اللي يريّح أخويا؟','خدمة لحد من الجماعة.'],
+ 'حب الراحة':['اختار الأصعب في الخدمة عمدًا، وقوم أول ما تصحى، وبلاش نوم بعد الفجر.','عمل شاق زيادة النهارده.']};
 const DEF_FAULTS=[['lisan','الغيبة'],['lisan','النميمة'],['lisan','الجدال'],['qalb','الكِبر'],['qalb','العُجب'],['qalb','حب الظهور'],['nafs','شُحّ النفس'],['nafs','الأنانية'],['nafs','حب الراحة']];
 const DEF_DUAS=['﴿رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ﴾','﴿رَبِّ اشْرَحْ لِي صَدْرِي ۝ وَيَسِّرْ لِي أَمْرِي﴾','اللهم إني أسألك الهدى والتقى والعفاف والغنى','يا حيّ يا قيوم برحمتك أستغيث، أصلح لي شأني كله، ولا تكلني إلى نفسي طرفة عين'];
 const NTAGS=['مفاهيم','من البيانات','رسائل','من الأحباب'];
@@ -402,12 +423,12 @@ let db=null;
 const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const defDeeds=()=>DEFAULT_DEEDS.map(d=>({...cp(d),on:true}));
 function blank(){return {version:4,deeds:defDeeds(),logs:{},reviews:{},plans:{},tags:[],p40:[],notes:[],journeys:[],people:[],
-  faults:DEF_FAULTS.map((f,i)=>({id:'flt'+i,g:f[0],name:f[1],on:true,detail:'',hist:[]})),duas:DEF_DUAS.map((t,i)=>({id:'dua'+i,text:t,k:'mathur'})),
+  faults:DEF_FAULTS.map((f,i)=>({id:'flt'+i,g:f[0],name:f[1],mode:'watch',on:true,detail:'',hist:[],stg:[]})),duas:DEF_DUAS.map((t,i)=>({id:'dua'+i,text:t,k:'mathur'})),
   goals:{d3:[],d40:[],m4:[]},gsecs:[{id:'life',name:'أهداف الحياة',items:[]},{id:'work',name:'أهداف العمل',items:[]}],settings:{dayStart:'03:30',city:'cairo',lastBackup:null,useLoc:false,loc:null},sched:{on:true,items:defSched()},noteCfg:{srcs:[...NSRC],topics:[...NTOPICS]},meta:{dirty:false,syncedAt:null}}}
 function migrate(d){const b=blank();
   if((d.version||1)<4){d.deeds=b.deeds;d.legacyLogs=d.logs;d.logs={}}
   ['p40','notes','journeys','people'].forEach(k=>d[k]=d[k]||b[k]);['logs','reviews','plans'].forEach(k=>d[k]=d[k]||{});
-  d.faults=(d.faults||b.faults).map(f=>{const x={detail:'',hist:[],g:'other',on:true,...f};if(x.g==='nafs')x.g='qalb';return x});d.tags=d.tags||[];d.duas=d.duas||b.duas;d.goals=Object.assign({d3:[],d40:[],m4:[]},d.goals||{});
+  d.faults=(d.faults||b.faults).map(f=>{const x={detail:'',hist:[],stg:[],g:'other',on:true,...f};if(x.g==='nafs')x.g='qalb';if(!x.mode)x.mode=x.on===false?'off':'watch';if(x.detail&&x.signs==null)x.signs=x.detail;return x});d.tags=d.tags||[];d.duas=d.duas||b.duas;d.goals=Object.assign({d3:[],d40:[],m4:[]},d.goals||{});
   d.gsecs=d.gsecs||b.gsecs;d.settings=Object.assign(b.settings,d.settings||{});d.sched=d.sched||b.sched;d.noteCfg=d.noteCfg||b.noteCfg;d.meta=d.meta||b.meta;normNotes(d);d.removed=d.removed||[];
   DEFAULT_DEEDS.forEach((x,i)=>{if(d.deeds.some(y=>y.id===x.id)||d.removed.includes(x.id))return;const prev=DEFAULT_DEEDS.slice(0,i).reverse().find(p=>d.deeds.some(y=>y.id===p.id));const at=prev?d.deeds.findIndex(y=>y.id===prev.id)+1:d.deeds.length;d.deeds.splice(at,0,{...cp(x),on:true})});
   if(!d.kb1){const tl=d.deeds.find(y=>y.id==='taleem');if(tl){const have=new Set((tl.perf||[]).map(f=>f.id));KBF.forEach(f=>{if(!have.has(f.id))(tl.perf=tl.perf||[]).push(cp(f))});tl.link=tl.link||'kb';if(tl.st&&tl.st.num)tl.st.orText=['hadith','ayah','qissa']}d.kb1=1}
@@ -498,9 +519,9 @@ function metrics(k){const l=db.logs[k]||{},list=daily(k);let w=0,rec=0;list.forE
   const heart=avg(pr.map(d=>score(findF(d,'heart')||{},ans(l[d.id],'heart'))));
   const quality=avg(list.flatMap(d=>(d.heart||[]).map(f=>score(f,ans(l[d.id],f.id)))));
   const adab=avg(list.filter(d=>d.cat==='adab').flatMap(d=>d.perf.map(f=>score(f,ans(l[d.id],f.id)))));
-  const fc=ans(l.tazkiya,'f')||{},faults=Object.values(fc).reduce((s,x)=>s+Number(x||0),0);
+  const fc=ans(l.tazkiya,'f')||{},faults=Object.values(fc).reduce((s,x)=>s+Number(x||0),0),fwc=ans(l.tazkiya,'fw')||{},wins=Object.values(fwc).reduce((s,x)=>s+Number(x||0),0);
   const pl=db.plans[k]||[],pd=pl.filter(x=>x.done).length;
-  return {n:list.length,rec,pct:list.length?w/list.length:0,heart,quality,adab,faults,fc,plan:pl.length?pd/pl.length:null,pd,pn:pl.length,
+  return {n:list.length,rec,pct:list.length?w/list.length:0,heart,quality,adab,faults,fc,wins,fwc,plan:pl.length?pd/pl.length:null,pd,pn:pl.length,
     distract:pr.flatMap(d=>ans(l[d.id],'distract')||[])}}
 function windowNow(){const k=dayKey(),P=timesFor(k),d=new Date(),now=d.getHours()*60+d.getMinutes(),ds=dsMin();let key;
   if(now>=P.isha-10||now<ds)key='isha';else if(now<P.fajr-10)key='night';else if(now<P.sunrise+15)key='fajr';else if(now<P.dhuhr-10)key='duha';else if(now<P.asr-10)key='dhuhr';else if(now<P.maghrib-10)key='asr';else key='maghrib';
@@ -536,8 +557,11 @@ function fieldHTML(d,f,e,k){if(!visible(f,e,k))return '';const v=ans(e,f.id),A=`
         <button class="tool ${isRec?'rec':''} ${busy||(rec&&!isRec)?'off':''}" data-act="mic" ${A} aria-label="${isRec?'وقّف التسجيل':'سجّل بصوتك'}" title="${isRec?'وقّف التسجيل':'سجّل بصوتك'}">${ico(isRec?'stop':'mic')}</button></span></div>`})()}
   else if(f.type==='text'){h+=`<textarea class="inp" data-act="text" ${A} placeholder="${esc(f.ph||'اكتب هنا')}">${esc(v||'')}</textarea>`}
   else if(f.type==='counts'){const c=v||{};h+=`<div>${f.items.map(it=>{const n=Number(c[it.n]||0);return `<div class="crow"><span class="n">${esc(it.n)}</span><span class="mini"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="-10">−</button><input type="number" inputmode="numeric" data-act="cnt" ${A} data-k="${esc(it.n)}" value="${n||''}" placeholder="0"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="33">+</button></span><span class="g ${n>=it.goal?'ok':''}">/ ${num(it.goal)}</span></div>`}).join('')}</div><p class="small muted">+ بيزوّد ٣٣، و− بينقص ١٠. وتقدر تكتب الرقم بإيدك.</p>`}
-  else if(f.type==='faults'){const c=v||{};const fl=db.faults.filter(x=>x.on);
-    h+=fl.length?`<div>${fl.map(x=>{const n=Number(c[x.id]||0);return `<div class="crow"><span class="n">${esc(x.name)}</span><span class="mini"><button data-act="finc" ${A} data-k="${x.id}" data-n="-1">−</button><input type="number" inputmode="numeric" data-act="fcnt" ${A} data-k="${x.id}" value="${n||''}" placeholder="0"><button data-act="finc" ${A} data-k="${x.id}" data-n="1">+</button></span><span class="g">مرة</span></div>`}).join('')}</div>`:'<p class="small muted">مفيش عيوب مفعّلة. فعّلها من مرآة العيوب.</p>';
+  else if(f.type==='faults'){const c=v||{},w=ans(e,'fw')||{},foc=db.faults.filter(x=>x.mode==='focus'),oth=db.faults.filter(x=>x.mode==='watch');
+    const ctr=(x,fid,store,lbl)=>{const n=Number(store[x.id]||0);return `<div class="crow"><span class="n">${lbl}</span><span class="mini"><button data-act="finc" data-id="${d.id}" data-f="${fid}" data-k="${x.id}" data-n="-1">−</button><input type="number" inputmode="numeric" data-act="fcnt" data-id="${d.id}" data-f="${fid}" data-k="${x.id}" value="${n||''}" placeholder="0"><button data-act="finc" data-id="${d.id}" data-f="${fid}" data-k="${x.id}" data-n="1">+</button></span><span class="g">مرة</span></div>`};
+    h+=foc.length?foc.map(x=>`<div class="fbox"><div class="ch"><b>${esc(x.name)}</b><span class="badge">${fStage(x)?esc(FSTG[fStage(x)-1]):'عيب تركيز'}</span></div>${ctr(x,f.id,c,'وقعت فيه')}${ctr(x,'fw',w,'قاومته وانتصرت')}</div>`).join('')
+      :'<p class="small muted">مفيش عيب تركيز. اختار عيب أو اتنين من مرآة العيوب تركّز عليهم.</p>';
+    if(oth.length){const open=view.fmore||!foc.length;h+=open?`<span class="lb">${foc.length?'باقي العيوب':'وقعت في إيه؟'}</span><div>${oth.map(x=>ctr(x,f.id,c,esc(x.name))).join('')}</div>`:`<button class="link" data-act="fmore" style="align-self:flex-start">باقي العيوب (${num(oth.length)})</button>`}
     h+=`<button class="link" data-act="zad-go" data-v="faults" style="align-self:flex-start">مرآة العيوب ←</button>`}
   return h+'</div>'}
 function deedBody(d,k){const e=(db.logs[k]||{})[d.id]||{a:{}};
@@ -571,7 +595,7 @@ function render(){
   document.querySelectorAll('nav.tabs [data-tab]').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===view.tab&&!view.sub?'page':'false'));
   const s=view.sub;let h;
   if(s==='review')h=renderReview();else if(s==='khuruj')h=renderKhuruj();else if(s==='shura')h=renderShura();else if(s==='settings')h=renderSettings();else if(s==='custom')h=renderCustom();else if(s==='cat')h=renderCat();else if(s==='sched')h=renderSched();else if(s==='harvest')h=renderHarvest();
-  else h=view.tab==='today'?renderToday():view.tab==='progress'?renderProgress():view.tab==='notes'?renderNotes():renderZad();
+  else h=view.tab==='today'?renderToday():view.tab==='progress'?renderProgress():(view.tab==='ilm'||view.tab==='notes')?renderIlm():renderZad();
   $('#app').innerHTML=h;
   document.querySelectorAll('.wz-nav').forEach(x=>{if(view.sub!=='review')x.remove()});
   document.body.classList.toggle('wz',view.sub==='review');
@@ -684,7 +708,7 @@ function summaryText(k,H){const {m,cats}=H,y=metrics(shift(k,-1)),S=[];const P=v
   const rk=cats.filter(c=>c.v!=null).sort((a,b)=>b.v-a.v);if(rk.length>1&&rk[0].v-rk[rk.length-1].v>.1)S.push(`أقوى حاجة كانت ${rk[0].n} (${P(rk[0].v)})، وأضعف حاجة ${rk[rk.length-1].n} (${P(rk[rk.length-1].v)}).`);
   const miss=cats.flatMap(c=>c.ds).filter(x=>!x.s||x.s==='miss').map(x=>dname(x.d,k));if(miss.length)S.push(`فاتك: ${miss.slice(0,4).join('، ')}${miss.length>4?` و${miss.length-4} كمان`:''}.`);else S.push('سجّلت كل أعمال اليوم.');
   if(m.heart!=null){const c={};m.distract.forEach(x=>c[x]=(c[x]||0)+1);const tp=Object.entries(c).sort((a,b)=>b[1]-a[1])[0];S.push(`حضور قلبك في الصلاة ${P(m.heart)}${tp?`، وأكتر حاجة شغلتك: ${tp[0]}`:''}.`)}
-  if(m.faults>0){const tp=Object.entries(m.fc).sort((a,b)=>b[1]-a[1])[0],nm=tp&&(db.faults.find(f=>f.id===tp[0])||{}).name;S.push(`وقعت في العيوب ${m.faults} ${m.faults>2&&m.faults<11?'مرات':'مرة'}${nm?`، أكترها: ${nm}`:''}.`)}
+  const mr=n=>`${n} ${n>2&&n<11?'مرات':'مرة'}`;if(m.faults>0||m.wins>0){const tp=Object.entries(m.fc).sort((a,b)=>b[1]-a[1])[0],nm=tp&&Number(tp[1])&&(db.faults.find(f=>f.id===tp[0])||{}).name;S.push([m.faults?`وقعت في العيوب ${mr(m.faults)}${nm?`، أكترها: ${nm}`:''}`:'',m.wins?`انتصرت على نفسك ${mr(m.wins)}`:''].filter(Boolean).join('، و')+'.')}
   if(m.pn)S.push(`نفّذت ${m.pd} من ${m.pn} من خطة النهارده.`);
   return S}
 function renderHarvest(){const k=view.day,H=harvest(k),{m,cats}=H,y=metrics(shift(k,-1)),r=db.reviews[k]||{},j=jOn(k);
@@ -721,8 +745,24 @@ function renderProgress(){const today=dayKey(),[y,mo]=view.month.split('-').map(
 /* ---------- notes (طلعت بإيه) ---------- */
 const noteMeta=n=>[n.src,...(n.topics||[])].filter(Boolean);
 const noteCard=n=>`<button class="ncard" data-act="note-open" data-id="${n.id}"><p>${esc(n.text)}</p><span class="nm">${n.star?'<span class="star">★</span>':''}${noteMeta(n).map(x=>`<span class="badge">${esc(x)}</span>`).join('')}${n.by?`<span class="small muted">— ${esc(n.by)}</span>`:''}</span></button>`;
+/* ---------- علمي: الأحاديث والآيات والقصص + الفوايد + التصنيفات ---------- */
+const kbCard=x=>`<button class="ncard" data-act="kb-open" data-k="${x.k}" data-id="${x.id}"><span class="nm"><span class="badge done">${esc(x.type)}</span><span class="small muted">${kbNext(x)}</span></span><p>${esc(x.text)}</p>${x.tags.length?`<span class="tagrow">${x.tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}</span>`:''}</button>`;
+function allTags(){const kb=kbItems(),m=new Map();const add=(s,key)=>{if(!s)return;const o=m.get(s)||{kb:0,notes:0};if(key)o[key]++;m.set(s,o)};
+  (db.tags||[]).forEach(s=>add(s));(db.noteCfg.topics||[]).forEach(s=>add(s));kb.forEach(x=>x.tags.forEach(s=>add(s,'kb')));db.notes.forEach(n=>(n.topics||[]).forEach(s=>add(s,'notes')));
+  return [...m].map(([s,o])=>({s,...o})).sort((a,b)=>(b.kb+b.notes)-(a.kb+a.notes))}
+function renderTags(){const T=allTags();
+  if(view.itag){const s=view.itag,kb=kbItems().filter(x=>x.tags.includes(s)),nt=db.notes.filter(n=>(n.topics||[]).includes(s)).slice().reverse();
+    return `<div class="ch"><h2 class="title" style="font-size:24px">${esc(s)}</h2><button class="link" data-act="itag" data-v="">كل التصنيفات</button></div>
+     ${kb.length?`<section class="slot"><div class="slot-h"><span>أحاديث وآيات وقصص · ${num(kb.length)}</span></div><div class="ncards">${kb.map(kbCard).join('')}</div></section>`:''}
+     ${nt.length?`<section class="slot"><div class="slot-h"><span>فوايد · ${num(nt.length)}</span></div><div class="ncards">${nt.map(noteCard).join('')}</div></section>`:''}
+     ${!kb.length&&!nt.length?'<p class="empty">لسه مفيش حاجة في التصنيف ده.</p>':''}`}
+  return `<p class="lead">اختار تصنيف، يطلعلك كل اللي كتبته فيه: أحاديث وآيات وقصص، وفوايد البيانات والحلقات.</p>
+   ${T.length?`<div class="tgrid">${T.map(o=>`<button class="tcell" data-act="itag" data-v="${esc(o.s)}"><b>${esc(o.s)}</b><span class="small muted">${o.kb+o.notes?num(o.kb+o.notes):'فاضي'}</span></button>`).join('')}</div>`:'<p class="empty">لسه مفيش تصنيفات.</p>'}`}
+function renderIlm(){const v=view.ilm||'kb',n=kbItems().length+db.notes.length;
+  return top(`${num(n)} حاجة اتعلمتها`,'علمي',gearBtn)+`<div class="seg-tabs">${[['kb','أحاديث وآيات'],['notes','الفوايد'],['tags','التصنيفات']].map(([x,l])=>`<button data-act="ilm" data-v="${x}" aria-pressed="${v===x}">${l}</button>`).join('')}</div>`
+   +(v==='notes'?renderNotes():v==='tags'?renderTags():renderKB())}
 function renderNotes(){const v=view.nview||'days';
-  return top(`${num(db.notes.length)} فائدة`,'طلعت بإيه',gearBtn)+`<p class="lead">دفتر الفوايد: اللي بتطلع بيه من البيانات والحلقات والمواقف، عشان ترجعله وتعمل بيه.</p>
+  return `<p class="lead">دفتر الفوايد: اللي بتطلع بيه من البيانات والحلقات والمواقف، عشان ترجعله وتعمل بيه.</p>
    <button class="btn block" data-act="note-new">+ فائدة جديدة</button>
    <input class="inp" type="search" data-act="nsearch" value="${esc(view.nq)}" placeholder="دوّر في فوايدك">
    <div class="seg-tabs">${[['days','بالأيام'],['topic','بالموضوع'],['src','بالمصدر'],['star','المميّزة']].map(([x,l])=>`<button data-act="nview" data-v="${x}" aria-pressed="${v===x}">${l}</button>`).join('')}</div>
@@ -875,8 +915,8 @@ function useLocation(){if(!navigator.geolocation){toast('الموقع مش مت�
    ()=>toast('مقدرناش نجيب الموقع. اسمح بالموقع من إعدادات الموبايل'),{timeout:15000,maximumAge:3600e3})}
 
 /* ---------- zad ---------- */
-function renderZad(){const z=view.zad;let h=top('زادي',{goals:'أهدافي',kb:'بنك المعرفة',duas:'أدعيتي',faults:'مرآة العيوب'}[z],gearBtn)+`<div class="seg-tabs">${[['goals','أهدافي'],['kb','بنك المعرفة'],['duas','أدعيتي'],['faults','مرآة العيوب']].map(([v,t])=>`<button data-act="zad" data-v="${v}" aria-pressed="${z===v}">${t}</button>`).join('')}</div>`;
-  return h+(z==='goals'?renderGoals():z==='kb'?renderKB():z==='duas'?renderDuas():renderFaults())}
+function renderZad(){if(view.zad==='kb')view.zad='goals';const z=view.zad;let h=top('زادي',{goals:'أهدافي',duas:'أدعيتي',faults:'مرآة العيوب'}[z],gearBtn)+`<div class="seg-tabs">${[['goals','أهدافي'],['duas','أدعيتي'],['faults','مرآة العيوب']].map(([v,t])=>`<button data-act="zad" data-v="${v}" aria-pressed="${z===v}">${t}</button>`).join('')}</div>`;
+  return h+(z==='goals'?renderGoals():z==='duas'?renderDuas():renderFaults())}
 const metricVal=(m,j,s)=>m==='people'?db.people.filter(p=>p.j===j.id).length:s[m];
 function renderGoals(){const j=activeJ(),gt=view.gtype||(j?j.type:'d40'),s=j&&j.type===gt?jStats(j):null,G=db.goals[gt];
   let h=`<section class="card rise"><h2>أرقام الخروج</h2><p class="lead">أهداف مربوطة بأرقام، وتقدّمها بيتحسب لوحده من تسجيلاتك.</p><div class="chips">${Object.entries(JTYPES).map(([id,t])=>`<button class="chip" data-act="gtype" data-v="${id}" aria-pressed="${gt===id}">${t.label}</button>`).join('')}</div>
@@ -888,7 +928,7 @@ function renderGoals(){const j=activeJ(),gt=view.gtype||(j?j.type:'d40'),s=j&&j.
 /* tags, like Google Keep: several per entry, filter by any of them */
 function tagRow(o,A,key){const tg=o.tags||[],open=view.tagFor===key;
   let h=`<div class="tagrow">${tg.map(x=>`<span class="tg">${esc(x)}</span>`).join('')}<button class="tg add" data-act="tag-open" data-key="${esc(key)}">${ico('tag')}${tg.length?'تعديل':'تصنيف'}</button></div>`;
-  if(open){const all=[...new Set([...(db.tags||[]),...tg])];
+  if(open){const all=[...new Set([...(db.tags||[]),...(db.noteCfg.topics||[]),...tg])];
     h+=`<div class="tagbox">${all.length?`<div class="tagrow">${all.map(x=>`<button class="chip" data-act="tag-tog" ${A} data-e="${o.id}" data-v="${esc(x)}" aria-pressed="${tg.includes(x)}">${esc(x)}</button>`).join('')}</div>`:'<p class="small muted">لسه معندكش تصنيفات. اكتب أول واحد.</p>'}
       <div class="row-in"><input class="inp" id="tagnew" placeholder="تصنيف جديد، زي: الصبر"><button class="btn ghost sm" data-act="tag-new" ${A} data-e="${o.id}">أضف</button></div>
       <button class="link" data-act="tag-open" data-key="" style="align-self:flex-start">تمام</button></div>`}
@@ -920,7 +960,7 @@ const kbNext=x=>{const s=(db.kbr||{})[kbKey(x)];if(!s)return 'لسه ماترا�
 function kbList(){const all=kbItems(),q=(view.kbq||'').trim(),sel=view.kbtags||[],L=all.filter(x=>(!view.kbt||x.type===view.kbt)&&sel.every(s=>x.tags.includes(s))&&(!q||x.text.includes(q)||x.tags.some(s=>s.includes(q))));
   if(!L.length)return `<p class="empty">${all.length?'مفيش نتايج.':'لسه مكتبتش حاجة. افتح "التعليم الانفرادي" في يومك واكتب حديث اليوم وآيته وقصته.'}</p>`;
   const G=new Map();L.forEach(x=>{if(!G.has(x.k))G.set(x.k,[]);G.get(x.k).push(x)});
-  return [...G].map(([k,arr])=>`<section class="slot"><div class="slot-h"><span>${fmt(k,{weekday:'long',day:'numeric',month:'long'})}</span></div><div class="ncards">${arr.map(x=>`<button class="ncard" data-act="kb-open" data-k="${x.k}" data-id="${x.id}"><span class="nm"><span class="badge done">${esc(x.type)}</span><span class="small muted">${kbNext(x)}</span></span><p>${esc(x.text)}</p>${x.tags.length?`<span class="tagrow">${x.tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}</span>`:''}</button>`).join('')}</div></section>`).join('')}
+  return [...G].map(([k,arr])=>`<section class="slot"><div class="slot-h"><span>${fmt(k,{weekday:'long',day:'numeric',month:'long'})}</span></div><div class="ncards">${arr.map(kbCard).join('')}</div></section>`).join('')}
 function renderKB(){const all=kbItems(),types=[...new Set(KBF.map(f=>f.kb).concat(all.map(x=>x.type)))],cnt=t2=>all.filter(x=>x.type===t2).length;
   let h=`<p class="lead">كل حديث وآية وقصة كتبتهم في التعليم الانفرادي، متجمّعين هنا عشان تراجعهم كل فترة.</p>
    <div class="stats">${types.map(t2=>`<button class="stat" data-act="kbt" data-v="${esc(t2)}" style="text-align:start;${view.kbt===t2?'outline:2px solid var(--forest)':''}"><b>${num(cnt(t2))}</b><span>${esc(t2==='آية'?'آيات':t2==='حديث'?'أحاديث':t2==='قصة'?'قصص':t2)}</span></button>`).join('')}</div>`;
@@ -929,19 +969,40 @@ function renderKB(){const all=kbItems(),types=[...new Set(KBF.map(f=>f.kb).conca
   return h+`<input class="inp" type="search" data-act="kbq" value="${esc(view.kbq||'')}" placeholder="دوّر في بنك المعرفة"><div class="filters"><button class="chip" data-act="kbt" data-v="" aria-pressed="${!view.kbt}">الكل · ${num(all.length)}</button>${types.map(t2=>`<button class="chip" data-act="kbt" data-v="${esc(t2)}" aria-pressed="${view.kbt===t2}">${esc(t2)}</button>`).join('')}</div>${(()=>{const used=[...new Set(all.flatMap(x=>x.tags))];return used.length?`<div class="tagf"><span class="small muted">التصنيفات</span><div class="filters">${used.map(s=>`<button class="chip" data-act="kbtag" data-v="${esc(s)}" aria-pressed="${(view.kbtags||[]).includes(s)}">${esc(s)} · ${num(all.filter(x=>x.tags.includes(s)).length)}</button>`).join('')}</div></div>`:''})()}<div id="kblist">${kbList()}</div>`}
 function renderDuas(){const sec=(k,t)=>{const L=db.duas.filter(x=>x.k===k);return `<section class="card rise"><h2>${t}</h2>${L.length?L.map(x=>`<div class="note-c"><p class="dua">${esc(x.text)}</p><div class="ch"><span></span>${xbtn('dua-del',`data-id="${x.id}"`)}</div></div>`).join(''):'<p class="lead">لسه فاضية.</p>'}</section>`};
   return sec('mine','أدعيتي')+sec('mathur','أدعية مأثورة')+`<section class="card rise"><h2>دعاء جديد</h2><textarea class="inp" id="duaText" placeholder="اكتب الدعاء"></textarea><div class="seg" id="duaKind">${[['mine','من أدعيتي'],['mathur','مأثور']].map(([v,t],i)=>`<button data-act="dkind" data-v="${v}" aria-pressed="${(view.dkind||'mine')===v}">${t}</button>`).join('')}</div><button class="btn block" data-act="dua-add">أضف الدعاء</button></section>`}
-function renderFaults(){const since=shift(dayKey(),-29),cnt=id=>Object.entries(db.logs).filter(([k])=>k>=since).reduce((s,[,l])=>s+Number((ans(l.tazkiya,'f')||{})[id]||0),0);
-  let h='<p class="lead">كل يوم بتسجّل كام مرة وقعت في كل عيب. وكل أسبوع حدّث نسبته: تقديرك لقوّته فيك دلوقتي.</p>';
-  FGROUPS.forEach(([g,t])=>{const fl=db.faults.filter(f=>f.g===g);if(g==='other'&&!fl.length)return;
-    h+=`<section class="slot rise"><div class="slot-h"><span>${t}</span></div><div class="list">${fl.map(f=>{const p=fPct(f),c=cnt(f.id);return `<button class="row" data-act="fault" data-id="${f.id}"><span class="t"><b>${esc(f.name)}</b><span>${p!=null?`${num(p,'%')}`:'من غير نسبة'}${c?` · وقعت فيه ${num(c)} مرة في ٣٠ يوم`:''}${f.on?'':' · مش متابَع'}</span></span>${p!=null?`<span class="meter" style="width:64px;flex:0 0 64px"><i style="width:${p}%;background:var(--alert)"></i></span>`:''}</button>`}).join('')}</div>
+const fStage=f=>{const s=f.stg||[];return s.length?s[s.length-1][1]:0};
+const fStageAt=f=>{const s=f.stg||[];return s.length?s[s.length-1][0]:null};
+function fRange(id,from,to){let fa=0,wi=0;for(const k in db.logs){if(k<from||k>to)continue;const tz=db.logs[k].tazkiya;fa+=Number((ans(tz,'f')||{})[id]||0);wi+=Number((ans(tz,'fw')||{})[id]||0)}return {fa,wi}}
+const fWeeks=(id,n=8)=>Array.from({length:n},(_,i)=>{const to=shift(dayKey(),-7*(n-1-i)),r=fRange(id,shift(to,-6),to);return r});
+function wkBars(id){const W8=fWeeks(id),mx=Math.max(1,...W8.map(r=>Math.max(r.fa,r.wi))),bw=14,gap=10,H=56;
+  return `<svg viewBox="0 0 ${W8.length*(bw*2+gap)} ${H+14}" class="wk" preserveAspectRatio="none">${W8.map((r,i)=>{const x=i*(bw*2+gap),hf=r.fa/mx*H,hw=r.wi/mx*H;
+    return `<rect x="${x}" y="${H-hf}" width="${bw-2}" height="${Math.max(hf,1)}" rx="3" fill="var(--alert)" opacity=".75"/><rect x="${x+bw}" y="${H-hw}" width="${bw-2}" height="${Math.max(hw,1)}" rx="3" fill="var(--forest)"/>`}).join('')}</svg>
+    <div class="ch small muted"><span><i class="dot" style="background:var(--alert)"></i> وقعت <i class="dot" style="background:var(--forest)"></i> انتصرت</span><span>آخر ٨ أسابيع</span></div>`}
+const stgDots=n=>`<span class="sdots">${FSTG.map((_,i)=>`<i class="${i<n?'on':''}"></i>`).join('')}</span>`;
+function fGrad(f){const s=f.stg||[];if(fStage(f)<5)return false;let i=s.length-1;while(i>0&&s[i-1][1]===5)i--;return diffDays(s[i][0],dayKey())>=14}
+function renderFaults(){const td=dayKey(),since=shift(td,-29),foc=db.faults.filter(f=>f.mode==='focus');
+  let h='<p class="lead">ركّز على عيب أو اتنين بس. كل يوم سجّل وقعت فيه كام مرة، وقاومته كام مرة. وكل أسبوع حدّد وصلت لأنهي مرحلة.</p>';
+  const due=foc.filter(f=>!fStageAt(f)||diffDays(fStageAt(f),td)>=7);
+  if(due.length)h+=`<section class="card rise" style="border-color:var(--forest)"><span class="eyebrow">وقفة الأسبوع</span><h2>وصلت لفين؟</h2><p class="lead">حدّد مرحلتك في: ${due.map(f=>esc(f.name)).join('، ')}.</p><div class="tagrow">${due.map(f=>`<button class="btn ghost sm" data-act="fault" data-id="${f.id}">${esc(f.name)}</button>`).join('')}</div></section>`;
+  foc.filter(fGrad).forEach(f=>{h+=`<section class="card rise"><span class="eyebrow">ما شاء الله</span><p>${esc(f.name)} بقاله أكتر من أسبوعين في آخر مرحلة. تطلّعه من التركيز وتبص عليه كل أسبوع بس؟</p><button class="btn sm" data-act="f-mode" data-id="${f.id}" data-v="watch">أيوه، وأختار عيب تاني</button></section>`});
+  h+=`<section class="slot rise"><div class="slot-h"><span>عيوب التركيز</span></div>${foc.length?foc.map(f=>{const r=fRange(f.id,shift(td,-6),td),tot=r.fa+r.wi,st=fStage(f);
+    return `<button class="card fcard2" data-act="fault" data-id="${f.id}" style="text-align:start"><div class="ch"><b style="font-size:17px">${esc(f.name)}</b>${stgDots(st)}</div><span class="small muted">${st?esc(FSTG[st-1]):'لسه محددتش المرحلة'}</span>
+      <div class="ch"><span class="small">الأسبوع ده: وقعت <bdi>${r.fa}</bdi> · انتصرت <bdi>${r.wi}</bdi></span>${tot?`<b class="pc ${r.wi/tot>=.7?'hi':r.wi/tot>=.4?'md':'lo'}">${num(Math.round(r.wi/tot*100),'%')} انتصار</b>`:''}</div>${wkBars(f.id)}</button>`}).join(''):'<p class="empty">اختار عيب أو اتنين من تحت، وخلّيهم "تركيز".</p>'}</section>`;
+  FGROUPS.forEach(([g,tt])=>{const fl=db.faults.filter(f=>f.g===g);if(g==='other'&&!fl.length)return;
+    h+=`<section class="slot rise"><div class="slot-h"><span>${tt}</span></div><div class="list">${fl.map(f=>{const c=fRange(f.id,since,td).fa,st=fStage(f);
+      return `<button class="row" data-act="fault" data-id="${f.id}"><span class="t"><b>${esc(f.name)}</b><span>${st?esc(FSTG[st-1]):'لسه محددتش المرحلة'}${c?` · وقعت فيه ${num(c)} مرة في ٣٠ يوم`:''}</span></span><span class="badge ${f.mode==='focus'?'done':''}">${FMODES.find(m=>m[0]===f.mode)[1]}</span></button>`}).join('')}</div>
      <div class="row-in"><input class="inp" id="fn-${g}" placeholder="عيب تاني"><button class="btn ghost sm" data-act="f-add" data-v="${g}">أضف</button></div></section>`});
   return h}
-function openFault(id){openSheet(()=>{const f=db.faults.find(x=>x.id===id);if(!f){closeSheet();return {head:'',body:''}}const p=fPct(f);
+function openFault(id){openSheet(()=>{const f=db.faults.find(x=>x.id===id);if(!f){closeSheet();return {head:'',body:''}}const st=fStage(f),cure=FCURE[f.name]||[];
+  const txt=(k,l,ph)=>`<div class="fld"><span class="lb">${l}</span><textarea class="inp" data-act="f-txt" data-id="${f.id}" data-k="${k}" placeholder="${esc(ph)}">${esc(f[k]??'')}</textarea></div>`;
   return {head:`<span class="eyebrow">مرآة العيوب</span><h2 class="title">${esc(f.name)}</h2>`,
-   body:`<div class="fld"><span class="lb">الاسم</span><input class="inp" data-act="f-name" data-id="${f.id}" value="${esc(f.name)}"></div>
-    <div class="fld"><span class="lb">قوّته فيّ دلوقتي: ${p!=null?num(p,'%'):'لسه ما حددتش'}</span><input type="range" min="0" max="100" step="5" value="${p??50}" data-act="f-pct" data-id="${f.id}"></div>
-    ${f.hist.length>1?`<div class="chart">${spark(f.hist.map(x=>x[1]),100)}<span class="small muted">من ${num(f.hist[0][1],'%')} في ${fmt(f.hist[0][0],{day:'numeric',month:'short'})} لـ ${num(p,'%')} النهارده</span></div>`:''}
-    <div class="fld"><span class="lb">التفاصيل: بيظهر إمتى، ومع مين، وإزاي أعالجه</span><textarea class="inp" data-act="f-detail" data-id="${f.id}">${esc(f.detail||'')}</textarea></div>
-    <div class="fld"><span class="lb">المتابعة</span><div class="seg">${[['1','بتابعه كل يوم'],['0','مش دلوقتي']].map(([v,t])=>`<button data-act="f-on" data-id="${f.id}" data-v="${v}" aria-pressed="${f.on===(v==='1')}">${t}</button>`).join('')}</div></div>`,
+   body:`<div class="fld"><span class="lb">المتابعة</span><div class="seg">${FMODES.map(([v,l])=>`<button data-act="f-mode" data-id="${f.id}" data-v="${v}" aria-pressed="${f.mode===v}">${l}</button>`).join('')}</div><span class="small muted">التركيز: بتسجّل الوقوع والانتصار كل يوم. كل أسبوع: بتبص عليه في الوقفة الأسبوعية.</span></div>
+    <div class="fld"><span class="lb">وصلت لأنهي مرحلة؟</span><div class="stages">${FSTG.map((l,i)=>`<button data-act="f-stage" data-id="${f.id}" data-v="${i+1}" aria-pressed="${st===i+1}"><i>${num(i+1)}</i>${l}</button>`).join('')}</div>
+      ${(f.stg||[]).length?`<span class="small muted">آخر تحديث: ${fmt(fStageAt(f),{day:'numeric',month:'long'})}${f.stg.length>1?` · بدأت من المرحلة ${num(f.stg[0][1])}`:''}</span>`:''}</div>
+    <div class="chart">${wkBars(f.id)}</div>
+    ${txt('signs','بيظهر فيّ إزاي؟','تصرفات محددة، زي: بقاطع اللي بيتكلم')}
+    ${txt('when','إمتى ومع مين؟','المواقف اللي بتطلّعه')}
+    ${txt('cure','العلاج بالضد: هعمل إيه عكسه؟',cure[0]||'عمل عكس العيب تعمله عمدًا')}
+    ${txt('kaff','لو وقعت فيه هعمل إيه؟',cure[1]||'استغفار، وحسنة تمحوها')}`,
    foot:`<button class="btn danger" data-act="f-del" data-id="${f.id}">امسح</button><button class="btn" data-act="close-sheet">تمام</button>`}})}
 
 /* ---------- settings & customize ---------- */
@@ -1066,6 +1127,8 @@ document.addEventListener('click',ev=>{
     r.last=today;r.reps++;db.kbr[key]=r;const td=kbToday();if(td)td.done[key]=q2;view.kbRev=null;buzz();save();render();toast(q2===0?'هيرجعلك بكرة':q2===1?`هيرجعلك بعد ${diffDays(today,r.due)} يوم`:`ممتاز. هيرجعلك بعد ${diffDays(today,r.due)} يوم`);return}
   if(a==='kb-more'){const td=kbToday();if(!td)return;const nx=kbDueSort(kbEligible().filter(x=>!td.keys.includes(kbKey(x))))[0];if(!nx){toast('راجعت كل اللي عندك النهارده');return}td.keys.push(kbKey(nx));save();return render()}
   if(a==='kbt'){view.kbt=view.kbt===v?'':v;return render()}
+  if(a==='ilm'){view.ilm=v;view.itag='';render();scrollTo(0,0);return}
+  if(a==='itag'){view.itag=v;render();scrollTo(0,0);return}
   if(a==='kbtag'){const s=view.kbtags||[];view.kbtags=s.includes(v)?s.filter(x=>x!==v):[...s,v];return render()}
   if(a==='tag-open'){view.tagFor=view.tagFor===b.dataset.key?'':b.dataset.key;return sheetEl?paintSheet():render()}
   if(a==='tag-tog'&&d){setTag(d,fid,b.dataset.e,v,b.getAttribute('aria-pressed')!=='true');return sheetEl?paintSheet():render()}
@@ -1113,7 +1176,7 @@ document.addEventListener('click',ev=>{
     secArr(d,s).push(f);upd();toast(f.opts?'ضيف اختياراته تحت':'اتضاف السؤال');return}
   /* zad */
   if(a==='zad'){view.zad=v;return render()}
-  if(a==='zad-go'){closeSheet(true);view.tab='zad';view.zad=v;view.sub=null;render();scrollTo(0,0);return}
+  if(a==='zad-go'){closeSheet(true);if(v==='kb'){view.tab='ilm';view.ilm='kb';view.sub=null;render();scrollTo(0,0);return}view.tab='zad';view.zad=v;view.sub=null;render();scrollTo(0,0);return}
   if(a==='gtype'){view.gtype=v;return render()}
   const WL=w=>{const [t2,x]=w.split(':');return t2==='j'?db.goals[x]:(db.gsecs.find(s=>s.id===x)||{items:[]}).items};
   if(a==='goal-add'){const w=b.dataset.w,isJ=w[0]==='j',el=isJ?$('#gj-text'):document.getElementById('g-'+w.slice(2)),text=el.value.trim();if(!text){toast('اكتب الهدف الأول');return}
@@ -1126,8 +1189,11 @@ document.addEventListener('click',ev=>{
   if(a==='dua-add'){const val=$('#duaText').value.trim();if(!val){toast('اكتب الدعاء الأول');return}db.duas.push({id:uid('dua'),text:val,k:view.dkind||'mine'});upd();toast('اتحفظ الدعاء');return}
   if(a==='dua-del'){if(!b.dataset.sure){b.dataset.sure=1;toast('اضغط تاني للمسح');return}db.duas=db.duas.filter(x=>x.id!==id);return upd()}
   if(a==='fault')return openFault(id);
-  if(a==='f-add'){const val=$('#fn-'+v).value.trim();if(!val){toast('اكتب العيب الأول');return}db.faults.push({id:uid('flt'),g:v,name:val,on:true,detail:'',hist:[]});return upd()}
+  if(a==='f-add'){const val=$('#fn-'+v).value.trim();if(!val){toast('اكتب العيب الأول');return}db.faults.push({id:uid('flt'),g:v,name:val,mode:'watch',on:true,detail:'',hist:[],stg:[]});return upd()}
   if(a==='f-on'){const f=db.faults.find(x=>x.id===id);if(f)f.on=v==='1';return upd()}
+  if(a==='f-mode'){const f=db.faults.find(x=>x.id===id);if(!f)return;if(v==='focus'&&f.mode!=='focus'&&db.faults.filter(x=>x.mode==='focus').length>=2)toast('الأفضل متزودش عن عيبين تركيز');f.mode=v;f.on=v!=='off';return upd()}
+  if(a==='f-stage'){const f=db.faults.find(x=>x.id===id);if(!f)return;f.stg=f.stg||[];const k=dayKey(),last=f.stg[f.stg.length-1];if(last&&last[0]===k)last[1]=Number(v);else f.stg.push([k,Number(v)]);buzz();return upd()}
+  if(a==='fmore'){view.fmore=true;return sheetEl?paintSheet():render()}
   if(a==='f-del'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟';return}db.faults=db.faults.filter(x=>x.id!==id);closeSheet();return}
   /* notes */
   if(a==='ntag'){view.newTag=v;const t2=$('#nText').value;render();$('#nText').value=t2;return}
@@ -1177,6 +1243,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   const f=db.faults.find(x=>x.id===id);
   if(a==='f-name'&&f){f.name=v.trim()||f.name;return upd()}
   if(a==='f-detail'&&f){f.detail=v.trim();save();return}
+  if(a==='f-txt'&&f){f[el.dataset.k]=v.trim();save();return}
   if(a==='f-pct'&&f){const k=dayKey(),last=f.hist[f.hist.length-1];if(last&&last[0]===k)last[1]=Number(v);else f.hist.push([k,Number(v)]);return upd()}
   if(a==='daystart'){db.settings.dayStart=v||'03:30';save();toast('اتحفظ');return}
   if(a==='city'){db.settings.city=v;save();toast('اتحفظت المحافظة');return}
