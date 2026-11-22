@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;600;700&family=Amiri&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;600;700&display=swap">
 <style>
 :root{
   --ink:#1b1b1b;--cream:#faf8f2;--fog:#edf1e7;--white:#fffdf7;--forest:#1c9151;--forest-deep:#0a4f2c;
@@ -162,7 +162,7 @@ select.inp{appearance:none;-webkit-appearance:none;background-image:url("data:im
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(200,16,27,.35)}50%{box-shadow:0 0 0 8px rgba(200,16,27,0)}}
 .busytxt{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
 .busytxt.rect{color:var(--alert);font-weight:600}
-.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--forest);animation:spin .8s linear infinite;display:inline-block}
+.spin{display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 .missbtn{align-self:flex-start;color:var(--muted);font-size:13px;text-decoration:underline}
 /* review wizard */
@@ -194,6 +194,16 @@ select.inp{appearance:none;-webkit-appearance:none;background-image:url("data:im
 .spark .area{fill:var(--lime);opacity:.6;stroke:none}
 .spark .base{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
 .insight{display:flex;flex-direction:column;gap:8px}
+.ib{width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--white);display:grid;place-items:center;color:var(--ink);flex:0 0 36px}.ib svg{width:18px;height:18px}
+.ib.lt{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.25);color:#fff}
+.btn.icon{width:44px;padding:0;display:grid;place-items:center}.btn.icon svg{width:20px;height:20px}
+.hd-act{display:inline-flex;align-items:center;gap:8px}
+.vt{font-size:19px}
+.rl{display:flex;flex-direction:column;gap:2px;text-align:start;padding:10px 0;border-bottom:1px solid var(--line);width:100%}.rl .if{font-size:14px;color:var(--muted)}.rl .th{font-weight:600}
+.prog{display:grid;grid-template-columns:repeat(3,1fr);text-align:center}.prog b{font-size:24px;font-variant-numeric:tabular-nums;display:block}.prog small{font-size:12px;color:var(--muted)}.prog span{font-size:12px;color:var(--muted)}
+.note-c{display:flex;flex-direction:column;gap:2px;border-inline-start:3px solid var(--forest);background:var(--fog);border-radius:12px;padding:10px 14px;font-size:14px}
+.pk{gap:12px}.pk .ck{flex:0 0 24px;height:24px;border-radius:8px;border:1.5px solid var(--line);display:grid;place-items:center}.pk .ck svg{width:14px;height:14px}.pk.on .ck{background:var(--forest);border-color:var(--forest);color:#fff}.pk .t b{font-weight:400;font-size:15px}
+.link.danger{color:var(--alert)}
 .mv{display:inline-flex;gap:6px;flex:0 0 auto}.mv button{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--white);display:grid;place-items:center}.mv button svg{width:18px;height:18px}.mv button:disabled{opacity:.25}
 .ordbar{display:flex;justify-content:space-between;align-items:center}
 .tgb{background:var(--forest-deep);color:#fff;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px}.tgb .eyebrow{color:var(--neon)}.tgb .small.muted{color:rgba(255,255,255,.6)}
@@ -207,14 +217,14 @@ select.inp{appearance:none;-webkit-appearance:none;background-image:url("data:im
 .fold{border-top:1px solid var(--line)}.fold-h{width:100%;display:flex;justify-content:space-between;align-items:center;padding:14px 0;font-weight:700;font-size:16px}.fold-h svg{width:18px;height:18px}
 .fold-b{display:flex;flex-direction:column;gap:12px;padding-bottom:12px}
 .lgi{border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;background:var(--white)}
-.dua{font-size:14px;line-height:1.9;color:var(--muted);text-align:center;padding:8px 6px}
+.fdua{font-size:13px;line-height:1.9;color:var(--muted);text-align:center;padding:4px 6px}
 .drill{display:flex;gap:10px;align-items:flex-start;text-align:start;border:1px dashed var(--line);border-radius:14px;padding:10px;background:var(--cream)}.drill i{flex:0 0 22px;height:22px;border-radius:7px;border:1.5px solid var(--line);display:grid;place-items:center}.drill i svg{width:14px;height:14px}
 .drill span{display:flex;flex-direction:column;font-size:14px}.drill.on{border-style:solid;border-color:var(--forest);background:var(--lime)}.drill.on i{background:var(--forest);border-color:var(--forest);color:#fff}
 .seg5 button{padding:8px 2px;font-size:13.5px}
 .tgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .tcell{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:start;display:flex;flex-direction:column;gap:2px}.tcell b{font-size:16px}
 .fbox{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--white)}
-.fcard2{display:flex;flex-direction:column;gap:8px;width:100%}
+.fcard2{display:flex;flex-direction:column;gap:6px;width:100%;text-align:start;align-items:stretch}
 .wk{width:100%;height:64px;display:block}.dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-inline:2px 4px}
 .sdots{display:inline-flex;gap:4px}.sdots i{width:16px;height:6px;border-radius:3px;background:var(--fog)}.sdots i.on{background:var(--forest)}
 .stages{display:flex;flex-direction:column;gap:6px}
@@ -242,9 +252,9 @@ select.inp{appearance:none;-webkit-appearance:none;background-image:url("data:im
 .note-c{display:flex;flex-direction:column;gap:6px;padding:14px 0;border-top:1px solid var(--line)}
 .note-c:first-of-type{border-top:0}
 .note-c p{white-space:pre-wrap;font-size:15px}
-.dua{font-family:'Amiri',serif;font-size:19px;line-height:2}
+.dua{font-size:17px;line-height:2}
 .empty{color:var(--muted);text-align:center;padding:12px}
-.ayah{font-family:'Amiri',serif;font-size:18px;color:var(--muted);text-align:center}
+.ayah{font-size:15px;color:var(--muted);text-align:center}
 input[type=range]{width:100%;accent-color:var(--forest)}
 .ed-f{border:1px dashed var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--white)}
 .tag{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line);background:var(--white);border-radius:999px;padding:3px 6px 3px 12px;font-size:13px}
@@ -301,7 +311,7 @@ const P={salah:'<path d="M4 20h16M6 20v-8a6 6 0 0 1 12 0v8M12 6V3"/>',dhikr:'<ci
  jamaai:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15.5 14.2c2.9.3 5.5 2.6 5.5 5.8"/>',adab:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
  nafs:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',ok:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
- back:'<path d="M9 6l6 6-6 6"/>',fwd:'<path d="M15 6l-6 6 6 6"/>',up:'<path d="M6 15l6-6 6 6"/>',down:'<path d="M6 9l6 6 6-6"/>',map:'<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',cam:'<path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.2l1.6-2.2h6.4L16.8 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.4"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/>',spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',stop:'<rect x="7" y="7" width="10" height="10" rx="2.5" fill="currentColor" stroke="none"/>'};
+ back:'<path d="M9 6l6 6-6 6"/>',fwd:'<path d="M15 6l-6 6 6 6"/>',up:'<path d="M6 15l6-6 6 6"/>',down:'<path d="M6 9l6 6 6-6"/>',map:'<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',cam:'<path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.2l1.6-2.2h6.4L16.8 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.4"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/>',pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>',book:'<path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13"/>',plus:'<path d="M12 5v14M5 12h14"/>',spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',stop:'<rect x="7" y="7" width="10" height="10" rx="2.5" fill="currentColor" stroke="none"/>'};
 const ico=(n,cls='')=>`<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]||''}</svg>`;
 /* ================= question bank (from the original app, kept word for word) ================= */
 const HEART=['كان غائبًا غالبًا','حاضرًا أحيانًا','حاضرًا غالبًا'];
@@ -589,7 +599,7 @@ function fieldHTML(d,f,e,k){if(!visible(f,e,k))return '';const v=ans(e,f.id),A=`
       ${ctr(x,'fw',w,'عملت الخُلق')}${x.name?ctr(x,f.id,c,`غلبني ${esc(x.name)}`):''}</div>`).join('')
       :'<p class="small muted">مفيش خُلق تركيز. اختار خُلق أو اتنين من تزكية تركّز عليهم.</p>';
     if(oth.length){const open=view.fmore||!foc.length;h+=open?`<span class="lb">${foc.length?'باقي العيوب':'وقعت في إيه؟'}</span><div>${oth.map(x=>ctr(x,f.id,c,esc(x.name))).join('')}</div>`:`<button class="link" data-act="fmore" style="align-self:flex-start">باقي العيوب (${num(oth.length)})</button>`}
-    h+=`<p class="dua">«اللهم اهدني لأحسن الأخلاق، لا يهدي لأحسنها إلا أنت، واصرف عني سيئها، لا يصرف عني سيئها إلا أنت»</p><button class="link" data-act="zad-go" data-v="faults" style="align-self:flex-start">تزكية ←</button>`}
+    h+=`<p class="fdua">«اللهم اهدني لأحسن الأخلاق، لا يهدي لأحسنها إلا أنت، واصرف عني سيئها، لا يصرف عني سيئها إلا أنت»</p><button class="link" data-act="zad-go" data-v="faults" style="align-self:flex-start">تزكية ←</button>`}
   return h+'</div>'}
 function deedBody(d,k){const e=(db.logs[k]||{})[d.id]||{a:{}};
   let h=`<div class="sec">${(d.perf||[]).map(f=>fieldHTML(d,f,e,k)).join('')}${d.st&&!d.st.f&&!d.st.avg?`<button class="missbtn" data-act="miss" data-id="${d.id}">${e.miss?'رجّعها: لسه هسجّل':'ما عملتوش النهارده'}</button>`:''}</div>`;
@@ -1056,10 +1066,10 @@ const fStage=f=>{const s=f.stg||[];return s.length?s[s.length-1][1]:0};
 const fStageAt=f=>{const s=f.stg||[];return s.length?s[s.length-1][0]:null};
 function fRange(id,from,to){let fa=0,wi=0;for(const k in db.logs){if(k<from||k>to)continue;const tz=db.logs[k].tazkiya;fa+=Number((ans(tz,'f')||{})[id]||0);wi+=Number((ans(tz,'fw')||{})[id]||0)}return {fa,wi}}
 const fWeeks=(id,n=8)=>Array.from({length:n},(_,i)=>{const to=shift(dayKey(),-7*(n-1-i)),r=fRange(id,shift(to,-6),to);return r});
-function wkBars(id){const W8=fWeeks(id),mx=Math.max(1,...W8.map(r=>Math.max(r.fa,r.wi))),bw=14,gap=10,H=56;
+function wkBars(id,bare){const W8=fWeeks(id),mx=Math.max(1,...W8.map(r=>Math.max(r.fa,r.wi))),bw=14,gap=10,H=56;
   return `<svg viewBox="0 0 ${W8.length*(bw*2+gap)} ${H+14}" class="wk" preserveAspectRatio="none">${W8.map((r,i)=>{const x=i*(bw*2+gap),hf=r.fa/mx*H,hw=r.wi/mx*H;
     return `<rect x="${x}" y="${H-hf}" width="${bw-2}" height="${Math.max(hf,1)}" rx="3" fill="var(--alert)" opacity=".75"/><rect x="${x+bw}" y="${H-hw}" width="${bw-2}" height="${Math.max(hw,1)}" rx="3" fill="var(--forest)"/>`}).join('')}</svg>
-    <div class="ch small muted"><span><i class="dot" style="background:var(--alert)"></i> وقعت <i class="dot" style="background:var(--forest)"></i> انتصرت</span><span>آخر ٨ أسابيع</span></div>`}
+    ${bare?'':`<div class="ch small muted"><span><i class="dot" style="background:var(--alert)"></i> وقعت <i class="dot" style="background:var(--forest)"></i> انتصرت</span><span>آخر ٨ أسابيع</span></div>`}`}
 const stgDots=n=>`<span class="sdots">${FSTG.map((_,i)=>`<i class="${i<n?'on':''}"></i>`).join('')}</span>`;
 function fGrad(f){const s=f.stg||[];if(fStage(f)<5)return false;let i=s.length-1;while(i>0&&s[i-1][1]===5)i--;return diffDays(s[i][0],dayKey())>=14}
 function fStreak(id){const td=dayKey();let n=0;const ks=Object.keys(db.logs).filter(k=>db.logs[k].tazkiya).sort();if(!ks.length)return 0;
@@ -1074,39 +1084,45 @@ async function suggestFault(id,auto){const f=db.faults.find(x=>x.id===id);if(!f)
     ['drill','signs','when','kaff'].forEach(k=>{if(!s(f[k])&&s(P[k]))f[k]=s(P[k])});save();toast('اقترحت عليك ✓ عدّل اللي مش مناسبك')}
   catch(e){toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':e.message||'حصلت مشكلة')}
   finally{clearTimeout(tm);view.fSug=null;if(sheetEl)paintSheet();else render()}}
-function renderFaults(){const td=dayKey(),since=shift(td,-29),foc=db.faults.filter(f=>f.mode==='focus');
-  let h='<p class="lead">ركّز على خُلق أو اتنين. كل يوم سجّل عملته كام مرة، والعيب غلبك كام مرة. وكل أسبوع حدّد وصلت لأنهي مرحلة.</p>';
-  const due=foc.filter(f=>!fStageAt(f)||diffDays(fStageAt(f),td)>=7);
-  if(due.length)h+=`<section class="card rise" style="border-color:var(--forest)"><span class="eyebrow">وقفة الأسبوع</span><h2>وصلت لفين؟</h2><p class="lead">حدّد مرحلتك في: ${due.map(f=>esc(vName(f))).join('، ')}.</p><div class="tagrow">${due.map(f=>`<button class="btn ghost sm" data-act="fault" data-id="${f.id}">${esc(vName(f))}</button>`).join('')}</div></section>`;
-  foc.filter(fGrad).forEach(f=>{h+=`<section class="card rise"><span class="eyebrow">ما شاء الله</span><p>${esc(vName(f))} بقالك أكتر من أسبوعين في آخر مرحلة فيه. تطلّعه من التركيز وتبص عليه كل أسبوع بس؟</p><button class="btn sm" data-act="f-mode" data-id="${f.id}" data-v="watch">أيوه، وأختار خُلق تاني</button></section>`});
-  h+=`<section class="slot rise"><div class="slot-h"><span>خُلق التركيز</span></div>${foc.length?foc.map(f=>{const r=fRange(f.id,shift(td,-6),td),tot=r.fa+r.wi,st=fStage(f),rl=fRel(f);
-    return `<button class="card fcard2" data-act="fault" data-id="${f.id}" style="text-align:start"><div class="ch"><span><b style="font-size:19px">${esc(vName(f))}</b>${f.name&&f.virtue?`<span class="small muted"> · ضدّه ${esc(f.name)}</span>`:''}</span>${stgDots(st)}</div><span class="small muted">${st?esc(FSTG[st-1]):'لسه محددتش المرحلة'}${rl.kb.length+rl.nt.length?` · ${num(rl.kb.length+rl.nt.length)} ترغيب`:''}</span>
-      <div class="ch"><span class="small">الأسبوع ده: عملته <bdi>${r.wi}</bdi> · غلبني العيب <bdi>${r.fa}</bdi></span>${tot?`<b class="pc ${r.wi/tot>=.7?'hi':r.wi/tot>=.4?'md':'lo'}">${num(Math.round(r.wi/tot*100),'%')}</b>`:''}</div>${wkBars(f.id)}</button>`}).join(''):'<p class="empty">اختار خُلق أو اتنين من تحت، وخلّيهم "تركيز".</p>'}</section>`;
-  FGROUPS.forEach(([g,tt])=>{const fl=db.faults.filter(f=>f.g===g);if(g==='other'&&!fl.length&&!view.fAddOther)return;
-    h+=`<section class="slot rise"><div class="slot-h"><span>${tt}</span></div><div class="list">${fl.map(f=>{const c=fRange(f.id,since,td).fa,st=fStage(f);
-      return `<button class="row" data-act="fault" data-id="${f.id}"><span class="t"><b>${esc(vName(f))}</b><span>${f.name&&f.virtue?`ضدّه ${esc(f.name)} · `:''}${st?esc(FSTG[st-1]):'لسه محددتش المرحلة'}${c?` · غلبني ${num(c)} مرة في ٣٠ يوم`:''}</span></span><span class="badge ${f.mode==='focus'?'done':''}">${FMODES.find(m=>m[0]===f.mode)[1]}</span></button>`}).join('')}</div>
-     <div class="row-in"><input class="inp" id="fn-${g}" placeholder="اكتب خُلق أو عيب، زي: الحلم"><button class="btn ghost sm" data-act="f-add" data-v="${g}">أضف</button></div></section>`});
+function renderFaults(){const td=dayKey(),foc=db.faults.filter(f=>f.mode==='focus');
+  let h='';const due=foc.filter(f=>!fStageAt(f)||diffDays(fStageAt(f),td)>=7);
+  if(due.length)h+=`<section class="note-c rise"><b>وقفة الأسبوع</b><span>حدّد مرحلتك في ${due.map(f=>`<button class="link" data-act="fault" data-id="${f.id}">${esc(vName(f))}</button>`).join('، ')}</span></section>`;
+  foc.filter(fGrad).forEach(f=>{h+=`<section class="note-c rise"><b>${esc(vName(f))} ثابت معاك من أسبوعين</b><button class="link" data-act="f-mode" data-id="${f.id}" data-v="watch">طلّعه من التركيز</button></section>`});
+  h+=`<section class="slot rise"><div class="slot-h"><span>تركيز</span></div>${foc.length?foc.map(f=>{const r=fRange(f.id,shift(td,-6),td),tot=r.fa+r.wi,st=fStage(f);
+    return `<button class="card fcard2" data-act="fault" data-id="${f.id}"><div class="ch"><b class="vt">${esc(vName(f))}</b>${stgDots(st)}</div>${f.name&&f.virtue?`<span class="small muted">ضد ${esc(f.name)}</span>`:''}
+      <div class="ch small"><span>✓ <bdi>${r.wi}</bdi>  ·  ✕ <bdi>${r.fa}</bdi></span>${tot?`<b class="pc ${r.wi/tot>=.7?'hi':r.wi/tot>=.4?'md':'lo'}">${num(Math.round(r.wi/tot*100),'%')}</b>`:''}</div>${wkBars(f.id,true)}</button>`}).join(''):'<p class="empty">اختار خُلق أو اتنين من تحت وخلّيهم تركيز.</p>'}</section>`;
+  FGROUPS.forEach(([g,tt])=>{const fl=db.faults.filter(f=>f.g===g&&f.mode!=='focus');if(g==='other'&&!fl.length)return;
+    h+=`<section class="slot rise"><div class="slot-h"><span>${tt}</span></div><div class="list">${fl.map(f=>`<button class="row" data-act="fault" data-id="${f.id}"><span class="t"><b>${esc(vName(f))}</b>${f.name&&f.virtue?`<span>ضد ${esc(f.name)}</span>`:''}</span>${stgDots(fStage(f))}</button>`).join('')}</div>
+     <div class="row-in"><input class="inp" id="fn-${g}" placeholder="خُلق أو عيب جديد"><button class="btn ghost sm icon" data-act="f-add" data-v="${g}" aria-label="أضف">${ico('plus')}</button></div></section>`});
   return h}
-function openFault(id){openSheet(()=>{const f=db.faults.find(x=>x.id===id);if(!f){closeSheet();return {head:'',body:''}}const st=fStage(f),cure=FCURE[f.name]||[],v=vName(f),rl=fRel(f),td=dayKey(),r=fRange(f.id,shift(td,-6),td),tot=r.fa+r.wi,op=view.fOpen||{};
+function openFault(id){openSheet(()=>{const f=db.faults.find(x=>x.id===id);if(!f){closeSheet();return {head:'',body:''}}const st=fStage(f),v=vName(f),rl=fRel(f),td=dayKey(),r=fRange(f.id,shift(td,-6),td),tot=r.fa+r.wi,op=view.fOpen||{};
   const txt=(k,l,ph)=>`<div class="fld"><span class="lb">${l}</span><textarea class="inp" data-act="f-txt" data-id="${f.id}" data-k="${k}" placeholder="${esc(ph)}">${esc(f[k]??'')}</textarea></div>`;
   const fold=(k,l,body)=>`<section class="fold ${op[k]?'open':''}"><button class="fold-h" data-act="f-fold" data-v="${k}"><span>${l}</span>${ico(op[k]?'up':'down')}</button>${op[k]?`<div class="fold-b">${body}</div>`:''}</section>`;
-  const lg=(f.log||[]).slice().reverse();
-  return {head:`<span class="eyebrow">تزكية${f.name&&f.virtue?` · ضدّه ${esc(f.name)}`:''}</span><div class="ch"><h2 class="title">${esc(v)}</h2>${stgDots(st)}</div>`,
-   body:`<section class="tgb"><div class="ch"><span class="eyebrow">ترغيب</span><span class="small muted">${num(rl.kb.length+rl.nt.length)}</span></div>
-      ${rl.kb.length||rl.nt.length?`<div class="tgb-l">${rl.kb.map(x=>`<button class="tgb-i" data-act="kb-open" data-back="${f.id}" ${x.sid?`data-s="${x.sid}"`:`data-k="${x.k}" data-id="${x.id}" data-f="${x.f}" data-e="${x.eid}"`}><span class="badge">${esc(x.type)}</span><p>${esc(x.text)}</p>${x.text.length>140?'<span class="more">اقرا كله ←</span>':''}</button>`).join('')}${rl.nt.map(n=>`<button class="tgb-i" data-act="note-open" data-back="${f.id}" data-id="${n.id}"><span class="badge">فائدة</span><p>${esc(n.text)}</p>${n.text.length>140?'<span class="more">اقرا كله ←</span>':''}</button>`).join('')}</div>`
-        :`<p class="small" style="color:rgba(255,255,255,.75)">ضيف أحاديث وآيات وقصص عن ${esc(v)} تشجّعك. هتتحفظ في علمي كمان.</p>`}
-      <div class="tagrow"><button class="tg add lt" data-act="f-kb" data-id="${f.id}" data-v="حديث">+ حديث</button><button class="tg add lt" data-act="f-kb" data-id="${f.id}" data-v="آية">+ آية</button><button class="tg add lt" data-act="f-kb" data-id="${f.id}" data-v="قصة">+ قصة</button></div></section>
-    <div class="fld"><div class="ch"><span class="lb">خطتي: لو… هعمل…</span>${view.fSug===f.id?'<span class="busytxt"><i class="spin"></i>بيفكّر…</span>':`<button class="tg add" data-act="f-sug" data-id="${f.id}">${ico('spark')}اقترح عليّ</button>`}</div>${(f.rules||[]).map(x=>`<div class="rule"><div class="rule-r"><span>لو</span><input class="inp" data-act="fr" data-id="${f.id}" data-r="${x.id}" data-k="a" value="${esc(x.a||'')}" placeholder="حد صحّحلي قدام الناس"></div><div class="rule-r"><span>هعمل</span><input class="inp" data-act="fr" data-id="${f.id}" data-r="${x.id}" data-k="b" value="${esc(x.b||'')}" placeholder="أقول جزاك الله خير وأسكت"></div>${xbtn('fr-del',`data-id="${f.id}" data-r="${x.id}"`)}</div>`).join('')}
-      <button class="link" data-act="fr-add" data-id="${f.id}" style="align-self:flex-start">+ ${(f.rules||[]).length?'قاعدة تانية':'أول قاعدة'}</button></div>
-    <div class="fld"><span class="lb">تمرين كل يوم</span><input class="inp" data-act="f-txt" data-id="${f.id}" data-k="drill" value="${esc(f.drill||'')}" placeholder="${esc(DRILL[v]||'فعل صغير تعمله عمدًا كل يوم')}"><span class="small muted">هيظهرلك في محاسبة الليلة تعلّم عليه.</span></div>
-    <div class="fld"><span class="lb">تقدّمك</span><div class="stats s3"><div class="stat"><b>${tot?num(Math.round(r.wi/tot*100),'%'):'–'}</b><span>انتصار الأسبوع ده</span></div><div class="stat"><b>${num(fStreak(f.id))}</b><span>يوم من غير وقوع</span></div><div class="stat"><b>${st?num(st):'–'}<small>/5</small></b><span>المرحلة</span></div></div><div class="chart">${wkBars(f.id)}</div></div>
-    ${fold('stage','المتابعة والمرحلة',`<div class="seg">${FMODES.map(([x,l])=>`<button data-act="f-mode" data-id="${f.id}" data-v="${x}" aria-pressed="${f.mode===x}">${l}</button>`).join('')}</div><div class="stages">${FSTG.map((l,i)=>`<button data-act="f-stage" data-id="${f.id}" data-v="${i+1}" aria-pressed="${st===i+1}"><i>${num(i+1)}</i>${l}</button>`).join('')}</div>${(f.stg||[]).length?`<span class="small muted">آخر تحديث: ${fmt(fStageAt(f),{day:'numeric',month:'long'})}${f.stg.length>1?` · بدأت من المرحلة ${num(f.stg[0][1])}`:''}</span>`:''}`)}
-    ${fold('log',`دفتر المواقف${lg.length?` · ${num(lg.length)}`:''}`,`${view.flog?`<div class="tagbox"><div class="seg">${[['win','انتصرت'],['fall','وقعت']].map(([x,l])=>`<button data-act="fl-kind" data-v="${x}" aria-pressed="${view.flog.kind===x}">${l}</button>`).join('')}</div><textarea class="inp" id="flWhat" placeholder="إيه الموقف؟"></textarea><textarea class="inp" id="flFelt" placeholder="كنت حاسس بإيه قبلها؟"></textarea><textarea class="inp" id="flNext" placeholder="المرة الجاية هعمل إيه؟"></textarea><div class="row-in"><button class="btn sm" data-act="fl-save" data-id="${f.id}">احفظ</button><button class="btn ghost sm" data-act="fl-new" data-v="">إلغاء</button></div></div>`:`<button class="btn ghost sm" data-act="fl-new" data-v="1" style="align-self:flex-start">+ موقف جديد</button>`}
-      ${lg.map(x=>`<div class="lgi"><div class="ch"><span class="badge ${x.kind==='win'?'done':'miss'}">${x.kind==='win'?'انتصرت':'وقعت'}</span><span class="small muted">${fmt(x.k,{day:'numeric',month:'long'})}</span></div>${x.what?`<p>${esc(x.what)}</p>`:''}${x.felt?`<p class="small muted">حسيت: ${esc(x.felt)}</p>`:''}${x.next?`<p class="small"><b>المرة الجاية:</b> ${esc(x.next)}</p>`:''}</div>`).join('')}`)}
-    ${fold('more','تفاصيل',`<div class="fld"><span class="lb">اسم الخُلق</span><input class="inp" data-act="f-txt" data-id="${f.id}" data-k="virtue" value="${esc(f.virtue||'')}" placeholder="زي: التواضع"></div><div class="fld"><span class="lb">العيب اللي قصاده (اختياري)</span><input class="inp" data-act="f-txt" data-id="${f.id}" data-k="name" value="${esc(f.name||'')}" placeholder="زي: الكبر"></div>
-      ${f.name?txt('signs',`${esc(f.name)} بيظهر فيّ إزاي؟`,'تصرفات محددة، زي: بقاطع اللي بيتكلم')+txt('when','إمتى ومع مين؟','المواقف اللي بتطلّعه')+txt('kaff','لو وقعت فيه هعمل إيه؟',cure[1]||'استغفار، وحسنة تمحوها'):''}${(f.cure||'').trim()?txt('cure','العلاج بالضد',''):''}`)}
-    <p class="dua">«اللهم اهدني لأحسن الأخلاق، لا يهدي لأحسنها إلا أنت، واصرف عني سيئها، لا يصرف عني سيئها إلا أنت»</p>`,
-   foot:`<button class="btn danger" data-act="f-del" data-id="${f.id}">امسح</button><button class="btn" data-act="close-sheet">تمام</button>`}})}
+  const lg=(f.log||[]).slice().reverse(),edit=view.fEditName;
+  const items=[...rl.kb.map(x=>`<button class="tgb-i" data-act="kb-open" data-back="${f.id}" ${x.sid?`data-s="${x.sid}"`:`data-k="${x.k}" data-id="${x.id}" data-f="${x.f}" data-e="${x.eid}"`}><span class="badge">${esc(x.type)}</span><p>${esc(x.text)}</p>${x.text.length>140?'<span class="more">اقرا كله</span>':''}</button>`),
+    ...rl.nt.map(n=>`<button class="tgb-i" data-act="note-open" data-back="${f.id}" data-id="${n.id}"><span class="badge">فائدة</span><p>${esc(n.text)}</p>${n.text.length>140?'<span class="more">اقرا كله</span>':''}</button>`)];
+  return {head:`<div class="ch"><div><h2 class="title">${esc(v)}</h2>${f.name&&f.virtue?`<span class="small muted">ضد ${esc(f.name)}</span>`:''}</div><span class="hd-act">${stgDots(st)}<button class="ib" data-act="f-ename" aria-label="تعديل الاسم">${ico('pen')}</button></span></div>`,
+   body:`${edit?`<div class="tagbox"><div class="fld"><span class="lb">الخُلق</span><input class="inp" data-act="f-txt" data-id="${f.id}" data-k="virtue" value="${esc(f.virtue||'')}" placeholder="التواضع"></div><div class="fld"><span class="lb">ضده</span><input class="inp" data-act="f-txt" data-id="${f.id}" data-k="name" value="${esc(f.name||'')}" placeholder="الكبر"></div></div>`:''}
+    <section class="tgb"><div class="ch"><span class="eyebrow">ترغيب${items.length?` · <bdi>${items.length}</bdi>`:''}</span><span class="hd-act"><button class="ib lt" data-act="f-pick" data-id="${f.id}" aria-label="اختار من علمي">${ico('book')}</button><button class="ib lt" data-act="f-kb" data-id="${f.id}" data-v="حديث" aria-label="أضف جديد">${ico('plus')}</button></span></div>
+      ${items.length?`<div class="tgb-l">${items.join('')}</div>`:`<p class="small" style="color:rgba(255,255,255,.7)">ضيف أو اختار من علمي</p>`}</section>
+    <div class="fld"><div class="ch"><span class="lb">لو… هعمل…</span><span class="hd-act">${view.fSug===f.id?'<span class="busytxt">بيفكّر…</span>':`<button class="ib" data-act="f-sug" data-id="${f.id}" aria-label="اقترح عليّ">${ico('spark')}</button>`}<button class="ib" data-act="fr-add" data-id="${f.id}" aria-label="قاعدة جديدة">${ico('plus')}</button></span></div>
+      ${(f.rules||[]).map(x=>view.rEdit===x.id?`<div class="rule"><div class="rule-r"><span>لو</span><input class="inp" data-act="fr" data-id="${f.id}" data-r="${x.id}" data-k="a" value="${esc(x.a||'')}" placeholder="الموقف"></div><div class="rule-r"><span>←</span><input class="inp" data-act="fr" data-id="${f.id}" data-r="${x.id}" data-k="b" value="${esc(x.b||'')}" placeholder="هعمل إيه"></div><div class="ch"><button class="link danger" data-act="fr-del" data-id="${f.id}" data-r="${x.id}">امسح</button><button class="btn sm" data-act="r-edit" data-v="">تمام</button></div></div>`
+        :`<button class="rl" data-act="r-edit" data-v="${x.id}"><span class="if">لو ${esc(x.a||'…')}</span><span class="th">← ${esc(x.b||'…')}</span></button>`).join('')||'<p class="small muted">لسه مفيش. دوس ✦ يقترح عليك.</p>'}</div>
+    <div class="fld"><span class="lb">تمرين كل يوم</span><input class="inp" data-act="f-txt" data-id="${f.id}" data-k="drill" value="${esc(f.drill||'')}" placeholder="${esc(DRILL[v]||'فعل صغير كل يوم')}"></div>
+    <div class="prog"><div><b>${tot?num(Math.round(r.wi/tot*100),'%'):'–'}</b><span>انتصار</span></div><div><b>${num(fStreak(f.id))}</b><span>يوم سليم</span></div><div><b>${st?num(st):'–'}<small>/5</small></b><span>المرحلة</span></div></div>
+    <div class="chart">${wkBars(f.id,true)}</div>
+    ${fold('stage','المرحلة والمتابعة',`<div class="seg">${FMODES.map(([x,l])=>`<button data-act="f-mode" data-id="${f.id}" data-v="${x}" aria-pressed="${f.mode===x}">${l}</button>`).join('')}</div><div class="stages">${FSTG.map((l,i)=>`<button data-act="f-stage" data-id="${f.id}" data-v="${i+1}" aria-pressed="${st===i+1}"><i>${num(i+1)}</i>${l}</button>`).join('')}</div>`)}
+    ${fold('log',`المواقف${lg.length?` · <bdi>${lg.length}</bdi>`:''}`,`${view.flog?`<div class="tagbox"><div class="seg">${[['win','انتصرت'],['fall','وقعت']].map(([x,l])=>`<button data-act="fl-kind" data-v="${x}" aria-pressed="${view.flog.kind===x}">${l}</button>`).join('')}</div><textarea class="inp" id="flWhat" placeholder="الموقف"></textarea><textarea class="inp" id="flFelt" placeholder="كنت حاسس بإيه؟"></textarea><textarea class="inp" id="flNext" placeholder="المرة الجاية؟"></textarea><div class="ch"><button class="link" data-act="fl-new" data-v="">إلغاء</button><button class="btn sm" data-act="fl-save" data-id="${f.id}">حفظ</button></div></div>`:`<button class="ib" data-act="fl-new" data-v="1" aria-label="موقف جديد" style="align-self:flex-start">${ico('plus')}</button>`}
+      ${lg.map(x=>`<div class="lgi"><div class="ch"><span class="badge ${x.kind==='win'?'done':'miss'}">${x.kind==='win'?'انتصرت':'وقعت'}</span><span class="small muted">${fmt(x.k,{day:'numeric',month:'short'})}</span></div>${x.what?`<p>${esc(x.what)}</p>`:''}${x.felt?`<p class="small muted">${esc(x.felt)}</p>`:''}${x.next?`<p class="small">← ${esc(x.next)}</p>`:''}</div>`).join('')}`)}
+    ${f.name?fold('more','عن العيب',txt('signs','بيظهر إزاي؟','تصرفات محددة')+txt('when','إمتى ومع مين؟','المواقف اللي بتطلّعه')+txt('kaff','لو وقعت؟',(FCURE[f.name]||[])[1]||'استغفار، وحسنة تمحوها')):''}
+    <button class="link danger" data-act="f-del" data-id="${f.id}" style="align-self:center">امسح الخُلق ده</button>`,
+   foot:'<button class="btn" data-act="close-sheet">تمام</button>'}})}
+/* choose items from علمي for a virtue: tapping adds or removes its tag */
+function openKBPick(fid){view.kbiBack=fid;view.pq='';openSheet(()=>{const f=db.faults.find(x=>x.id===fid),v=vName(f),q=view.pq||'',all=kbItems().filter(x=>!q||x.text.includes(q));
+  return {head:`<span class="eyebrow">اختار لـ ${esc(v)}</span><h2 class="title">من علمي</h2>`,
+   body:`<input class="inp" data-act="pq" placeholder="دوّر" value="${esc(q)}"><div class="list" id="pkl">${pickList(all,v)}</div>`,foot:'<button class="btn" data-act="close-sheet">تمام</button>'}})}
+const pickList=(all,v)=>all.map(x=>{const on=x.tags.includes(v);return `<button class="row pk ${on?'on':''}" data-act="pk" ${x.sid?`data-s="${x.sid}"`:`data-k="${x.k}" data-id="${x.id}" data-f="${x.f}" data-e="${x.eid}"`}><span class="ck">${on?ico('ok'):''}</span><span class="t"><b>${esc(x.text.slice(0,90))}${x.text.length>90?'…':''}</b><span>${esc(x.type)}</span></span></button>`}).join('')||'<p class="empty">مفيش حاجة في علمي لسه.</p>';
+
 
 /* ---------- settings & customize ---------- */
 function renderSettings(){const s=db.settings;
@@ -1312,7 +1328,7 @@ document.addEventListener('click',ev=>{
   if(a==='dkind'){view.dkind=v;const t2=$('#duaText').value;render();$('#duaText').value=t2;return}
   if(a==='dua-add'){const val=$('#duaText').value.trim();if(!val){toast('اكتب الدعاء الأول');return}db.duas.push({id:uid('dua'),text:val,k:view.dkind||'mine'});upd();toast('اتحفظ الدعاء');return}
   if(a==='dua-del'){if(!b.dataset.sure){b.dataset.sure=1;toast('اضغط تاني للمسح');return}db.duas=db.duas.filter(x=>x.id!==id);return upd()}
-  if(a==='fault'){view.fOpen={};view.flog=null;return openFault(id)}
+  if(a==='fault'){view.fOpen={};view.flog=null;view.fEditName=false;view.rEdit='';return openFault(id)}
   if(a==='f-add'){const val=$('#fn-'+v).value.trim();if(!val){toast('اكتب الخُلق الأول');return}const nf={id:uid('flt'),g:v,name:'',virtue:val,mode:'watch',on:true,detail:'',hist:[],stg:[],rules:[],log:[]};db.faults.push(nf);save();render();view.fOpen={};view.flog=null;openFault(nf.id);suggestFault(nf.id,true);return}
   if(a==='f-on'){const f=db.faults.find(x=>x.id===id);if(f)f.on=v==='1';return upd()}
   if(a==='f-mode'){const f=db.faults.find(x=>x.id===id);if(!f)return;if(v==='focus'&&f.mode!=='focus'&&db.faults.filter(x=>x.mode==='focus').length>=2)toast('الأفضل متزودش عن عيبين تركيز');f.mode=v;f.on=v!=='off';return upd()}
@@ -1320,7 +1336,12 @@ document.addEventListener('click',ev=>{
   if(a==='f-fold'){view.fOpen=view.fOpen||{};view.fOpen[v]=!view.fOpen[v];return paintSheet()}
   if(a==='f-kb'){const f=db.faults.find(x=>x.id===id);if(!f)return;view.kbnBack=f.id;return openKBNew(v,'',{type:v,t:'',tags:[vName(f)],src:''})}
   if(a==='f-sug')return suggestFault(id);
-  if(a==='fr-add'){const f=db.faults.find(x=>x.id===id);f.rules=f.rules||[];f.rules.push({id:uid('r'),a:'',b:''});save();paintSheet();const ins=sheetEl.querySelectorAll('[data-act=fr][data-k=a]');ins.length&&ins[ins.length-1].focus();return}
+  if(a==='f-ename'){view.fEditName=!view.fEditName;return paintSheet()}
+  if(a==='r-edit'){view.rEdit=v;return paintSheet()}
+  if(a==='f-pick')return openKBPick(id);
+  if(a==='pk'){const f=db.faults.find(x=>x.id===view.kbiBack),vv=vName(f),R2=kbRef(b.dataset.s?{s:b.dataset.s}:{k:b.dataset.k,id:b.dataset.id,f:b.dataset.f,e:b.dataset.e});if(!R2.o)return;
+    const tg=R2.o.tags||[];R2.o.tags=tg.includes(vv)?tg.filter(x=>x!==vv):[...tg,vv];db.tags=db.tags||[];if(!db.tags.includes(vv))db.tags.push(vv);R2.save();buzz();return paintSheet()}
+  if(a==='fr-add'){const f=db.faults.find(x=>x.id===id);f.rules=f.rules||[];const nr={id:uid('r'),a:'',b:''};f.rules.push(nr);view.rEdit=nr.id;save();paintSheet();const ins=sheetEl.querySelectorAll('[data-act=fr][data-k=a]');ins.length&&ins[ins.length-1].focus();return}
   if(a==='fr-del'){const f=db.faults.find(x=>x.id===id);f.rules=(f.rules||[]).filter(x=>x.id!==b.dataset.r);save();return paintSheet()}
   if(a==='fl-new'){view.flog=v?{kind:'win'}:null;return paintSheet()}
   if(a==='fl-kind'){view.flog.kind=v;const keep=['flWhat','flFelt','flNext'].map(i=>($('#'+i)||{}).value||'');paintSheet();['flWhat','flFelt','flNext'].forEach((i,j)=>{const x=$('#'+i);if(x)x.value=keep[j]});return}
@@ -1390,7 +1411,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   if(a==='shura'){const sh=shuraOf(j,view.day),[g,ff]=el.dataset.path.split('.');(sh[g]||(sh[g]={}))[ff]=v.trim();save();return}
   if(a==='assign'){const sh=shuraOf(j,view.day),x=sh.assign[el.dataset.v]||(sh.assign[el.dataset.v]={});x.who=v.trim();save();return}
 });
-document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(ev.target.matches('textarea.inp'))fitTA(ev.target.parentNode);if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='nd-text'&&view.nd){view.nd.text=ev.target.value;ndApply()}if(a==='nd-by'&&view.nd){view.nd.by=ev.target.value;ndApply()}if(a==='kbn-text'&&view.kbn){view.kbn.t=ev.target.value;keepDraft()}});
+document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(ev.target.matches('textarea.inp'))fitTA(ev.target.parentNode);if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='pq'){view.pq=ev.target.value;const el=$('#pkl'),f=db.faults.find(x=>x.id===view.kbiBack);if(el&&f)el.innerHTML=pickList(kbItems().filter(x=>!view.pq||x.text.includes(view.pq)),vName(f))}if(a==='nd-text'&&view.nd){view.nd.text=ev.target.value;ndApply()}if(a==='nd-by'&&view.nd){view.nd.by=ev.target.value;ndApply()}if(a==='kbn-text'&&view.kbn){view.kbn.t=ev.target.value;keepDraft()}});
 document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='kbiTag'){ev.preventDefault();const b=document.querySelector('[data-act="kbi-tagnew"]');if(b)b.click();return}if(ev.key==='Enter'&&ev.target.id==='tagnew'){ev.preventDefault();const b=document.querySelector('[data-act="tag-new"]');if(b)b.click();return}if(ev.key==='Enter'&&ev.target.id&&ev.target.id.startsWith('pl-')){ev.preventDefault();const b=document.querySelector(`[data-act="pl-add"][data-k="${ev.target.id.slice(3)}"]`);b&&b.click()}});
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 let lastTouch=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouch<300&&!e.target.closest('input,textarea,select'))e.preventDefault();lastTouch=n},{passive:false});
