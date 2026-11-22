@@ -194,6 +194,8 @@ select.inp{appearance:none;-webkit-appearance:none;background-image:url("data:im
 .spark .area{fill:var(--lime);opacity:.6;stroke:none}
 .spark .base{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
 .insight{display:flex;flex-direction:column;gap:8px}
+.mv{display:inline-flex;gap:6px;flex:0 0 auto}.mv button{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--white);display:grid;place-items:center}.mv button svg{width:18px;height:18px}.mv button:disabled{opacity:.25}
+.ordbar{display:flex;justify-content:space-between;align-items:center}
 .tgb{background:var(--forest-deep);color:#fff;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px}.tgb .eyebrow{color:var(--neon)}.tgb .small.muted{color:rgba(255,255,255,.6)}
 .tgb-l{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:0 16px 4px}
 .tgb-i{flex:0 0 82%;scroll-snap-align:start;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:14px;text-align:start;color:#fff;display:flex;flex-direction:column;gap:8px}
@@ -994,8 +996,11 @@ function useLocation(){if(!navigator.geolocation){toast('الموقع مش مت�
 function renderZad(){if(view.zad==='kb')view.zad='goals';const z=view.zad;let h=top('زادي',{goals:'أهدافي',duas:'أدعيتي',faults:'تزكية'}[z],gearBtn)+`<div class="seg-tabs">${[['goals','أهدافي'],['duas','أدعيتي'],['faults','تزكية']].map(([v,t])=>`<button data-act="zad" data-v="${v}" aria-pressed="${z===v}">${t}</button>`).join('')}</div>`;
   return h+(z==='goals'?renderGoals():z==='duas'?renderDuas():renderFaults())}
 const metricVal=(m,j,s)=>m==='people'?db.people.filter(p=>p.j===j.id).length:s[m];
-function renderGoals(){const j=activeJ(),gt=view.gtype||(j?j.type:'d40'),s=j&&j.type===gt?jStats(j):null,G=db.goals[gt];
-  let h=`<section class="card rise"><h2>أرقام الخروج</h2><p class="lead">أهداف مربوطة بأرقام، وتقدّمها بيتحسب لوحده من تسجيلاتك.</p><div class="chips">${Object.entries(JTYPES).map(([id,t])=>`<button class="chip" data-act="gtype" data-v="${id}" aria-pressed="${gt===id}">${t.label}</button>`).join('')}</div>
+const mvBtns=(act,attrs,i,len)=>`<span class="mv"><button data-act="${act}" ${attrs} data-n="-1" ${i?'':'disabled'} aria-label="لفوق">${ico('up')}</button><button data-act="${act}" ${attrs} data-n="1" ${i<len-1?'':'disabled'} aria-label="لتحت">${ico('down')}</button></span>`;
+function renderGoals(){const j=activeJ(),gt=view.gtype||(j?j.type:'d40'),s=j&&j.type===gt?jStats(j):null,G=db.goals[gt],O=view.gOrder;
+  if(O)return `<div class="ordbar rise"><span>رتّب بالأسهم</span><button class="btn sm" data-act="g-order">خلّصت</button></div>`+db.gsecs.map((sec,si)=>`<section class="card rise"><div class="ch"><h2>${esc(sec.name)}</h2>${mvBtns('gsec-mv',`data-id="${sec.id}"`,si,db.gsecs.length)}</div>${sec.items.map((g,i)=>`<div class="check"><div class="t"><span>${esc(g.text)}</span></div>${mvBtns('goal-mv',`data-w="s:${sec.id}" data-id="${g.id}"`,i,sec.items.length)}</div>`).join('')}</section>`).join('')
+    +`<section class="card rise"><div class="ch"><h2>أرقام الخروج</h2></div>${G.map((g,i)=>`<div class="check"><div class="t"><span>${esc(g.text)}</span></div>${mvBtns('goal-mv',`data-w="j:${gt}" data-id="${g.id}"`,i,G.length)}</div>`).join('')}</section>`;
+  let h=`<div class="ordbar rise"><span class="small muted">عايز تغيّر الترتيب؟</span><button class="btn ghost sm" data-act="g-order">رتّب</button></div><section class="card rise"><h2>أرقام الخروج</h2><p class="lead">أهداف مربوطة بأرقام، وتقدّمها بيتحسب لوحده من تسجيلاتك.</p><div class="chips">${Object.entries(JTYPES).map(([id,t])=>`<button class="chip" data-act="gtype" data-v="${id}" aria-pressed="${gt===id}">${t.label}</button>`).join('')}</div>
    ${G.map(g=>{const v=s?metricVal(g.metric,j,s):null;return `<div class="check"><div class="t"><span>${esc(g.text)}</span>${v==null?'<span class="small muted">بيتحسب لما تبدأ الخروج ده</span>':`<span class="small muted">${num(v)} من ${num(g.target)}</span><div class="meter"><i style="width:${Math.min(100,v/g.target*100)}%"></i></div>`}</div>${xbtn('goal-del',`data-w="j:${gt}" data-id="${g.id}"`)}</div>`}).join('')}
    <div class="row-in"><input class="inp" id="gj-text" placeholder="هدف جديد"></div><div class="row-in"><select class="inp" id="gj-m">${METRICS.map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select><input class="inp" type="number" inputmode="numeric" id="gj-t" placeholder="الرقم" style="flex:0 0 90px"><button class="btn sm" data-act="goal-add" data-w="j:${gt}">أضف</button></div></section>`;
   db.gsecs.forEach(sec=>{const d=sec.items.filter(x=>x.done).length;h+=`<section class="card rise"><div class="ch"><h2>${esc(sec.name)}</h2>${xbtn('gsec-del',`data-id="${sec.id}"`,'امسح القسم')}</div>${sec.items.map(g=>`<div class="check ${g.done?'done':''}">${tick('goal-done',`data-w="s:${sec.id}" data-id="${g.id}"`,g.done)}<div class="t"><span>${esc(g.text)}</span></div>${xbtn('goal-del',`data-w="s:${sec.id}" data-id="${g.id}"`)}</div>`).join('')||'<p class="lead">لسه فاضي.</p>'}
@@ -1299,6 +1304,9 @@ document.addEventListener('click',ev=>{
     const g={id:uid('g'),text,done:false};if(isJ){g.metric=$('#gj-m').value;g.target=Number($('#gj-t').value||0);if(!g.target){toast('اكتب الرقم');return}}WL(w).push(g);return upd()}
   if(a==='goal-done'){const g=WL(b.dataset.w).find(x=>x.id===id);if(g){g.done=!g.done;buzz()}return upd()}
   if(a==='goal-del'){const arr=WL(b.dataset.w),i=arr.findIndex(x=>x.id===id);if(i>=0)arr.splice(i,1);return upd()}
+  if(a==='g-order'){view.gOrder=!view.gOrder;render();scrollTo(0,0);return}
+  if(a==='goal-mv'||a==='gsec-mv'){const arr=a==='goal-mv'?WL(b.dataset.w):db.gsecs,i=arr.findIndex(x=>x.id===id),k=i+Number(b.dataset.n);if(i<0||k<0||k>=arr.length)return;[arr[i],arr[k]]=[arr[k],arr[i]];buzz();save();render();
+    const el=document.querySelector(`[data-act="${a}"][data-id="${id}"]`);if(el)el.closest(a==='goal-mv'?'.check':'section').animate([{background:'var(--lime)'},{background:'transparent'}],{duration:600});return}
   if(a==='gsec-add'){const val=$('#gsec-new').value.trim();if(!val)return;db.gsecs.push({id:uid('s'),name:val,items:[]});return upd()}
   if(a==='gsec-del'){const s=db.gsecs.find(x=>x.id===id);if(s&&s.items.length&&!b.dataset.sure){b.dataset.sure=1;toast('القسم فيه أهداف. اضغط تاني للمسح');return}db.gsecs=db.gsecs.filter(x=>x.id!==id);return upd()}
   if(a==='dkind'){view.dkind=v;const t2=$('#duaText').value;render();$('#duaText').value=t2;return}
