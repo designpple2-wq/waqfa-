@@ -192,6 +192,7 @@ textarea.inp{min-height:84px;resize:vertical;line-height:1.7}
 .spark .area{fill:var(--lime);opacity:.6;stroke:none}
 .spark .base{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
 .insight{display:flex;flex-direction:column;gap:8px}
+.seg5 button{padding:8px 2px;font-size:13.5px}
 .tgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .tcell{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:start;display:flex;flex-direction:column;gap:2px}.tcell b{font-size:16px}
 .fbox{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--white)}
@@ -422,13 +423,13 @@ const CITIES=[['cairo','القاهرة',30.0444,31.2357],['giza','الجيزة',
 let db=null;
 const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const defDeeds=()=>DEFAULT_DEEDS.map(d=>({...cp(d),on:true}));
-function blank(){return {version:4,deeds:defDeeds(),logs:{},reviews:{},plans:{},tags:[],p40:[],notes:[],journeys:[],people:[],
+function blank(){return {version:4,deeds:defDeeds(),logs:{},reviews:{},plans:{},tags:[],kb:[],p40:[],notes:[],journeys:[],people:[],
   faults:DEF_FAULTS.map((f,i)=>({id:'flt'+i,g:f[0],name:f[1],mode:'watch',on:true,detail:'',hist:[],stg:[]})),duas:DEF_DUAS.map((t,i)=>({id:'dua'+i,text:t,k:'mathur'})),
   goals:{d3:[],d40:[],m4:[]},gsecs:[{id:'life',name:'أهداف الحياة',items:[]},{id:'work',name:'أهداف العمل',items:[]}],settings:{dayStart:'03:30',city:'cairo',lastBackup:null,useLoc:false,loc:null},sched:{on:true,items:defSched()},noteCfg:{srcs:[...NSRC],topics:[...NTOPICS]},meta:{dirty:false,syncedAt:null}}}
 function migrate(d){const b=blank();
   if((d.version||1)<4){d.deeds=b.deeds;d.legacyLogs=d.logs;d.logs={}}
   ['p40','notes','journeys','people'].forEach(k=>d[k]=d[k]||b[k]);['logs','reviews','plans'].forEach(k=>d[k]=d[k]||{});
-  d.faults=(d.faults||b.faults).map(f=>{const x={detail:'',hist:[],stg:[],g:'other',on:true,...f};if(x.g==='nafs')x.g='qalb';if(!x.mode)x.mode=x.on===false?'off':'watch';if(x.detail&&x.signs==null)x.signs=x.detail;return x});d.tags=d.tags||[];d.duas=d.duas||b.duas;d.goals=Object.assign({d3:[],d40:[],m4:[]},d.goals||{});
+  d.faults=(d.faults||b.faults).map(f=>{const x={detail:'',hist:[],stg:[],g:'other',on:true,...f};if(x.g==='nafs')x.g='qalb';if(!x.mode)x.mode=x.on===false?'off':'watch';if(x.detail&&x.signs==null)x.signs=x.detail;return x});d.tags=d.tags||[];d.kb=d.kb||[];d.duas=d.duas||b.duas;d.goals=Object.assign({d3:[],d40:[],m4:[]},d.goals||{});
   d.gsecs=d.gsecs||b.gsecs;d.settings=Object.assign(b.settings,d.settings||{});d.sched=d.sched||b.sched;d.noteCfg=d.noteCfg||b.noteCfg;d.meta=d.meta||b.meta;normNotes(d);d.removed=d.removed||[];
   DEFAULT_DEEDS.forEach((x,i)=>{if(d.deeds.some(y=>y.id===x.id)||d.removed.includes(x.id))return;const prev=DEFAULT_DEEDS.slice(0,i).reverse().find(p=>d.deeds.some(y=>y.id===p.id));const at=prev?d.deeds.findIndex(y=>y.id===prev.id)+1:d.deeds.length;d.deeds.splice(at,0,{...cp(x),on:true})});
   if(!d.kb1){const tl=d.deeds.find(y=>y.id==='taleem');if(tl){const have=new Set((tl.perf||[]).map(f=>f.id));KBF.forEach(f=>{if(!have.has(f.id))(tl.perf=tl.perf||[]).push(cp(f))});tl.link=tl.link||'kb';if(tl.st&&tl.st.num)tl.st.orText=['hadith','ayah','qissa']}d.kb1=1}
@@ -551,10 +552,7 @@ function fieldHTML(d,f,e,k){if(!visible(f,e,k))return '';const v=ans(e,f.id),A=`
     h+=`<div class="stepper"><button class="sb" data-act="inc" ${A} data-n="${-st}" aria-label="أقل">−</button><input type="number" inputmode="numeric" min="0" data-act="numin" ${A} value="${n||''}" placeholder="0"><button class="sb" data-act="inc" ${A} data-n="${st}" aria-label="أكتر">+</button><span class="u">${esc(f.unit||'')}${f.goal?` من ${num(f.goal)}`:''}</span></div>${f.goal?`<div class="meter"><i style="width:${Math.min(100,n/f.goal*100)}%"></i></div>`:''}`}
   else if(f.type==='text'&&f.kb){const arr=kbArr(v),more=f.kb==='حديث'?'تاني':'تانية';
     h+=(arr.length?arr:[{id:'new',t:''}]).map((o,i)=>`<div class="row-in" style="align-items:flex-start"><textarea class="inp" data-act="kbtext" ${A} data-e="${o.id}" placeholder="${esc(i?f.kb+' '+more:(f.ph||'اكتب هنا'))}">${esc(o.t||'')}</textarea>${arr.length>1?xbtn('kbdel',`${A} data-e="${o.id}"`):''}</div>${o.id!=='new'&&(o.t||'').trim()?tagRow(o,A,d.id+f.id+o.id):''}`).join('')
-      +(()=>{const key=d.id+f.id,busy=view.aiBusy&&view.aiBusy.key===key,isRec=rec&&rec.key===key;
-      return `<div class="kbt"><button class="link" data-act="kbadd" ${A}>+ ${esc(f.kb)} ${more}</button><span class="tools">${busy?`<span class="busytxt"><i class="spin"></i>${esc(view.aiBusy.label)}</span>`:isRec?`<span class="busytxt rect" data-rect>0:00</span>`:''}
-        <label class="tool ${busy||rec?'off':''}" aria-label="صوّر الصفحة" title="صوّر الصفحة">${ico('cam')}<input type="file" accept="image/*" data-act="ocr" ${A} hidden></label>
-        <button class="tool ${isRec?'rec':''} ${busy||(rec&&!isRec)?'off':''}" data-act="mic" ${A} aria-label="${isRec?'وقّف التسجيل':'سجّل بصوتك'}" title="${isRec?'وقّف التسجيل':'سجّل بصوتك'}">${ico(isRec?'stop':'mic')}</button></span></div>`})()}
+      +`<div class="kbt"><button class="link" data-act="kbadd" ${A}>+ ${esc(f.kb)} ${more}</button>${toolsHTML(d.id+f.id,A)}</div>`}
   else if(f.type==='text'){h+=`<textarea class="inp" data-act="text" ${A} placeholder="${esc(f.ph||'اكتب هنا')}">${esc(v||'')}</textarea>`}
   else if(f.type==='counts'){const c=v||{};h+=`<div>${f.items.map(it=>{const n=Number(c[it.n]||0);return `<div class="crow"><span class="n">${esc(it.n)}</span><span class="mini"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="-10">−</button><input type="number" inputmode="numeric" data-act="cnt" ${A} data-k="${esc(it.n)}" value="${n||''}" placeholder="0"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="33">+</button></span><span class="g ${n>=it.goal?'ok':''}">/ ${num(it.goal)}</span></div>`}).join('')}</div><p class="small muted">+ بيزوّد ٣٣، و− بينقص ١٠. وتقدر تكتب الرقم بإيدك.</p>`}
   else if(f.type==='faults'){const c=v||{},w=ans(e,'fw')||{},foc=db.faults.filter(x=>x.mode==='focus'),oth=db.faults.filter(x=>x.mode==='watch');
@@ -746,7 +744,7 @@ function renderProgress(){const today=dayKey(),[y,mo]=view.month.split('-').map(
 const noteMeta=n=>[n.src,...(n.topics||[])].filter(Boolean);
 const noteCard=n=>`<button class="ncard" data-act="note-open" data-id="${n.id}"><p>${esc(n.text)}</p><span class="nm">${n.star?'<span class="star">★</span>':''}${noteMeta(n).map(x=>`<span class="badge">${esc(x)}</span>`).join('')}${n.by?`<span class="small muted">— ${esc(n.by)}</span>`:''}</span></button>`;
 /* ---------- علمي: الأحاديث والآيات والقصص + الفوايد + التصنيفات ---------- */
-const kbCard=x=>`<button class="ncard" data-act="kb-open" data-k="${x.k}" data-id="${x.id}"><span class="nm"><span class="badge done">${esc(x.type)}</span><span class="small muted">${kbNext(x)}</span></span><p>${esc(x.text)}</p>${x.tags.length?`<span class="tagrow">${x.tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}</span>`:''}</button>`;
+const kbCard=x=>`<button class="ncard" data-act="kb-open" ${x.sid?`data-s="${x.sid}"`:`data-k="${x.k}" data-id="${x.id}" data-f="${x.f}" data-e="${x.eid}"`}><span class="nm"><span class="badge done">${esc(x.type)}</span><span class="small muted">${kbNext(x)}</span></span><p>${esc(x.text)}</p>${x.tags.length?`<span class="tagrow">${x.tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}</span>`:''}</button>`;
 function allTags(){const kb=kbItems(),m=new Map();const add=(s,key)=>{if(!s)return;const o=m.get(s)||{kb:0,notes:0};if(key)o[key]++;m.set(s,o)};
   (db.tags||[]).forEach(s=>add(s));(db.noteCfg.topics||[]).forEach(s=>add(s));kb.forEach(x=>x.tags.forEach(s=>add(s,'kb')));db.notes.forEach(n=>(n.topics||[]).forEach(s=>add(s,'notes')));
   return [...m].map(([s,o])=>({s,...o})).sort((a,b)=>(b.kb+b.notes)-(a.kb+a.notes))}
@@ -761,6 +759,31 @@ function renderTags(){const T=allTags();
 function renderIlm(){const v=view.ilm||'kb',n=kbItems().length+db.notes.length;
   return top(`${num(n)} حاجة اتعلمتها`,'علمي',gearBtn)+`<div class="seg-tabs">${[['kb','أحاديث وآيات'],['notes','الفوايد'],['tags','التصنيفات']].map(([x,l])=>`<button data-act="ilm" data-v="${x}" aria-pressed="${v===x}">${l}</button>`).join('')}</div>`
    +(v==='notes'?renderNotes():v==='tags'?renderTags():renderKB())}
+/* ---------- عنصر واحد من بنك المعرفة ---------- */
+const KBT={hadith:'حديث',aya:'آية',qissa:'قصة'},KBT_R={'حديث':'hadith','آية':'aya','قصة':'qissa'},KBTITLE={'حديث':'الحديث','آية':'الآية','قصة':'القصة'};
+const addSeg=(act,cur)=>`<div class="seg seg5">${[['note','فائدة'],['hadith','حديث'],['aya','آية'],['qissa','قصة'],['plan','خطوة']].map(([x,l])=>`<button data-act="${act}" data-v="${x}" aria-pressed="${cur===x}">${l}</button>`).join('')}</div>`;
+function kbRef(r){if(r.s){const o=(db.kb||[]).find(x=>x.id===r.s);return {o,save:()=>save(),del:()=>{db.kb=db.kb.filter(x=>x.id!==r.s);save()}}}
+  const e=(db.logs[r.k]||{})[r.id];if(!e||!e.a)return {o:null,save(){},del(){}};const arr=kbArr(e.a[r.f]),o=arr.find(x=>x.id===r.e);
+  return {o,save:()=>{e.a[r.f]=arr;save()},del:()=>{e.a[r.f]=arr.filter(x=>x.id!==r.e);save()}}}
+function tagPick(tags,act,newAct,inputId){const all=[...new Set([...(db.tags||[]),...(db.noteCfg.topics||[]),...tags])];
+  return `<div class="tagbox">${all.length?`<div class="tagrow">${all.map(x=>`<button class="chip" data-act="${act}" data-v="${esc(x)}" aria-pressed="${tags.includes(x)}">${esc(x)}</button>`).join('')}</div>`:''}
+    <div class="row-in"><input class="inp" id="${inputId}" placeholder="تصنيف جديد، زي: الصبر"><button class="btn ghost sm" data-act="${newAct}">أضف</button></div></div>`}
+function openKBItem(r){view.kbi=r;view.kbiTag=false;view.kbn=null;openSheet(()=>{const R2=kbRef(r),o=R2.o;if(!o){closeSheet();return {head:'',body:''}}
+  const x=kbItems().find(y=>r.s?y.sid===r.s:(y.k===r.k&&y.id===r.id&&y.f===r.f&&y.eid===r.e))||{},type=x.type||o.type,tags=o.tags||[],dk=r.s?o.k:r.k;
+  return {head:`<span class="eyebrow">${esc(type)} · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})}</span><h2 class="title">${KBTITLE[type]||esc(type)}</h2>`,
+   body:`<textarea class="inp ftext" data-act="kbi-text" style="min-height:140px">${esc(o.t||'')}</textarea>
+    <div class="fld"><span class="lb">التصنيفات</span><div class="tagrow">${tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}<button class="tg add" data-act="kbi-tagbox">${ico('tag')}${tags.length?'تعديل':'تصنيف'}</button></div>${view.kbiTag?tagPick(tags,'kbi-tag','kbi-tagnew','kbiTag'):''}</div>
+    <div class="fld"><span class="lb">المراجعة</span><span class="small muted">${x.k?kbNext(x):''}</span></div>
+    <div class="fld"><span class="lb">المصدر</span>${r.s?`<span>${o.src?esc(o.src):'اتضاف من زرار +'}</span>`:`<button class="link" data-act="kbi-day" style="align-self:flex-start">التعليم الانفرادي · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})} ←</button>`}</div>`,
+   foot:`<button class="btn danger" data-act="kbi-del">امسح</button><button class="btn" data-act="close-sheet">تمام</button>`}})}
+function openKBNew(type,text){view.kbi=null;view.kbn={type,t:text||'',tags:[],src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():''};view.kbiTag=false;
+  openSheet(()=>{const s=view.kbn;if(!s)return {head:'',body:''};return {head:`<span class="eyebrow">إضافة لعلمي</span><h2 class="title">${s.type==='حديث'?'حديث جديد':s.type==='آية'?'آية جديدة':'قصة جديدة'}</h2>`,
+   body:`${addSeg('kbn-mode',KBT_R[s.type])}<textarea class="inp" id="kbnText" data-act="kbn-text" placeholder="${s.type==='حديث'?'نص الحديث، وراويه لو تعرفه':s.type==='آية'?'الآية، واسم السورة ورقمها':'القصة باختصار، ومن أي كتاب'}" style="min-height:140px">${esc(s.t)}</textarea>
+    <div class="kbt"><span class="small muted">صوّر الصفحة أو سجّل بصوتك</span>${toolsHTML('kbn','data-kbn="1"')}</div>
+    <div class="fld"><span class="lb">التصنيفات</span>${tagPick(s.tags,'kbi-tag','kbi-tagnew','kbiTag')}</div>
+    <div class="fld"><span class="lb">سمعته فين؟ (اختياري)</span><div class="chips">${db.noteCfg.srcs.map(o=>`<button class="chip" data-act="kbn-src" data-v="${esc(o)}" aria-pressed="${s.src===o}">${esc(o)}</button>`).join('')}</div></div>`,
+   foot:'<button class="btn ghost" data-act="close-sheet">إلغاء</button><button class="btn" data-act="kbn-save">احفظ</button>'}});
+  setTimeout(()=>{const el=$('#kbnText');el&&!el.value&&el.focus()},350)}
 function renderNotes(){const v=view.nview||'days';
   return `<p class="lead">دفتر الفوايد: اللي بتطلع بيه من البيانات والحلقات والمواقف، عشان ترجعله وتعمل بيه.</p>
    <button class="btn block" data-act="note-new">+ فائدة جديدة</button>
@@ -782,7 +805,7 @@ function openNote(id,quick){const n=id&&db.notes.find(x=>x.id===id);
   view.nd=n?{id,text:n.text,src:n.src||'',topics:[...(n.topics||[])],by:n.by||'',star:!!n.star,mode:'note'}:{text:'',src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():'',topics:[],by:'',star:false,mode:'note',quick:!!quick};
   openSheet(()=>{const s=view.nd,cfg=db.noteCfg,chips=(arr,act,on)=>`<div class="chips">${arr.map(o=>`<button class="chip" data-act="${act}" data-v="${esc(o)}" aria-pressed="${on(o)}">${esc(o)}</button>`).join('')}</div>`;
     return {head:`<span class="eyebrow">${n?fmt(n.k,{weekday:'long',day:'numeric',month:'long'})+(n.mosque?' · '+esc(n.mosque):''):'إضافة'}</span><h2 class="title">${n?'الفائدة':s.mode==='plan'?'خطوة في خطة النهارده':'فائدة جديدة'}</h2>`,
-     body:(s.quick?`<div class="seg">${[['note','فائدة'],['plan','خطوة في الخطة']].map(([x,l])=>`<button data-act="nd-mode" data-v="${x}" aria-pressed="${s.mode===x}">${l}</button>`).join('')}</div>`:'')
+     body:(s.quick?`${addSeg('nd-mode',s.mode)}`:'')
       +`<textarea class="inp" data-act="nd-text" id="ndText" placeholder="${s.mode==='plan'?'الخطوة':'الفائدة أو الرسالة اللي جاتلك'}" style="min-height:130px">${esc(s.text)}</textarea>`
       +(s.mode==='note'?`<div class="fld"><span class="lb">المصدر</span>${chips(cfg.srcs,'nd-src',o=>s.src===o)}<span class="small muted">بيتحدد لوحده حسب الوقت، وتقدر تغيّره.</span></div>
        <div class="fld"><span class="lb">الموضوع</span>${chips(cfg.topics,'nd-top',o=>s.topics.includes(o))}</div>
@@ -837,7 +860,7 @@ async function token(){if(Date.now()<auth.exp)return auth.at;try{setSession(awai
 async function rest(path,opt={}){const tk=await token();const r=await fetch(SB+'/rest/v1/'+path,{...opt,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json',...(opt.headers||{})}});
   if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||('HTTP '+r.status))}return r.status===204||r.status===201?null:r.json().catch(()=>null)}
 function mergeDB(a,b){const m=cp(a),ua=(x=[],y=[])=>{const ids=new Set(x.map(o=>o&&o.id));return x.concat((y||[]).filter(o=>o&&!ids.has(o.id)))};
-  ['notes','p40','journeys','people','duas','faults','deeds'].forEach(k=>m[k]=ua(a[k],b[k]));m.tags=[...new Set([...(a.tags||[]),...(b.tags||[])])];
+  ['notes','p40','journeys','people','duas','faults','deeds','kb'].forEach(k=>m[k]=ua(a[k]||[],b[k]||[]));m.tags=[...new Set([...(a.tags||[]),...(b.tags||[])])];
   m.gsecs=ua(a.gsecs,b.gsecs).map(s=>{const o=(b.gsecs||[]).find(x=>x.id===s.id);return o?{...s,items:ua(s.items,o.items)}:s});
   for(const t2 in b.goals||{})m.goals[t2]=ua((a.goals||{})[t2],b.goals[t2]);
   for(const k in b.plans||{})m.plans[k]=ua((a.plans||{})[k],b.plans[k]);
@@ -876,6 +899,13 @@ function accountCard(){if(!auth)return `<section class="card"><h2>احفظ بي�
    <div class="row-in"><button class="btn" data-act="acc-sync">احفظ دلوقتي</button><button class="btn ghost" data-act="acc-logout">${view.logoutAsk?'متأكد؟':'خروج من الحساب'}</button></div></section>`}
 function shrinkImage(file,max=1800){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{const s=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');
   c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',0.85).split(',')[1])};img.onerror=rej;img.src=url})}
+function toolsHTML(key,A){const busy=view.aiBusy&&view.aiBusy.key===key,isRec=rec&&rec.key===key;
+  return `<span class="tools">${busy?`<span class="busytxt"><i class="spin"></i>${esc(view.aiBusy.label)}</span>`:isRec?`<span class="busytxt rect" data-rect>0:00</span>`:''}
+    <label class="tool ${busy||rec?'off':''}" aria-label="صوّر الصفحة" title="صوّر الصفحة">${ico('cam')}<input type="file" accept="image/*" data-act="ocr" ${A} hidden></label>
+    <button class="tool ${isRec?'rec':''} ${busy||(rec&&!isRec)?'off':''}" data-act="mic" ${A} aria-label="${isRec?'وقّف التسجيل':'سجّل بصوتك'}" title="${isRec?'وقّف التسجيل':'سجّل بصوتك'}">${ico(isRec?'stop':'mic')}</button></span>`}
+// where the text from a photo or voice goes
+const tgtDeed=(d,f)=>({key:d.id+f.id,kind:f.kb,put:txt=>{const e=E(d.id);e.a=e.a||{};const arr=kbArr(e.a[f.id]).filter(o=>(o.t||'').trim()),nid=uid('e');arr.push({id:nid,t:txt});e.a[f.id]=arr;delete e.miss;save();return `[data-act="kbtext"][data-e="${nid}"]`}});
+const tgtNew=()=>({key:'kbn',kind:(view.kbn||{}).type,put:txt=>{const s=view.kbn;s.t=(s.t||'').trim()?s.t.trim()+'\n\n'+txt:txt;return '#kbnText'}});
 let rec=null;
 const paintKB=()=>{if(sheetEl)paintSheet();else render()};
 const blobB64=blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(blob)});
@@ -885,19 +915,18 @@ async function toWav16k(ab){const AC=window.AudioContext||window.webkitAudioCont
   const r=await off.startRendering(),ch=r.getChannelData(0),buf=new ArrayBuffer(44+ch.length*2),v=new DataView(buf),ws=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
   ws(0,'RIFF');v.setUint32(4,36+ch.length*2,true);ws(8,'WAVE');ws(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);ws(36,'data');v.setUint32(40,ch.length*2,true);
   for(let i=0;i<ch.length;i++){const s=Math.max(-1,Math.min(1,ch[i]));v.setInt16(44+i*2,s<0?s*0x8000:s*0x7fff,true)}return new Blob([buf],{type:'audio/wav'})}
-async function sendAI(payload,d,f,label){if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
-  view.aiBusy={key:d.id+f.id,label};paintKB();
+async function sendAI(payload,T,label){if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
+  view.aiBusy={key:T.key,label};paintKB();
   const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),130000);
-  try{const tk=await token();const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({...payload,kind:f.kb})});
+  try{const tk=await token();const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({...payload,kind:T.kind})});
     const j=await r.json().catch(()=>({}));
     if(!r.ok)throw new Error(j.error==='no_key'?'لسه مفتاح Gemini ما اتحطّش في Supabase':j.error==='rate'?'استنى دقيقة وجرّب تاني':j.error==='key'?'مفتاح Gemini فيه مشكلة':j.error==='too_big'?'التسجيل طويل. خليه أقل من دقيقتين':j.error==='model'?'الخدمة زحمة دلوقتي. جرّب كمان دقيقة':'حصلت مشكلة. جرّب تاني');
     const txt=(j.text||'').trim();if(!txt||txt==='لا يوجد نص')throw new Error(payload.image?'مش لاقي نص واضح. قرّب الكاميرا وخلّي الإضاءة كويسة':'مسمعتش كلام واضح. جرّب تاني');
-    const e=E(d.id);e.a=e.a||{};const arr=kbArr(e.a[f.id]).filter(o=>(o.t||'').trim()),nid=uid('e');arr.push({id:nid,t:txt});e.a[f.id]=arr;delete e.miss;save();
-    view.aiBusy=null;paintKB();const el=document.querySelector(`[data-act="kbtext"][data-e="${nid}"]`);if(el)el.scrollIntoView({block:'center'})
+    const sel=T.put(txt);view.aiBusy=null;paintKB();const el=document.querySelector(sel);if(el)el.scrollIntoView({block:'center'})
     toast('اتكتب ✓ راجعه وعدّل لو محتاج')}
   catch(err){view.aiBusy=null;paintKB();toast(err.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':err.message||'حصلت مشكلة')}finally{clearTimeout(tm)}}
-async function ocrImage(file,d,f){try{const image=await shrinkImage(file);await sendAI({image,mime:'image/jpeg'},d,f,'بيقرا الصفحة…')}catch(e){toast('مقدرناش نفتح الصورة')}}
-async function toggleMic(d,f){const key=d.id+f.id;if(rec&&rec.key===key){rec.mr.stop();return}if(rec)return;
+async function ocrImage(file,T){try{const image=await shrinkImage(file);await sendAI({image,mime:'image/jpeg'},T,'بيقرا الصفحة…')}catch(e){toast('مقدرناش نفتح الصورة')}}
+async function toggleMic(T){const key=T.key;if(rec&&rec.key===key){rec.mr.stop();return}if(rec)return;
   if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
   if(!navigator.mediaDevices||!window.MediaRecorder){toast('التسجيل مش متاح هنا. استخدم مايك الكيبورد');return}
   let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){toast('اسمح لوقفة تستخدم المايك من إعدادات الموبايل');return}
@@ -908,7 +937,7 @@ async function toggleMic(d,f){const key=d.id+f.id;if(rec&&rec.key===key){rec.mr.
   mr.onstop=async()=>{stream.getTracks().forEach(x=>x.stop());clearInterval(rec.tick);const dur=Date.now()-rec.start;rec=null;buzz();
     const blob=new Blob(chunks,{type:(mr.mimeType||mime||'audio/mp4').split(';')[0]});if(dur<1200||blob.size<1500){toast('التسجيل قصير');paintKB();return}
     let out=blob;try{out=await toWav16k(await blob.arrayBuffer())}catch(e){out=blob}
-    await sendAI({audio:await blobB64(out),mime:out.type||'audio/mp4'},d,f,'بيكتب كلامك…')};
+    await sendAI({audio:await blobB64(out),mime:out.type||'audio/mp4'},T,'بيكتب كلامك…')};
   mr.start(1000);paintKB()}
 function useLocation(){if(!navigator.geolocation){toast('الموقع مش متاح هنا');return}toast('بنجيب موقعك…');
   navigator.geolocation.getCurrentPosition(p=>{db.settings.loc={lat:+p.coords.latitude.toFixed(4),lng:+p.coords.longitude.toFixed(4),at:dayKey()};db.settings.useLoc=true;save();render();toast('المواقيت بقت على موقعك ✓')},
@@ -936,10 +965,12 @@ function tagRow(o,A,key){const tg=o.tags||[],open=view.tagFor===key;
 function setTag(d,fid,eid,tag,on){const e=E(d.id);e.a=e.a||{};const arr=kbArr(e.a[fid]),o=arr.find(x=>x.id===eid);if(!o)return;
   o.tags=(o.tags||[]).filter(x=>x!==tag);if(on)o.tags.push(tag);db.tags=db.tags||[];if(!db.tags.includes(tag))db.tags.push(tag);e.a[fid]=arr;save()}
 function kbItems(){const out=[];Object.keys(db.logs).sort().reverse().forEach(k=>{const l=db.logs[k];for(const id in l){const d=byId(id),e=l[id];if(!d||!e||!e.a)continue;
-    fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{const v=(o.t||'').trim();if(v)out.push({k,id,f:f.id,eid:o.id,type:f.kb,text:v,tags:o.tags||[]})}))}});return out}
+    fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{const v=(o.t||'').trim();if(v)out.push({k,id,f:f.id,eid:o.id,type:f.kb,text:v,tags:o.tags||[]})}))}});
+  (db.kb||[]).forEach(x=>{if((x.t||'').trim())out.push({k:x.k,sid:x.id,type:x.type,text:x.t.trim(),tags:x.tags||[],src:x.src||''})});
+  return out.sort((a,b)=>b.k.localeCompare(a.k))}
 /* spaced repetition (Leitner): remembered well -> longer gap, forgot -> back tomorrow */
 const KB_INT=[1,1,3,7,14,30,60,120];
-const kbKey=x=>`${x.k}|${x.id}|${x.f}`+(x.eid&&x.eid!=='0'?'|'+x.eid:'');
+const kbKey=x=>x.sid?`s|${x.sid}`:`${x.k}|${x.id}|${x.f}`+(x.eid&&x.eid!=='0'?'|'+x.eid:'');
 const kbAdd=(k,n)=>shift(k,n);
 function kbEligible(){const today=dayKey();db.kbr=db.kbr||{};return kbItems().filter(x=>x.k<today)}
 function kbDueSort(arr){const st=x=>db.kbr[kbKey(x)]||{};return arr.slice().sort((a,b)=>(st(a).due||a.k).localeCompare(st(b).due||b.k))}
@@ -958,7 +989,7 @@ function reviewCard(){if(view.day!==dayKey())return '';const td=kbToday();if(!td
   return h+'</section>'}
 const kbNext=x=>{const s=(db.kbr||{})[kbKey(x)];if(!s)return 'لسه ماتراجعش';const d=diffDays(dayKey(),s.due);return d<=0?'عليه مراجعة':`المراجعة الجاية بعد ${num(d)} يوم`};
 function kbList(){const all=kbItems(),q=(view.kbq||'').trim(),sel=view.kbtags||[],L=all.filter(x=>(!view.kbt||x.type===view.kbt)&&sel.every(s=>x.tags.includes(s))&&(!q||x.text.includes(q)||x.tags.some(s=>s.includes(q))));
-  if(!L.length)return `<p class="empty">${all.length?'مفيش نتايج.':'لسه مكتبتش حاجة. افتح "التعليم الانفرادي" في يومك واكتب حديث اليوم وآيته وقصته.'}</p>`;
+  if(!L.length)return `<p class="empty">${all.length?'مفيش نتايج.':'لسه مكتبتش حاجة. اكتب حديث اليوم وآيته وقصته في "التعليم الانفرادي"، أو ضيفهم من زرار + اللي تحت.'}</p>`;
   const G=new Map();L.forEach(x=>{if(!G.has(x.k))G.set(x.k,[]);G.get(x.k).push(x)});
   return [...G].map(([k,arr])=>`<section class="slot"><div class="slot-h"><span>${fmt(k,{weekday:'long',day:'numeric',month:'long'})}</span></div><div class="ncards">${arr.map(kbCard).join('')}</div></section>`).join('')}
 function renderKB(){const all=kbItems(),types=[...new Set(KBF.map(f=>f.kb).concat(all.map(x=>x.type)))],cnt=t2=>all.filter(x=>x.type===t2).length;
@@ -1077,6 +1108,8 @@ document.addEventListener('click',ev=>{
   if(a==='open')return openDeed(id);
   if(a==='close-sheet')return closeSheet();
   if(a==='quick')return openNote(null,true);
+  if(a==='nd-mode'&&KBT[v]){const tx=(($('#ndText')||{}).value||'');return openKBNew(KBT[v],tx)}
+  if(a==='kbn-mode'){const tx=(($('#kbnText')||{}).value||'');if(KBT[v]){view.kbn.type=KBT[v];view.kbn.t=tx;return paintSheet()}openNote(null,true);view.nd.mode=v;view.nd.text=tx;return paintSheet()}
   /* notes */
   if(a==='note-new')return openNote(null);
   if(a==='note-open')return openNote(id);
@@ -1117,7 +1150,7 @@ document.addEventListener('click',ev=>{
   if(a==='pl-tog'){const x=plan(b.dataset.k)[b.dataset.i];x.done=!x.done;buzz();return upd()}
   if(a==='pl-del'){plan(b.dataset.k).splice(b.dataset.i,1);return upd()}
   if(a==='pl-add'){const inp=document.getElementById('pl-'+b.dataset.k),val=inp.value.trim();if(!val){toast('اكتب الخطوة الأول');return}plan(b.dataset.k).push({id:uid('p'),t:val,done:false});upd();const n2=document.getElementById('pl-'+b.dataset.k);n2&&n2.focus();return}
-  if(a==='mic'&&d){const f=findF(d,fid);if(f)toggleMic(d,f);return}
+  if(a==='mic'){if(b.dataset.kbn)return toggleMic(tgtNew());if(d){const f=findF(d,fid);if(f)toggleMic(tgtDeed(d,f))}return}
   if(a==='kbadd'&&d){const e=E(id);e.a=e.a||{};const arr=kbArr(e.a[fid]).filter(o=>(o.t||'').trim());const nid=uid('e');arr.push({id:nid,t:''});e.a[fid]=arr;save();if(sheetEl)paintSheet();else render();
     const el=document.querySelector(`[data-act="kbtext"][data-id="${id}"][data-f="${fid}"][data-e="${nid}"]`);if(el)el.focus();return}
   if(a==='kbdel'&&d){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}const e=E(id);e.a[fid]=kbArr(e.a[fid]).filter(o=>o.id!==b.dataset.e);save();if(sheetEl)paintSheet();else render();return}
@@ -1134,7 +1167,15 @@ document.addEventListener('click',ev=>{
   if(a==='tag-tog'&&d){setTag(d,fid,b.dataset.e,v,b.getAttribute('aria-pressed')!=='true');return sheetEl?paintSheet():render()}
   if(a==='tag-new'&&d){const inp=$('#tagnew'),s=(inp&&inp.value||'').trim().replace(/^#/,'');if(!s)return;setTag(d,fid,b.dataset.e,s,true);return sheetEl?paintSheet():render()}
   if(a==='kb-rand'){const n=kbItems().length;if(n)view.kbPick=Math.floor(Math.random()*n);return render()}
-  if(a==='kb-open')return openDeed(id,b.dataset.k);
+  if(a==='kb-open')return openKBItem(b.dataset.s?{s:b.dataset.s}:{k:b.dataset.k,id,f:b.dataset.f,e:b.dataset.e});
+  if(a==='kbi-day'){const r=view.kbi;closeSheet(true);return openDeed(r.id,r.k)}
+  if(a==='kbi-tagbox'){view.kbiTag=!view.kbiTag;return paintSheet()}
+  if(a==='kbi-tag'||a==='kbi-tagnew'){const s=a==='kbi-tag'?v:($('#kbiTag')||{}).value||'',x=s.trim().replace(/^#/,'');if(!x)return;const o=view.kbi?kbRef(view.kbi).o:view.kbn;if(!o)return;
+    const on=a==='kbi-tagnew'||!(o.tags||[]).includes(x);o.tags=(o.tags||[]).filter(y=>y!==x);if(on)o.tags.push(x);db.tags=db.tags||[];if(!db.tags.includes(x))db.tags.push(x);if(view.kbi)kbRef(view.kbi).save();return paintSheet()}
+  if(a==='kbi-del'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟';return}kbRef(view.kbi).del();closeSheet();toast('اتمسح');return}
+  if(a==='kbn-type'){view.kbn.type=v;return paintSheet()}
+  if(a==='kbn-src'){view.kbn.src=view.kbn.src===v?'':v;return paintSheet()}
+  if(a==='kbn-save'){const s=view.kbn,tx=(($('#kbnText')||{}).value||s.t||'').trim();if(!tx){toast('اكتب الأول');return}db.kb=db.kb||[];db.kb.push({id:uid('kb'),k:dayKey(),type:s.type,t:tx,tags:s.tags||[],src:s.src||''});save();view.kbn=null;closeSheet();toast(`اتحفظ في علمي ✓`);return}
   if(a==='p40-edit')return openP40();
   if(a==='p40-add'){const v2=$('#p40-new').value.trim();if(!v2){toast('اكتب البند الأول');return}db.p40.push({id:uid('p40'),text:v2,link:$('#p40-newlink').value||null});save();paintSheet();render();toast('اتضاف');return}
   if(a==='p40-del'){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}db.p40=db.p40.filter(x=>x.id!==id);save();paintSheet();return render()}
@@ -1217,7 +1258,7 @@ document.addEventListener('click',ev=>{
   if(a==='import'){try{toast(doImport($('#importBox').value));save();render()}catch(e){toast('النص ده مش نسخة سليمة')}return}
 });
 document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!a)return;const id=el.dataset.id,d=id&&byId(id),fid=el.dataset.f,v=el.value;
-  if(a==='ocr'&&d){const f=findF(d,fid),file=el.files&&el.files[0];el.value='';if(file&&f)ocrImage(file,d,f);return}
+  if(a==='ocr'){const file=el.files&&el.files[0];el.value='';if(!file)return;if(el.dataset.kbn)return ocrImage(file,tgtNew());const f=d&&findF(d,fid);if(f)ocrImage(file,tgtDeed(d,f));return}
   if(a==='kbtext'&&d){const e=E(id);e.a=e.a||{};const arr=kbArr(e.a[fid]),eid=el.dataset.e,o=arr.find(x=>x.id===eid);
     if(o)o.t=v.trim();else if(v.trim()){const nid=uid('e');arr.push({id:nid,t:v.trim()});el.dataset.e=nid}e.a[fid]=arr;delete e.miss;save();
     if(sheetEl){const hh=sheetEl.querySelector('.hh');if(hh)hh.innerHTML=sheetRender().head}return}
@@ -1243,6 +1284,8 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   const f=db.faults.find(x=>x.id===id);
   if(a==='f-name'&&f){f.name=v.trim()||f.name;return upd()}
   if(a==='f-detail'&&f){f.detail=v.trim();save();return}
+  if(a==='kbi-text'){const r=kbRef(view.kbi);if(r.o){r.o.t=v.trim();r.save()}return}
+  if(a==='kbn-text'){view.kbn.t=v;return}
   if(a==='f-txt'&&f){f[el.dataset.k]=v.trim();save();return}
   if(a==='f-pct'&&f){const k=dayKey(),last=f.hist[f.hist.length-1];if(last&&last[0]===k)last[1]=Number(v);else f.hist.push([k,Number(v)]);return upd()}
   if(a==='daystart'){db.settings.dayStart=v||'03:30';save();toast('اتحفظ');return}
@@ -1253,7 +1296,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   if(a==='assign'){const sh=shuraOf(j,view.day),x=sh.assign[el.dataset.v]||(sh.assign[el.dataset.v]={});x.who=v.trim();save();return}
 });
 document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(ev.target.matches('textarea.inp'))fitTA(ev.target.parentNode);if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='nd-text'&&view.nd)view.nd.text=ev.target.value;if(a==='nd-by'&&view.nd)view.nd.by=ev.target.value});
-document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='tagnew'){ev.preventDefault();const b=document.querySelector('[data-act="tag-new"]');if(b)b.click();return}if(ev.key==='Enter'&&ev.target.id&&ev.target.id.startsWith('pl-')){ev.preventDefault();const b=document.querySelector(`[data-act="pl-add"][data-k="${ev.target.id.slice(3)}"]`);b&&b.click()}});
+document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='kbiTag'){ev.preventDefault();const b=document.querySelector('[data-act="kbi-tagnew"]');if(b)b.click();return}if(ev.key==='Enter'&&ev.target.id==='tagnew'){ev.preventDefault();const b=document.querySelector('[data-act="tag-new"]');if(b)b.click();return}if(ev.key==='Enter'&&ev.target.id&&ev.target.id.startsWith('pl-')){ev.preventDefault();const b=document.querySelector(`[data-act="pl-add"][data-k="${ev.target.id.slice(3)}"]`);b&&b.click()}});
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 let lastTouch=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouch<300&&!e.target.closest('input,textarea,select'))e.preventDefault();lastTouch=n},{passive:false});
 window.addEventListener('online',syncNow);window.addEventListener('offline',paintCloud);
