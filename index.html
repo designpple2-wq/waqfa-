@@ -194,6 +194,20 @@ select.inp{appearance:none;-webkit-appearance:none;background-image:url("data:im
 .spark .area{fill:var(--lime);opacity:.6;stroke:none}
 .spark .base{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
 .insight{display:flex;flex-direction:column;gap:8px}
+.tgb{background:var(--forest-deep);color:#fff;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px}.tgb .eyebrow{color:var(--neon)}.tgb .small.muted{color:rgba(255,255,255,.6)}
+.tgb-l{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:0 16px 4px}
+.tgb-i{flex:0 0 82%;scroll-snap-align:start;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:14px;text-align:start;color:#fff;display:flex;flex-direction:column;gap:8px}
+.tgb-i p{font-size:15px;line-height:1.9;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}.tgb-i .more{font-size:12px;color:var(--neon);margin-top:auto}.tgb-i .badge{align-self:flex-start;background:rgba(127,220,166,.18);color:var(--neon)}
+.tg.add.lt{color:#fff;border-color:rgba(255,255,255,.3)}
+.rule{position:relative;border:1px solid var(--line);border-radius:16px;padding:10px 10px 10px 40px;background:var(--white);display:flex;flex-direction:column;gap:6px}
+.rule-r{display:grid;grid-template-columns:44px 1fr;align-items:center;gap:6px}.rule-r span{font-weight:700;color:var(--forest)}.rule .x{position:absolute;top:6px;left:6px}
+.stats.s3{grid-template-columns:repeat(3,1fr)}.stat small{font-size:12px;color:var(--muted)}
+.fold{border-top:1px solid var(--line)}.fold-h{width:100%;display:flex;justify-content:space-between;align-items:center;padding:14px 0;font-weight:700;font-size:16px}.fold-h svg{width:18px;height:18px}
+.fold-b{display:flex;flex-direction:column;gap:12px;padding-bottom:12px}
+.lgi{border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;background:var(--white)}
+.dua{font-size:14px;line-height:1.9;color:var(--muted);text-align:center;padding:8px 6px}
+.drill{display:flex;gap:10px;align-items:flex-start;text-align:start;border:1px dashed var(--line);border-radius:14px;padding:10px;background:var(--cream)}.drill i{flex:0 0 22px;height:22px;border-radius:7px;border:1.5px solid var(--line);display:grid;place-items:center}.drill i svg{width:14px;height:14px}
+.drill span{display:flex;flex-direction:column;font-size:14px}.drill.on{border-style:solid;border-color:var(--forest);background:var(--lime)}.drill.on i{background:var(--forest);border-color:var(--forest);color:#fff}
 .seg5 button{padding:8px 2px;font-size:13.5px}
 .tgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .tcell{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:start;display:flex;flex-direction:column;gap:2px}.tcell b{font-size:16px}
@@ -285,7 +299,7 @@ const P={salah:'<path d="M4 20h16M6 20v-8a6 6 0 0 1 12 0v8M12 6V3"/>',dhikr:'<ci
  jamaai:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15.5 14.2c2.9.3 5.5 2.6 5.5 5.8"/>',adab:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
  nafs:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',ok:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
- back:'<path d="M9 6l6 6-6 6"/>',fwd:'<path d="M15 6l-6 6 6 6"/>',up:'<path d="M6 15l6-6 6 6"/>',down:'<path d="M6 9l6 6 6-6"/>',map:'<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',cam:'<path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.2l1.6-2.2h6.4L16.8 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.4"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/>',stop:'<rect x="7" y="7" width="10" height="10" rx="2.5" fill="currentColor" stroke="none"/>'};
+ back:'<path d="M9 6l6 6-6 6"/>',fwd:'<path d="M15 6l-6 6 6 6"/>',up:'<path d="M6 15l6-6 6 6"/>',down:'<path d="M6 9l6 6 6-6"/>',map:'<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',cam:'<path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.2l1.6-2.2h6.4L16.8 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.4"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/>',spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',stop:'<rect x="7" y="7" width="10" height="10" rx="2.5" fill="currentColor" stroke="none"/>'};
 const ico=(n,cls='')=>`<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]||''}</svg>`;
 /* ================= question bank (from the original app, kept word for word) ================= */
 const HEART=['كان غائبًا غالبًا','حاضرًا أحيانًا','حاضرًا غالبًا'];
@@ -377,7 +391,10 @@ const DEFAULT_DEEDS=[
 const SLOTS=[['night','آخر الليل'],['fajr','الفجر'],['duha','الضحى'],['dhuhr','الظهر'],['asr','العصر'],['maghrib','المغرب'],['isha','العشاء'],['any','طول اليوم']];
 const STL={done:'تم',part:'جزئي',miss:'فاتني'};
 const DISCLAIMER='ما يظهر هنا وصفٌ لما سجّلته أنت، وليس حكمًا على الإخلاص أو القبول؛ فذلك إلى الله وحده.';
-const FGROUPS=[['lisan','آفات اللسان'],['qalb','آفات القلب والنفس'],['other','عيوب تانية']];
+const FGROUPS=[['lisan','أخلاق اللسان'],['qalb','أخلاق القلب والنفس'],['other','أخلاق تانية']];
+const VIRT={'الغيبة':'حفظ اللسان','النميمة':'الستر والإصلاح','الجدال':'ترك المراء','الكِبر':'التواضع','العُجب':'رؤية فضل الله','حب الظهور':'الإخلاص','شُحّ النفس':'السخاء','الأنانية':'الإيثار','حب الراحة':'المجاهدة'};
+const DRILL={'حفظ اللسان':'لما حد يتكلم عن غايب، دافع عنه مرة','الستر والإصلاح':'قول كلمة طيبة عن حد قدام اللي زعلان منه','ترك المراء':'سيب نقاش واحد وانت محق','التواضع':'ابدأ بالسلام على ٣ أشخاص، واخدم حد بنفسك','رؤية فضل الله':'بعد كل عمل قول: الحمد لله اللي وفقني','الإخلاص':'عمل واحد في السر محدش يعرفه','السخاء':'صدقة صغيرة أو هدية لحد','الإيثار':'قدّم حد عليك في أكل أو مكان','المجاهدة':'اختار أصعب حاجة في الخدمة'};
+const vName=f=>f.virtue||f.name;
 const FSTG=['مش واخد بالي منه','باخد بالي بعد ما أقع','باخد بالي وأنا بقع','باخد بالي قبلها وبمنع نفسي','تقريبًا اختفى'];
 const FMODES=[['focus','تركيز'],['watch','كل أسبوع'],['off','مش دلوقتي']];
 const FCURE={'الغيبة':['لما حد يتكلم عن غايب قدامك، دافع عنه أو غيّر الموضوع، واذكر له حسنة.','استغفر له، وادعيله باسمه.'],
@@ -426,7 +443,7 @@ let db=null;
 const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const defDeeds=()=>DEFAULT_DEEDS.map(d=>({...cp(d),on:true}));
 function blank(){return {version:4,deeds:defDeeds(),logs:{},reviews:{},plans:{},tags:[],kb:[],p40:[],notes:[],journeys:[],people:[],
-  faults:DEF_FAULTS.map((f,i)=>({id:'flt'+i,g:f[0],name:f[1],mode:'watch',on:true,detail:'',hist:[],stg:[]})),duas:DEF_DUAS.map((t,i)=>({id:'dua'+i,text:t,k:'mathur'})),
+  faults:DEF_FAULTS.map((f,i)=>({id:'flt'+i,g:f[0]==='nafs'?'qalb':f[0],name:f[1],virtue:VIRT[f[1]]||'',mode:'watch',on:true,detail:'',hist:[],stg:[],rules:[],log:[]})),duas:DEF_DUAS.map((t,i)=>({id:'dua'+i,text:t,k:'mathur'})),
   goals:{d3:[],d40:[],m4:[]},gsecs:[{id:'life',name:'أهداف الحياة',items:[]},{id:'work',name:'أهداف العمل',items:[]}],settings:{dayStart:'03:30',city:'cairo',lastBackup:null,useLoc:false,loc:null},sched:{on:true,items:defSched()},noteCfg:{srcs:[...NSRC],topics:[...NTOPICS]},meta:{dirty:false,syncedAt:null}}}
 /* rename or merge a topic/tag everywhere (to='' deletes it) */
 function renameTagIn(d,from,to){const fix=arr=>{if(!Array.isArray(arr))return arr;const o=[];arr.forEach(x=>{const y=x===from?to:x;if(y&&!o.includes(y))o.push(y)});return o};
@@ -436,7 +453,7 @@ function renameTagIn(d,from,to){const fix=arr=>{if(!Array.isArray(arr))return ar
 function migrate(d){const b=blank();
   if((d.version||1)<4){d.deeds=b.deeds;d.legacyLogs=d.logs;d.logs={}}
   ['p40','notes','journeys','people'].forEach(k=>d[k]=d[k]||b[k]);['logs','reviews','plans'].forEach(k=>d[k]=d[k]||{});
-  d.faults=(d.faults||b.faults).map(f=>{const x={detail:'',hist:[],stg:[],g:'other',on:true,...f};if(x.g==='nafs')x.g='qalb';if(!x.mode)x.mode=x.on===false?'off':'watch';if(x.detail&&x.signs==null)x.signs=x.detail;return x});d.tags=d.tags||[];d.kb=d.kb||[];d.duas=d.duas||b.duas;d.goals=Object.assign({d3:[],d40:[],m4:[]},d.goals||{});
+  d.faults=(d.faults||b.faults).map(f=>{const x={detail:'',hist:[],stg:[],g:'other',on:true,...f};if(x.g==='nafs')x.g='qalb';if(!x.mode)x.mode=x.on===false?'off':'watch';if(x.virtue==null)x.virtue=VIRT[x.name]||'';x.rules=x.rules||[];x.log=x.log||[];if(x.detail&&x.signs==null)x.signs=x.detail;return x});d.tags=d.tags||[];d.kb=d.kb||[];d.duas=d.duas||b.duas;d.goals=Object.assign({d3:[],d40:[],m4:[]},d.goals||{});
   d.gsecs=d.gsecs||b.gsecs;d.settings=Object.assign(b.settings,d.settings||{});d.sched=d.sched||b.sched;d.noteCfg=d.noteCfg||b.noteCfg;d.meta=d.meta||b.meta;normNotes(d);d.removed=d.removed||[];
   DEFAULT_DEEDS.forEach((x,i)=>{if(d.deeds.some(y=>y.id===x.id)||d.removed.includes(x.id))return;const prev=DEFAULT_DEEDS.slice(0,i).reverse().find(p=>d.deeds.some(y=>y.id===p.id));const at=prev?d.deeds.findIndex(y=>y.id===prev.id)+1:d.deeds.length;d.deeds.splice(at,0,{...cp(x),on:true})});
   if(!d.kb1){const tl=d.deeds.find(y=>y.id==='taleem');if(tl){const have=new Set((tl.perf||[]).map(f=>f.id));KBF.forEach(f=>{if(!have.has(f.id))(tl.perf=tl.perf||[]).push(cp(f))});tl.link=tl.link||'kb';if(tl.st&&tl.st.num)tl.st.orText=['hadith','ayah','qissa']}d.kb1=1}
@@ -563,12 +580,14 @@ function fieldHTML(d,f,e,k){if(!visible(f,e,k))return '';const v=ans(e,f.id),A=`
       +`<div class="kbt"><button class="link" data-act="kbadd" ${A}>+ ${esc(f.kb)} ${more}</button>${toolsHTML(d.id+f.id,A)}</div>`}
   else if(f.type==='text'){h+=`<textarea class="inp" data-act="text" ${A} placeholder="${esc(f.ph||'اكتب هنا')}">${esc(v||'')}</textarea>`}
   else if(f.type==='counts'){const c=v||{};h+=`<div>${f.items.map(it=>{const n=Number(c[it.n]||0);return `<div class="crow"><span class="n">${esc(it.n)}</span><span class="mini"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="-10">−</button><input type="number" inputmode="numeric" data-act="cnt" ${A} data-k="${esc(it.n)}" value="${n||''}" placeholder="0"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="33">+</button></span><span class="g ${n>=it.goal?'ok':''}">/ ${num(it.goal)}</span></div>`}).join('')}</div><p class="small muted">+ بيزوّد ٣٣، و− بينقص ١٠. وتقدر تكتب الرقم بإيدك.</p>`}
-  else if(f.type==='faults'){const c=v||{},w=ans(e,'fw')||{},foc=db.faults.filter(x=>x.mode==='focus'),oth=db.faults.filter(x=>x.mode==='watch');
+  else if(f.type==='faults'){const c=v||{},w=ans(e,'fw')||{},dr=ans(e,'fd')||{},foc=db.faults.filter(x=>x.mode==='focus'),oth=db.faults.filter(x=>x.mode==='watch'&&x.name);
     const ctr=(x,fid,store,lbl)=>{const n=Number(store[x.id]||0);return `<div class="crow"><span class="n">${lbl}</span><span class="mini"><button data-act="finc" data-id="${d.id}" data-f="${fid}" data-k="${x.id}" data-n="-1">−</button><input type="number" inputmode="numeric" data-act="fcnt" data-id="${d.id}" data-f="${fid}" data-k="${x.id}" value="${n||''}" placeholder="0"><button data-act="finc" data-id="${d.id}" data-f="${fid}" data-k="${x.id}" data-n="1">+</button></span><span class="g">مرة</span></div>`};
-    h+=foc.length?foc.map(x=>`<div class="fbox"><div class="ch"><b>${esc(x.name)}</b><span class="badge">${fStage(x)?esc(FSTG[fStage(x)-1]):'عيب تركيز'}</span></div>${ctr(x,f.id,c,'وقعت فيه')}${ctr(x,'fw',w,'قاومته وانتصرت')}</div>`).join('')
-      :'<p class="small muted">مفيش عيب تركيز. اختار عيب أو اتنين من مرآة العيوب تركّز عليهم.</p>';
+    h+=foc.length?foc.map(x=>`<div class="fbox"><div class="ch"><b>${esc(vName(x))}</b>${stgDots(fStage(x))}</div>
+      ${x.drill?`<button class="drill ${dr[x.id]?'on':''}" data-act="fdrill" data-id="${d.id}" data-k="${x.id}"><i>${dr[x.id]?ico('ok'):''}</i><span><b>تمرين النهارده</b>${esc(x.drill)}</span></button>`:''}
+      ${ctr(x,'fw',w,'عملت الخُلق')}${x.name?ctr(x,f.id,c,`غلبني ${esc(x.name)}`):''}</div>`).join('')
+      :'<p class="small muted">مفيش خُلق تركيز. اختار خُلق أو اتنين من تزكية تركّز عليهم.</p>';
     if(oth.length){const open=view.fmore||!foc.length;h+=open?`<span class="lb">${foc.length?'باقي العيوب':'وقعت في إيه؟'}</span><div>${oth.map(x=>ctr(x,f.id,c,esc(x.name))).join('')}</div>`:`<button class="link" data-act="fmore" style="align-self:flex-start">باقي العيوب (${num(oth.length)})</button>`}
-    h+=`<button class="link" data-act="zad-go" data-v="faults" style="align-self:flex-start">مرآة العيوب ←</button>`}
+    h+=`<p class="dua">«اللهم اهدني لأحسن الأخلاق، لا يهدي لأحسنها إلا أنت، واصرف عني سيئها، لا يصرف عني سيئها إلا أنت»</p><button class="link" data-act="zad-go" data-v="faults" style="align-self:flex-start">تزكية ←</button>`}
   return h+'</div>'}
 function deedBody(d,k){const e=(db.logs[k]||{})[d.id]||{a:{}};
   let h=`<div class="sec">${(d.perf||[]).map(f=>fieldHTML(d,f,e,k)).join('')}${d.st&&!d.st.f&&!d.st.avg?`<button class="missbtn" data-act="miss" data-id="${d.id}">${e.miss?'رجّعها: لسه هسجّل':'ما عملتوش النهارده'}</button>`:''}</div>`;
@@ -592,7 +611,7 @@ function openSheet(renderFn,opts={}){closeSheet(true);sheetRender=renderFn;const
 const fitTA=(root=document)=>root.querySelectorAll('textarea.inp').forEach(x=>{x.style.height='auto';x.style.height=(x.scrollHeight+2)+'px'});
 function paintSheet(keepScroll=true){if(!sheetEl)return;const r=sheetRender();const b=sheetEl.querySelector('.sh-b'),st=b.scrollTop;
   sheetEl.querySelector('.hh').innerHTML=r.head;b.innerHTML=r.body;sheetEl.querySelector('.sh-f').innerHTML=r.foot||'<button class="btn" data-act="close-sheet">تمام</button>';fitTA(b);if(keepScroll)b.scrollTop=st}
-function closeSheet(silent){if(sheetEl){sheetEl.remove();sheetEl=null;document.body.classList.remove('lock');if(!silent)render()}}
+function closeSheet(silent){if(sheetEl){sheetEl.remove();sheetEl=null;document.body.classList.remove('lock');if(!silent){render();if(view.kbiBack){const fb=view.kbiBack;view.kbiBack=null;openFault(fb)}}}}
 function openDeed(id,k=view.day){const d=byId(id);if(!d)return;
   openSheet(()=>{const s=stOf(d,k);return {head:`<div class="ch"><span class="eyebrow">${esc((CATS.find(c=>c[0]===d.cat)||[])[1]||'')}${k!==dayKey()?' · '+fmt(k,{weekday:'long',day:'numeric',month:'long'}):''}</span>${badge(s)}</div><h2 class="title">${esc(dname(d,k))}</h2>`,body:deedBody(d,k)}})}
 
@@ -972,7 +991,7 @@ function useLocation(){if(!navigator.geolocation){toast('الموقع مش مت�
    ()=>toast('مقدرناش نجيب الموقع. اسمح بالموقع من إعدادات الموبايل'),{timeout:15000,maximumAge:3600e3})}
 
 /* ---------- zad ---------- */
-function renderZad(){if(view.zad==='kb')view.zad='goals';const z=view.zad;let h=top('زادي',{goals:'أهدافي',duas:'أدعيتي',faults:'مرآة العيوب'}[z],gearBtn)+`<div class="seg-tabs">${[['goals','أهدافي'],['duas','أدعيتي'],['faults','مرآة العيوب']].map(([v,t])=>`<button data-act="zad" data-v="${v}" aria-pressed="${z===v}">${t}</button>`).join('')}</div>`;
+function renderZad(){if(view.zad==='kb')view.zad='goals';const z=view.zad;let h=top('زادي',{goals:'أهدافي',duas:'أدعيتي',faults:'تزكية'}[z],gearBtn)+`<div class="seg-tabs">${[['goals','أهدافي'],['duas','أدعيتي'],['faults','تزكية']].map(([v,t])=>`<button data-act="zad" data-v="${v}" aria-pressed="${z===v}">${t}</button>`).join('')}</div>`;
   return h+(z==='goals'?renderGoals():z==='duas'?renderDuas():renderFaults())}
 const metricVal=(m,j,s)=>m==='people'?db.people.filter(p=>p.j===j.id).length:s[m];
 function renderGoals(){const j=activeJ(),gt=view.gtype||(j?j.type:'d40'),s=j&&j.type===gt?jStats(j):null,G=db.goals[gt];
@@ -1038,30 +1057,50 @@ function wkBars(id){const W8=fWeeks(id),mx=Math.max(1,...W8.map(r=>Math.max(r.fa
     <div class="ch small muted"><span><i class="dot" style="background:var(--alert)"></i> وقعت <i class="dot" style="background:var(--forest)"></i> انتصرت</span><span>آخر ٨ أسابيع</span></div>`}
 const stgDots=n=>`<span class="sdots">${FSTG.map((_,i)=>`<i class="${i<n?'on':''}"></i>`).join('')}</span>`;
 function fGrad(f){const s=f.stg||[];if(fStage(f)<5)return false;let i=s.length-1;while(i>0&&s[i-1][1]===5)i--;return diffDays(s[i][0],dayKey())>=14}
+function fStreak(id){const td=dayKey();let n=0;const ks=Object.keys(db.logs).filter(k=>db.logs[k].tazkiya).sort();if(!ks.length)return 0;
+  for(let k=td;k>=ks[0]&&n<400;k=shift(k,-1)){if(Number((ans((db.logs[k]||{}).tazkiya,'f')||{})[id]||0)>0)break;n++}return n}
+function fRel(f){const keys=[vName(f),f.name].filter(Boolean);return {kb:kbItems().filter(x=>x.tags.some(s=>keys.includes(s))),nt:db.notes.filter(n=>(n.topics||[]).some(s=>keys.includes(s))).slice().reverse()}}
+async function suggestFault(id,auto){const f=db.faults.find(x=>x.id===id);if(!f)return;if(!auth){if(!auto)toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){if(!auto)toast('محتاج نت');return}
+  view.fSug=id;if(sheetEl)paintSheet();const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),100000);
+  try{const tk=await token();const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({task:'tazkiya',virtue:f.virtue||'',fault:f.name||''})});
+    const j=await r.json().catch(()=>({}));if(!r.ok||!j.plan)throw new Error(j.error==='rate'?'استنى دقيقة وجرّب تاني':'الخدمة زحمة دلوقتي. جرّب كمان شوية');
+    const P=j.plan,s=x=>String(x||'').trim();if(!f.virtue&&s(P.virtue))f.virtue=s(P.virtue);if(!f.name&&s(P.fault))f.name=s(P.fault);
+    f.rules=f.rules||[];(P.rules||[]).forEach(x=>{const ra=s(x.if||x.a),rb=s(x.then||x.b);if(ra&&rb&&!f.rules.some(y=>y.a===ra))f.rules.push({id:uid('r'),a:ra,b:rb})});
+    ['drill','signs','when','kaff'].forEach(k=>{if(!s(f[k])&&s(P[k]))f[k]=s(P[k])});save();toast('اقترحت عليك ✓ عدّل اللي مش مناسبك')}
+  catch(e){toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':e.message||'حصلت مشكلة')}
+  finally{clearTimeout(tm);view.fSug=null;if(sheetEl)paintSheet();else render()}}
 function renderFaults(){const td=dayKey(),since=shift(td,-29),foc=db.faults.filter(f=>f.mode==='focus');
-  let h='<p class="lead">ركّز على عيب أو اتنين بس. كل يوم سجّل وقعت فيه كام مرة، وقاومته كام مرة. وكل أسبوع حدّد وصلت لأنهي مرحلة.</p>';
+  let h='<p class="lead">ركّز على خُلق أو اتنين. كل يوم سجّل عملته كام مرة، والعيب غلبك كام مرة. وكل أسبوع حدّد وصلت لأنهي مرحلة.</p>';
   const due=foc.filter(f=>!fStageAt(f)||diffDays(fStageAt(f),td)>=7);
-  if(due.length)h+=`<section class="card rise" style="border-color:var(--forest)"><span class="eyebrow">وقفة الأسبوع</span><h2>وصلت لفين؟</h2><p class="lead">حدّد مرحلتك في: ${due.map(f=>esc(f.name)).join('، ')}.</p><div class="tagrow">${due.map(f=>`<button class="btn ghost sm" data-act="fault" data-id="${f.id}">${esc(f.name)}</button>`).join('')}</div></section>`;
-  foc.filter(fGrad).forEach(f=>{h+=`<section class="card rise"><span class="eyebrow">ما شاء الله</span><p>${esc(f.name)} بقاله أكتر من أسبوعين في آخر مرحلة. تطلّعه من التركيز وتبص عليه كل أسبوع بس؟</p><button class="btn sm" data-act="f-mode" data-id="${f.id}" data-v="watch">أيوه، وأختار عيب تاني</button></section>`});
-  h+=`<section class="slot rise"><div class="slot-h"><span>عيوب التركيز</span></div>${foc.length?foc.map(f=>{const r=fRange(f.id,shift(td,-6),td),tot=r.fa+r.wi,st=fStage(f);
-    return `<button class="card fcard2" data-act="fault" data-id="${f.id}" style="text-align:start"><div class="ch"><b style="font-size:17px">${esc(f.name)}</b>${stgDots(st)}</div><span class="small muted">${st?esc(FSTG[st-1]):'لسه محددتش المرحلة'}</span>
-      <div class="ch"><span class="small">الأسبوع ده: وقعت <bdi>${r.fa}</bdi> · انتصرت <bdi>${r.wi}</bdi></span>${tot?`<b class="pc ${r.wi/tot>=.7?'hi':r.wi/tot>=.4?'md':'lo'}">${num(Math.round(r.wi/tot*100),'%')} انتصار</b>`:''}</div>${wkBars(f.id)}</button>`}).join(''):'<p class="empty">اختار عيب أو اتنين من تحت، وخلّيهم "تركيز".</p>'}</section>`;
-  FGROUPS.forEach(([g,tt])=>{const fl=db.faults.filter(f=>f.g===g);if(g==='other'&&!fl.length)return;
+  if(due.length)h+=`<section class="card rise" style="border-color:var(--forest)"><span class="eyebrow">وقفة الأسبوع</span><h2>وصلت لفين؟</h2><p class="lead">حدّد مرحلتك في: ${due.map(f=>esc(vName(f))).join('، ')}.</p><div class="tagrow">${due.map(f=>`<button class="btn ghost sm" data-act="fault" data-id="${f.id}">${esc(vName(f))}</button>`).join('')}</div></section>`;
+  foc.filter(fGrad).forEach(f=>{h+=`<section class="card rise"><span class="eyebrow">ما شاء الله</span><p>${esc(vName(f))} بقالك أكتر من أسبوعين في آخر مرحلة فيه. تطلّعه من التركيز وتبص عليه كل أسبوع بس؟</p><button class="btn sm" data-act="f-mode" data-id="${f.id}" data-v="watch">أيوه، وأختار خُلق تاني</button></section>`});
+  h+=`<section class="slot rise"><div class="slot-h"><span>خُلق التركيز</span></div>${foc.length?foc.map(f=>{const r=fRange(f.id,shift(td,-6),td),tot=r.fa+r.wi,st=fStage(f),rl=fRel(f);
+    return `<button class="card fcard2" data-act="fault" data-id="${f.id}" style="text-align:start"><div class="ch"><span><b style="font-size:19px">${esc(vName(f))}</b>${f.name&&f.virtue?`<span class="small muted"> · ضدّه ${esc(f.name)}</span>`:''}</span>${stgDots(st)}</div><span class="small muted">${st?esc(FSTG[st-1]):'لسه محددتش المرحلة'}${rl.kb.length+rl.nt.length?` · ${num(rl.kb.length+rl.nt.length)} ترغيب`:''}</span>
+      <div class="ch"><span class="small">الأسبوع ده: عملته <bdi>${r.wi}</bdi> · غلبني العيب <bdi>${r.fa}</bdi></span>${tot?`<b class="pc ${r.wi/tot>=.7?'hi':r.wi/tot>=.4?'md':'lo'}">${num(Math.round(r.wi/tot*100),'%')}</b>`:''}</div>${wkBars(f.id)}</button>`}).join(''):'<p class="empty">اختار خُلق أو اتنين من تحت، وخلّيهم "تركيز".</p>'}</section>`;
+  FGROUPS.forEach(([g,tt])=>{const fl=db.faults.filter(f=>f.g===g);if(g==='other'&&!fl.length&&!view.fAddOther)return;
     h+=`<section class="slot rise"><div class="slot-h"><span>${tt}</span></div><div class="list">${fl.map(f=>{const c=fRange(f.id,since,td).fa,st=fStage(f);
-      return `<button class="row" data-act="fault" data-id="${f.id}"><span class="t"><b>${esc(f.name)}</b><span>${st?esc(FSTG[st-1]):'لسه محددتش المرحلة'}${c?` · وقعت فيه ${num(c)} مرة في ٣٠ يوم`:''}</span></span><span class="badge ${f.mode==='focus'?'done':''}">${FMODES.find(m=>m[0]===f.mode)[1]}</span></button>`}).join('')}</div>
-     <div class="row-in"><input class="inp" id="fn-${g}" placeholder="عيب تاني"><button class="btn ghost sm" data-act="f-add" data-v="${g}">أضف</button></div></section>`});
+      return `<button class="row" data-act="fault" data-id="${f.id}"><span class="t"><b>${esc(vName(f))}</b><span>${f.name&&f.virtue?`ضدّه ${esc(f.name)} · `:''}${st?esc(FSTG[st-1]):'لسه محددتش المرحلة'}${c?` · غلبني ${num(c)} مرة في ٣٠ يوم`:''}</span></span><span class="badge ${f.mode==='focus'?'done':''}">${FMODES.find(m=>m[0]===f.mode)[1]}</span></button>`}).join('')}</div>
+     <div class="row-in"><input class="inp" id="fn-${g}" placeholder="اكتب خُلق أو عيب، زي: الحلم"><button class="btn ghost sm" data-act="f-add" data-v="${g}">أضف</button></div></section>`});
   return h}
-function openFault(id){openSheet(()=>{const f=db.faults.find(x=>x.id===id);if(!f){closeSheet();return {head:'',body:''}}const st=fStage(f),cure=FCURE[f.name]||[];
+function openFault(id){openSheet(()=>{const f=db.faults.find(x=>x.id===id);if(!f){closeSheet();return {head:'',body:''}}const st=fStage(f),cure=FCURE[f.name]||[],v=vName(f),rl=fRel(f),td=dayKey(),r=fRange(f.id,shift(td,-6),td),tot=r.fa+r.wi,op=view.fOpen||{};
   const txt=(k,l,ph)=>`<div class="fld"><span class="lb">${l}</span><textarea class="inp" data-act="f-txt" data-id="${f.id}" data-k="${k}" placeholder="${esc(ph)}">${esc(f[k]??'')}</textarea></div>`;
-  return {head:`<span class="eyebrow">مرآة العيوب</span><h2 class="title">${esc(f.name)}</h2>`,
-   body:`<div class="fld"><span class="lb">المتابعة</span><div class="seg">${FMODES.map(([v,l])=>`<button data-act="f-mode" data-id="${f.id}" data-v="${v}" aria-pressed="${f.mode===v}">${l}</button>`).join('')}</div><span class="small muted">التركيز: بتسجّل الوقوع والانتصار كل يوم. كل أسبوع: بتبص عليه في الوقفة الأسبوعية.</span></div>
-    <div class="fld"><span class="lb">وصلت لأنهي مرحلة؟</span><div class="stages">${FSTG.map((l,i)=>`<button data-act="f-stage" data-id="${f.id}" data-v="${i+1}" aria-pressed="${st===i+1}"><i>${num(i+1)}</i>${l}</button>`).join('')}</div>
-      ${(f.stg||[]).length?`<span class="small muted">آخر تحديث: ${fmt(fStageAt(f),{day:'numeric',month:'long'})}${f.stg.length>1?` · بدأت من المرحلة ${num(f.stg[0][1])}`:''}</span>`:''}</div>
-    <div class="chart">${wkBars(f.id)}</div>
-    ${txt('signs','بيظهر فيّ إزاي؟','تصرفات محددة، زي: بقاطع اللي بيتكلم')}
-    ${txt('when','إمتى ومع مين؟','المواقف اللي بتطلّعه')}
-    ${txt('cure','العلاج بالضد: هعمل إيه عكسه؟',cure[0]||'عمل عكس العيب تعمله عمدًا')}
-    ${txt('kaff','لو وقعت فيه هعمل إيه؟',cure[1]||'استغفار، وحسنة تمحوها')}`,
+  const fold=(k,l,body)=>`<section class="fold ${op[k]?'open':''}"><button class="fold-h" data-act="f-fold" data-v="${k}"><span>${l}</span>${ico(op[k]?'up':'down')}</button>${op[k]?`<div class="fold-b">${body}</div>`:''}</section>`;
+  const lg=(f.log||[]).slice().reverse();
+  return {head:`<span class="eyebrow">تزكية${f.name&&f.virtue?` · ضدّه ${esc(f.name)}`:''}</span><div class="ch"><h2 class="title">${esc(v)}</h2>${stgDots(st)}</div>`,
+   body:`<section class="tgb"><div class="ch"><span class="eyebrow">ترغيب</span><span class="small muted">${num(rl.kb.length+rl.nt.length)}</span></div>
+      ${rl.kb.length||rl.nt.length?`<div class="tgb-l">${rl.kb.map(x=>`<button class="tgb-i" data-act="kb-open" data-back="${f.id}" ${x.sid?`data-s="${x.sid}"`:`data-k="${x.k}" data-id="${x.id}" data-f="${x.f}" data-e="${x.eid}"`}><span class="badge">${esc(x.type)}</span><p>${esc(x.text)}</p>${x.text.length>140?'<span class="more">اقرا كله ←</span>':''}</button>`).join('')}${rl.nt.map(n=>`<button class="tgb-i" data-act="note-open" data-back="${f.id}" data-id="${n.id}"><span class="badge">فائدة</span><p>${esc(n.text)}</p>${n.text.length>140?'<span class="more">اقرا كله ←</span>':''}</button>`).join('')}</div>`
+        :`<p class="small" style="color:rgba(255,255,255,.75)">ضيف أحاديث وآيات وقصص عن ${esc(v)} تشجّعك. هتتحفظ في علمي كمان.</p>`}
+      <div class="tagrow"><button class="tg add lt" data-act="f-kb" data-id="${f.id}" data-v="حديث">+ حديث</button><button class="tg add lt" data-act="f-kb" data-id="${f.id}" data-v="آية">+ آية</button><button class="tg add lt" data-act="f-kb" data-id="${f.id}" data-v="قصة">+ قصة</button></div></section>
+    <div class="fld"><div class="ch"><span class="lb">خطتي: لو… هعمل…</span>${view.fSug===f.id?'<span class="busytxt"><i class="spin"></i>بيفكّر…</span>':`<button class="tg add" data-act="f-sug" data-id="${f.id}">${ico('spark')}اقترح عليّ</button>`}</div>${(f.rules||[]).map(x=>`<div class="rule"><div class="rule-r"><span>لو</span><input class="inp" data-act="fr" data-id="${f.id}" data-r="${x.id}" data-k="a" value="${esc(x.a||'')}" placeholder="حد صحّحلي قدام الناس"></div><div class="rule-r"><span>هعمل</span><input class="inp" data-act="fr" data-id="${f.id}" data-r="${x.id}" data-k="b" value="${esc(x.b||'')}" placeholder="أقول جزاك الله خير وأسكت"></div>${xbtn('fr-del',`data-id="${f.id}" data-r="${x.id}"`)}</div>`).join('')}
+      <button class="link" data-act="fr-add" data-id="${f.id}" style="align-self:flex-start">+ ${(f.rules||[]).length?'قاعدة تانية':'أول قاعدة'}</button></div>
+    <div class="fld"><span class="lb">تمرين كل يوم</span><input class="inp" data-act="f-txt" data-id="${f.id}" data-k="drill" value="${esc(f.drill||'')}" placeholder="${esc(DRILL[v]||'فعل صغير تعمله عمدًا كل يوم')}"><span class="small muted">هيظهرلك في محاسبة الليلة تعلّم عليه.</span></div>
+    <div class="fld"><span class="lb">تقدّمك</span><div class="stats s3"><div class="stat"><b>${tot?num(Math.round(r.wi/tot*100),'%'):'–'}</b><span>انتصار الأسبوع ده</span></div><div class="stat"><b>${num(fStreak(f.id))}</b><span>يوم من غير وقوع</span></div><div class="stat"><b>${st?num(st):'–'}<small>/5</small></b><span>المرحلة</span></div></div><div class="chart">${wkBars(f.id)}</div></div>
+    ${fold('stage','المتابعة والمرحلة',`<div class="seg">${FMODES.map(([x,l])=>`<button data-act="f-mode" data-id="${f.id}" data-v="${x}" aria-pressed="${f.mode===x}">${l}</button>`).join('')}</div><div class="stages">${FSTG.map((l,i)=>`<button data-act="f-stage" data-id="${f.id}" data-v="${i+1}" aria-pressed="${st===i+1}"><i>${num(i+1)}</i>${l}</button>`).join('')}</div>${(f.stg||[]).length?`<span class="small muted">آخر تحديث: ${fmt(fStageAt(f),{day:'numeric',month:'long'})}${f.stg.length>1?` · بدأت من المرحلة ${num(f.stg[0][1])}`:''}</span>`:''}`)}
+    ${fold('log',`دفتر المواقف${lg.length?` · ${num(lg.length)}`:''}`,`${view.flog?`<div class="tagbox"><div class="seg">${[['win','انتصرت'],['fall','وقعت']].map(([x,l])=>`<button data-act="fl-kind" data-v="${x}" aria-pressed="${view.flog.kind===x}">${l}</button>`).join('')}</div><textarea class="inp" id="flWhat" placeholder="إيه الموقف؟"></textarea><textarea class="inp" id="flFelt" placeholder="كنت حاسس بإيه قبلها؟"></textarea><textarea class="inp" id="flNext" placeholder="المرة الجاية هعمل إيه؟"></textarea><div class="row-in"><button class="btn sm" data-act="fl-save" data-id="${f.id}">احفظ</button><button class="btn ghost sm" data-act="fl-new" data-v="">إلغاء</button></div></div>`:`<button class="btn ghost sm" data-act="fl-new" data-v="1" style="align-self:flex-start">+ موقف جديد</button>`}
+      ${lg.map(x=>`<div class="lgi"><div class="ch"><span class="badge ${x.kind==='win'?'done':'miss'}">${x.kind==='win'?'انتصرت':'وقعت'}</span><span class="small muted">${fmt(x.k,{day:'numeric',month:'long'})}</span></div>${x.what?`<p>${esc(x.what)}</p>`:''}${x.felt?`<p class="small muted">حسيت: ${esc(x.felt)}</p>`:''}${x.next?`<p class="small"><b>المرة الجاية:</b> ${esc(x.next)}</p>`:''}</div>`).join('')}`)}
+    ${fold('more','تفاصيل',`<div class="fld"><span class="lb">اسم الخُلق</span><input class="inp" data-act="f-txt" data-id="${f.id}" data-k="virtue" value="${esc(f.virtue||'')}" placeholder="زي: التواضع"></div><div class="fld"><span class="lb">العيب اللي قصاده (اختياري)</span><input class="inp" data-act="f-txt" data-id="${f.id}" data-k="name" value="${esc(f.name||'')}" placeholder="زي: الكبر"></div>
+      ${f.name?txt('signs',`${esc(f.name)} بيظهر فيّ إزاي؟`,'تصرفات محددة، زي: بقاطع اللي بيتكلم')+txt('when','إمتى ومع مين؟','المواقف اللي بتطلّعه')+txt('kaff','لو وقعت فيه هعمل إيه؟',cure[1]||'استغفار، وحسنة تمحوها'):''}${(f.cure||'').trim()?txt('cure','العلاج بالضد',''):''}`)}
+    <p class="dua">«اللهم اهدني لأحسن الأخلاق، لا يهدي لأحسنها إلا أنت، واصرف عني سيئها، لا يصرف عني سيئها إلا أنت»</p>`,
    foot:`<button class="btn danger" data-act="f-del" data-id="${f.id}">امسح</button><button class="btn" data-act="close-sheet">تمام</button>`}})}
 
 /* ---------- settings & customize ---------- */
@@ -1140,6 +1179,7 @@ document.addEventListener('click',ev=>{
   if(a==='kbn-mode'){const tx=(($('#kbnText')||{}).value||'');if(KBT[v]){view.kbn.type=KBT[v];view.kbn.t=tx;keepDraft();return paintSheet()}view.kbn=null;dropDraft();openNote(null,true);view.nd.mode=v;view.nd.text=tx;keepDraft();return paintSheet()}
   /* notes */
   if(a==='note-new')return openNote(null);
+  if((a==='kb-open'||a==='note-open'))view.kbiBack=b.dataset.back||null;
   if(a==='note-open')return openNote(id);
   if(a==='nd-mode'){view.nd.mode=v;keepDraft();return paintSheet()}
   if(a==='nd-src'){view.nd.src=view.nd.src===v?'':v;ndApply();return paintSheet()}
@@ -1210,7 +1250,7 @@ document.addEventListener('click',ev=>{
   if(a==='kbi-del'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟';return}kbRef(view.kbi).del();closeSheet();toast('اتمسح');return}
   if(a==='kbn-type'){view.kbn.type=v;keepDraft();return paintSheet()}
   if(a==='kbn-src'){view.kbn.src=view.kbn.src===v?'':v;return paintSheet()}
-  if(a==='kbn-save'){const s=view.kbn,tx=(($('#kbnText')||{}).value||s.t||'').trim();if(!tx){toast('اكتب الأول');return}db.kb=db.kb||[];db.kb.push({id:uid('kb'),k:dayKey(),type:s.type,t:tx,tags:s.tags||[],src:s.src||''});dropDraft();save();view.kbn=null;closeSheet();toast(`اتحفظ في علمي ✓`);return}
+  if(a==='kbn-save'){const s=view.kbn,tx=(($('#kbnText')||{}).value||s.t||'').trim();if(!tx){toast('اكتب الأول');return}db.kb=db.kb||[];db.kb.push({id:uid('kb'),k:dayKey(),type:s.type,t:tx,tags:s.tags||[],src:s.src||''});dropDraft();save();view.kbn=null;closeSheet();toast(`اتحفظ في علمي ✓`);if(view.kbnBack){const fb=view.kbnBack;view.kbnBack=null;openFault(fb)}return}
   if(a==='p40-edit')return openP40();
   if(a==='p40-add'){const v2=$('#p40-new').value.trim();if(!v2){toast('اكتب البند الأول');return}db.p40.push({id:uid('p40'),text:v2,link:$('#p40-newlink').value||null});save();paintSheet();render();toast('اتضاف');return}
   if(a==='p40-del'){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}db.p40=db.p40.filter(x=>x.id!==id);save();paintSheet();return render()}
@@ -1264,11 +1304,20 @@ document.addEventListener('click',ev=>{
   if(a==='dkind'){view.dkind=v;const t2=$('#duaText').value;render();$('#duaText').value=t2;return}
   if(a==='dua-add'){const val=$('#duaText').value.trim();if(!val){toast('اكتب الدعاء الأول');return}db.duas.push({id:uid('dua'),text:val,k:view.dkind||'mine'});upd();toast('اتحفظ الدعاء');return}
   if(a==='dua-del'){if(!b.dataset.sure){b.dataset.sure=1;toast('اضغط تاني للمسح');return}db.duas=db.duas.filter(x=>x.id!==id);return upd()}
-  if(a==='fault')return openFault(id);
-  if(a==='f-add'){const val=$('#fn-'+v).value.trim();if(!val){toast('اكتب العيب الأول');return}db.faults.push({id:uid('flt'),g:v,name:val,mode:'watch',on:true,detail:'',hist:[],stg:[]});return upd()}
+  if(a==='fault'){view.fOpen={};view.flog=null;return openFault(id)}
+  if(a==='f-add'){const val=$('#fn-'+v).value.trim();if(!val){toast('اكتب الخُلق الأول');return}const nf={id:uid('flt'),g:v,name:'',virtue:val,mode:'watch',on:true,detail:'',hist:[],stg:[],rules:[],log:[]};db.faults.push(nf);save();render();view.fOpen={};view.flog=null;openFault(nf.id);suggestFault(nf.id,true);return}
   if(a==='f-on'){const f=db.faults.find(x=>x.id===id);if(f)f.on=v==='1';return upd()}
   if(a==='f-mode'){const f=db.faults.find(x=>x.id===id);if(!f)return;if(v==='focus'&&f.mode!=='focus'&&db.faults.filter(x=>x.mode==='focus').length>=2)toast('الأفضل متزودش عن عيبين تركيز');f.mode=v;f.on=v!=='off';return upd()}
   if(a==='f-stage'){const f=db.faults.find(x=>x.id===id);if(!f)return;f.stg=f.stg||[];const k=dayKey(),last=f.stg[f.stg.length-1];if(last&&last[0]===k)last[1]=Number(v);else f.stg.push([k,Number(v)]);buzz();return upd()}
+  if(a==='f-fold'){view.fOpen=view.fOpen||{};view.fOpen[v]=!view.fOpen[v];return paintSheet()}
+  if(a==='f-kb'){const f=db.faults.find(x=>x.id===id);if(!f)return;view.kbnBack=f.id;return openKBNew(v,'',{type:v,t:'',tags:[vName(f)],src:''})}
+  if(a==='f-sug')return suggestFault(id);
+  if(a==='fr-add'){const f=db.faults.find(x=>x.id===id);f.rules=f.rules||[];f.rules.push({id:uid('r'),a:'',b:''});save();paintSheet();const ins=sheetEl.querySelectorAll('[data-act=fr][data-k=a]');ins.length&&ins[ins.length-1].focus();return}
+  if(a==='fr-del'){const f=db.faults.find(x=>x.id===id);f.rules=(f.rules||[]).filter(x=>x.id!==b.dataset.r);save();return paintSheet()}
+  if(a==='fl-new'){view.flog=v?{kind:'win'}:null;return paintSheet()}
+  if(a==='fl-kind'){view.flog.kind=v;const keep=['flWhat','flFelt','flNext'].map(i=>($('#'+i)||{}).value||'');paintSheet();['flWhat','flFelt','flNext'].forEach((i,j)=>{const x=$('#'+i);if(x)x.value=keep[j]});return}
+  if(a==='fl-save'){const f=db.faults.find(x=>x.id===id),g=i=>(($('#'+i)||{}).value||'').trim(),o={id:uid('l'),k:dayKey(),kind:view.flog.kind,what:g('flWhat'),felt:g('flFelt'),next:g('flNext')};if(!o.what&&!o.next){toast('اكتب الموقف الأول');return}f.log=f.log||[];f.log.push(o);save();view.flog=null;toast('اتسجّل');return paintSheet()}
+  if(a==='fdrill'&&d){const e=E(d.id);e.a=e.a||{};const m={...(e.a.fd||{})};if(m[b.dataset.k])delete m[b.dataset.k];else m[b.dataset.k]=true;e.a.fd=m;save();buzz();return sheetEl?paintSheet():render()}
   if(a==='fmore'){view.fmore=true;return sheetEl?paintSheet():render()}
   if(a==='f-del'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟';return}db.faults=db.faults.filter(x=>x.id!==id);closeSheet();return}
   /* notes */
@@ -1324,6 +1373,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   if(a==='kbi-text'){const r=kbRef(view.kbi);if(r.o){r.o.t=v.trim();r.save()}return}
   if(a==='kbn-text'){view.kbn.t=v;return}
   if(a==='f-txt'&&f){f[el.dataset.k]=v.trim();save();return}
+  if(a==='fr'&&f){const r=(f.rules||[]).find(x=>x.id===el.dataset.r);if(r){r[el.dataset.k]=v.trim();save()}return}
   if(a==='f-pct'&&f){const k=dayKey(),last=f.hist[f.hist.length-1];if(last&&last[0]===k)last[1]=Number(v);else f.hist.push([k,Number(v)]);return upd()}
   if(a==='daystart'){db.settings.dayStart=v||'03:30';save();toast('اتحفظ');return}
   if(a==='city'){db.settings.city=v;save();toast('اتحفظت المحافظة');return}
