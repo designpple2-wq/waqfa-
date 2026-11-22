@@ -426,6 +426,11 @@ const defDeeds=()=>DEFAULT_DEEDS.map(d=>({...cp(d),on:true}));
 function blank(){return {version:4,deeds:defDeeds(),logs:{},reviews:{},plans:{},tags:[],kb:[],p40:[],notes:[],journeys:[],people:[],
   faults:DEF_FAULTS.map((f,i)=>({id:'flt'+i,g:f[0],name:f[1],mode:'watch',on:true,detail:'',hist:[],stg:[]})),duas:DEF_DUAS.map((t,i)=>({id:'dua'+i,text:t,k:'mathur'})),
   goals:{d3:[],d40:[],m4:[]},gsecs:[{id:'life',name:'أهداف الحياة',items:[]},{id:'work',name:'أهداف العمل',items:[]}],settings:{dayStart:'03:30',city:'cairo',lastBackup:null,useLoc:false,loc:null},sched:{on:true,items:defSched()},noteCfg:{srcs:[...NSRC],topics:[...NTOPICS]},meta:{dirty:false,syncedAt:null}}}
+/* rename or merge a topic/tag everywhere (to='' deletes it) */
+function renameTagIn(d,from,to){const fix=arr=>{if(!Array.isArray(arr))return arr;const o=[];arr.forEach(x=>{const y=x===from?to:x;if(y&&!o.includes(y))o.push(y)});return o};
+  (d.notes||[]).forEach(n=>{if(n.topics)n.topics=fix(n.topics)});(d.kb||[]).forEach(x=>{if(x.tags)x.tags=fix(x.tags)});
+  Object.values(d.logs||{}).forEach(l=>Object.values(l||{}).forEach(e=>{if(!e||!e.a)return;Object.values(e.a).forEach(v=>{if(Array.isArray(v))v.forEach(o=>{if(o&&typeof o==='object'&&o.tags)o.tags=fix(o.tags)})})}));
+  d.tags=fix(d.tags||[]);if(d.noteCfg)d.noteCfg.topics=fix(d.noteCfg.topics||[])}
 function migrate(d){const b=blank();
   if((d.version||1)<4){d.deeds=b.deeds;d.legacyLogs=d.logs;d.logs={}}
   ['p40','notes','journeys','people'].forEach(k=>d[k]=d[k]||b[k]);['logs','reviews','plans'].forEach(k=>d[k]=d[k]||{});
@@ -434,6 +439,7 @@ function migrate(d){const b=blank();
   DEFAULT_DEEDS.forEach((x,i)=>{if(d.deeds.some(y=>y.id===x.id)||d.removed.includes(x.id))return;const prev=DEFAULT_DEEDS.slice(0,i).reverse().find(p=>d.deeds.some(y=>y.id===p.id));const at=prev?d.deeds.findIndex(y=>y.id===prev.id)+1:d.deeds.length;d.deeds.splice(at,0,{...cp(x),on:true})});
   if(!d.kb1){const tl=d.deeds.find(y=>y.id==='taleem');if(tl){const have=new Set((tl.perf||[]).map(f=>f.id));KBF.forEach(f=>{if(!have.has(f.id))(tl.perf=tl.perf||[]).push(cp(f))});tl.link=tl.link||'kb';if(tl.st&&tl.st.num)tl.st.orText=['hadith','ayah','qissa']}d.kb1=1}
   if(!d.fri){const dh=d.deeds.find(y=>y.id==='dhuhr');if(dh)dh.notDays=[5];d.fri=1}
+  if(!d.mg1){renameTagIn(d,'رسائل','مفاهيم');d.mg1=1;d._mg=1}
   d.version=4;return d}
 function normNotes(d){d.notes.forEach(n=>{if(!n.topics){n.topics=n.tag?[n.tag]:[];delete n.tag}n.topics.forEach(x=>{if(!d.noteCfg.topics.includes(x))d.noteCfg.topics.push(x)});if(n.src==null)n.src=''})}
 function load(){try{const s=localStorage.getItem(KEY);if(s)return migrate(JSON.parse(s))}catch(e){}return blank()}
@@ -468,7 +474,7 @@ const city=()=>db.settings.useLoc&&db.settings.loc?['loc','موقعك',db.settin
 const timesFor=k=>{const c=city();return prayerTimes(fromKey(k),c[2],c[3])};
 
 /* ================= model helpers ================= */
-db=load();
+db=load();if(db._mg){delete db._mg;setTimeout(()=>save(),800)}
 let view={tab:'today',day:dayKey(),filter:'all',step:0,zad:'goals',ntag:'',nq:'',month:dayKey().slice(0,7),ready:0};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -754,7 +760,7 @@ function renderTags(){const T=allTags();
      ${kb.length?`<section class="slot"><div class="slot-h"><span>أحاديث وآيات وقصص · ${num(kb.length)}</span></div><div class="ncards">${kb.map(kbCard).join('')}</div></section>`:''}
      ${nt.length?`<section class="slot"><div class="slot-h"><span>فوايد · ${num(nt.length)}</span></div><div class="ncards">${nt.map(noteCard).join('')}</div></section>`:''}
      ${!kb.length&&!nt.length?'<p class="empty">لسه مفيش حاجة في التصنيف ده.</p>':''}`}
-  return `<p class="lead">اختار تصنيف، يطلعلك كل اللي كتبته فيه: أحاديث وآيات وقصص، وفوايد البيانات والحلقات.</p>
+  return `<div class="ch"><p class="lead" style="flex:1">اختار تصنيف، يطلعلك كل اللي كتبته فيه.</p><button class="btn ghost sm" data-act="tagmgr">تعديل</button></div>
    ${T.length?`<div class="tgrid">${T.map(o=>`<button class="tcell" data-act="itag" data-v="${esc(o.s)}"><b>${esc(o.s)}</b><span class="small muted">${o.kb+o.notes?num(o.kb+o.notes):'فاضي'}</span></button>`).join('')}</div>`:'<p class="empty">لسه مفيش تصنيفات.</p>'}`}
 function renderIlm(){const v=view.ilm||'kb',n=kbItems().length+db.notes.length;
   return top(`${num(n)} حاجة اتعلمتها`,'علمي',gearBtn)+`<div class="seg-tabs">${[['kb','أحاديث وآيات'],['notes','الفوايد'],['tags','التصنيفات']].map(([x,l])=>`<button data-act="ilm" data-v="${x}" aria-pressed="${v===x}">${l}</button>`).join('')}</div>`
@@ -786,10 +792,10 @@ function openKBNew(type,text){view.kbi=null;view.kbn={type,t:text||'',tags:[],sr
   setTimeout(()=>{const el=$('#kbnText');el&&!el.value&&el.focus()},350)}
 function renderNotes(){const v=view.nview||'days';
   return `<p class="lead">دفتر الفوايد: اللي بتطلع بيه من البيانات والحلقات والمواقف، عشان ترجعله وتعمل بيه.</p>
-   <button class="btn block" data-act="note-new">+ فائدة جديدة</button>
+   <button class="btn block" data-act="note-new">+ فائدة جديدة</button><div class="ch"><button class="link" data-act="ncfg">تعديل المصادر</button><button class="link" data-act="tagmgr">تعديل المواضيع</button></div>
    <input class="inp" type="search" data-act="nsearch" value="${esc(view.nq)}" placeholder="دوّر في فوايدك">
    <div class="seg-tabs">${[['days','بالأيام'],['topic','بالموضوع'],['src','بالمصدر'],['star','المميّزة']].map(([x,l])=>`<button data-act="nview" data-v="${x}" aria-pressed="${v===x}">${l}</button>`).join('')}</div>
-   <div id="nlist">${notesList()}</div><button class="link" data-act="ncfg" style="align-self:center">تعديل المصادر والمواضيع</button>`}
+   <div id="nlist">${notesList()}</div>`}
 function notesList(){const q=view.nq.trim(),v=view.nview||'days',L=db.notes.filter(n=>!q||n.text.includes(q)||(n.by||'').includes(q)||noteMeta(n).some(x=>x.includes(q))).slice().reverse();
   if(!L.length)return `<p class="empty">${q?'مفيش نتايج.':'لسه مفيش فوايد. اضغط "فائدة جديدة"، أو + من تحت من أي شاشة.'}</p>`;
   const G=new Map(),add=(key,n)=>{if(!G.has(key))G.set(key,[]);G.get(key).push(n)};
@@ -815,8 +821,15 @@ function openNote(id,quick){const n=id&&db.notes.find(x=>x.id===id);
        ${n?'<button class="btn ghost" data-act="nd-plan">حوّلها لخطوة في خطة بكرة</button>':''}`:''),
      foot:n?'<button class="btn danger" data-act="nd-del">امسح</button><button class="btn" data-act="nd-save">احفظ</button>':'<button class="btn ghost" data-act="close-sheet">إلغاء</button><button class="btn" data-act="nd-save">احفظ</button>'}});
   if(!n)setTimeout(()=>{const x=$('#ndText');x&&x.focus()},350)}
+function openTagMgr(){view.tagEdit='';openSheet(()=>{const T=allTags();
+  return {head:'<span class="eyebrow">علمي</span><h2 class="title">المواضيع والتصنيفات</h2>',
+   body:`<p class="small muted">نفس التصنيفات للفوايد والأحاديث والآيات. لو غيّرت اسم لاسم موجود، الاتنين بيتدمجوا في واحد.</p>
+    <div class="list">${T.map(o=>view.tagEdit===o.s?`<div class="tagbox"><input class="inp" id="tagRen" value="${esc(o.s)}"><div class="row-in"><button class="btn sm" data-act="tag-ren" data-v="${esc(o.s)}">احفظ</button><button class="btn ghost sm" data-act="tag-edit" data-v="">إلغاء</button><button class="btn danger sm" data-act="tag-del" data-v="${esc(o.s)}">امسح</button></div></div>`
+      :`<button class="row" data-act="tag-edit" data-v="${esc(o.s)}"><span class="t"><b>${esc(o.s)}</b><span>${o.notes?`${num(o.notes)} فائدة`:''}${o.notes&&o.kb?' · ':''}${o.kb?`${num(o.kb)} من الأحاديث والآيات`:''}${!o.notes&&!o.kb?'فاضي':''}</span></span><span class="small muted">تعديل</span></button>`).join('')}</div>
+    <div class="row-in"><input class="inp" id="tagAdd" placeholder="موضوع جديد"><button class="btn ghost sm" data-act="tag-add">أضف</button></div>`,
+   foot:'<button class="btn" data-act="close-sheet">تمام</button>'}})}
 function openNoteCfg(){const back=view.nd&&sheetEl?view.nd:null;openSheet(()=>{const sec=(key,l)=>`<div class="fld"><span class="lb">${l}</span><div class="chips">${db.noteCfg[key].map((o,i)=>`<span class="tag">${esc(o)}${xbtn('cfg-del',`data-v="${key}" data-i="${i}"`)}</span>`).join('')}</div><div class="row-in"><input class="inp" id="cfg-${key}" placeholder="أضف"><button class="btn ghost sm" data-act="cfg-add" data-v="${key}">أضف</button></div></div>`;
-  return {head:'<span class="eyebrow">طلعت بإيه</span><h2 class="title">المصادر والمواضيع</h2>',body:sec('srcs','المصادر')+sec('topics','المواضيع'),foot:`<button class="btn" data-act="${back?'cfg-back':'close-sheet'}">تمام</button>`}})}
+  return {head:'<span class="eyebrow">طلعت بإيه</span><h2 class="title">المصادر والمواضيع</h2>',body:sec('srcs','المصادر')+sec('topics','المواضيع')+(back?'':'<button class="btn ghost" data-act="tagmgr">تغيير اسم أو دمج المواضيع</button>'),foot:`<button class="btn" data-act="${back?'cfg-back':'close-sheet'}">تمام</button>`}})}
 function fawaidCard(k){const pool=db.notes.filter(n=>n.k!==dayKey());if(!pool.length)return '';let h=0;for(const c of k)h=(h*31+c.charCodeAt(0))>>>0;
   const st=pool.filter(n=>n.star),P=st.length&&!((view.fseed||0)%2)?st:pool,n=P[(h+(view.fseed||0))%P.length];
   return `<section class="card fcard rise"><div class="ch"><span class="eyebrow">فائدة من اللي فات</span><button class="link" data-act="fseed">غيّرها</button></div><p class="ftext">${esc(n.text)}</p><span class="small muted">${noteMeta(n).map(esc).join(' · ')}${n.k?' · '+fmt(n.k,{day:'numeric',month:'long'}):''}</span></section>`}
@@ -1125,6 +1138,11 @@ document.addEventListener('click',ev=>{
   if(a==='nd-plan'){plan(shift(dayKey(),1)).push({id:uid('p'),t:(view.nd.text||'').trim(),done:false});save();toast('اتضافت لخطة بكرة');return}
   if(a==='nview'){view.nview=v;return render()}
   if(a==='ncfg')return openNoteCfg();
+  if(a==='tagmgr')return openTagMgr();
+  if(a==='tag-edit'){view.tagEdit=v;paintSheet();const x=$('#tagRen');if(x)x.focus();return}
+  if(a==='tag-ren'){const to=(($('#tagRen')||{}).value||'').trim();if(!to||to===v){view.tagEdit='';return paintSheet()}const merge=allTags().some(o=>o.s===to);renameTagIn(db,v,to);save();view.tagEdit='';toast(merge?`اتدمج في "${to}"`:'اتغيّر الاسم');return paintSheet()}
+  if(a==='tag-del'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟ هيتشال من كل حاجة';return}renameTagIn(db,v,'');save();view.tagEdit='';toast('اتمسح');return paintSheet()}
+  if(a==='tag-add'){const s=(($('#tagAdd')||{}).value||'').trim();if(!s)return;db.noteCfg.topics=db.noteCfg.topics||[];if(!db.noteCfg.topics.includes(s))db.noteCfg.topics.push(s);save();return paintSheet()}
   if(a==='cfg-back'){const n=view.nd;openNote(n.id||null,n.quick);Object.assign(view.nd,n);return paintSheet()}
   if(a==='cfg-add'){const inp=$('#cfg-'+v),val=inp.value.trim();if(!val)return;if(!db.noteCfg[v].includes(val))db.noteCfg[v].push(val);save();return paintSheet()}
   if(a==='cfg-del'){db.noteCfg[v].splice(Number(b.dataset.i),1);save();return paintSheet()}
