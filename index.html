@@ -59,7 +59,9 @@ h1,h2,h3,p{margin:0}
 .notice{border-radius:14px;border-inline-start:3px solid var(--forest);background:var(--fog);padding:12px 16px;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .inp{width:100%;border-radius:14px;border:1px solid var(--line);background:var(--white);padding:10px 16px;outline:0;transition:border .2s,box-shadow .2s}
 .inp:focus{border-color:var(--forest);box-shadow:0 0 0 4px rgba(28,145,81,.15)}
-textarea.inp{min-height:84px;resize:vertical;line-height:1.7}
+textarea.inp{min-height:84px;resize:vertical;line-height:1.7;flex-shrink:0}
+.sh-b>*{flex-shrink:0}
+select.inp{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%235a675e' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-position:left 16px center;background-size:12px 8px;background-repeat:no-repeat;padding-left:38px}
 .row-in{display:flex;gap:8px;align-items:center}
 .row-in .inp{flex:1;min-width:0}
 /* hero */
@@ -586,7 +588,7 @@ function openSheet(renderFn,opts={}){closeSheet(true);sheetRender=renderFn;const
   sh.addEventListener('touchstart',e=>{const b=sh.querySelector('.sh-b');if(e.target.closest('input[type=range]')){y0=null;return}if(e.target.closest('.sh-h')||(e.target.closest('.sh-b')&&b.scrollTop<=0)){y0=e.touches[0].clientY;x0=e.touches[0].clientX;dy=0;drag=false}else y0=null},{passive:true});
   sh.addEventListener('touchmove',e=>{if(y0==null)return;const d=e.touches[0].clientY-y0,dx=Math.abs(e.touches[0].clientX-x0);if(!drag){if(d>8&&d>dx){drag=true;sh.style.transition='none'}else if(d<-4||dx>8){y0=null;return}else return}
     dy=Math.max(0,d);sh.style.transform=`translateY(${dy}px)`;s.style.background=`rgba(27,27,27,${Math.max(.05,.4-dy/900)})`;if(e.cancelable)e.preventDefault()},{passive:false});
-  sh.addEventListener('touchend',()=>{if(!drag){y0=null;return}sh.style.transition='transform .25s var(--ease)';if(dy>110){sh.style.transform='translateY(100%)';setTimeout(()=>closeSheet(),180)}else{sh.style.transform='';s.style.background=''}y0=null;drag=false});document.body.classList.add('lock');sheetEl=s;paintSheet()}
+  sh.addEventListener('touchend',()=>{if(!drag){y0=null;return}sh.style.transition='transform .25s var(--ease)';if(dy>110){sh.style.transform='translateY(100%)';setTimeout(()=>closeSheet(),180)}else{sh.style.transform='';s.style.background=''}y0=null;drag=false});document.body.classList.add('lock');sheetEl=s;paintSheet();const b0=s.querySelector('.sh-b');setTimeout(()=>fitTA(b0),60);if(document.fonts)document.fonts.ready.then(()=>fitTA(b0))}
 const fitTA=(root=document)=>root.querySelectorAll('textarea.inp').forEach(x=>{x.style.height='auto';x.style.height=(x.scrollHeight+2)+'px'});
 function paintSheet(keepScroll=true){if(!sheetEl)return;const r=sheetRender();const b=sheetEl.querySelector('.sh-b'),st=b.scrollTop;
   sheetEl.querySelector('.hh').innerHTML=r.head;b.innerHTML=r.body;sheetEl.querySelector('.sh-f').innerHTML=r.foot||'<button class="btn" data-act="close-sheet">تمام</button>';fitTA(b);if(keepScroll)b.scrollTop=st}
@@ -782,13 +784,13 @@ function openKBItem(r){view.kbi=r;view.kbiTag=false;view.kbn=null;openSheet(()=>
     <div class="fld"><span class="lb">المراجعة</span><span class="small muted">${x.k?kbNext(x):''}</span></div>
     <div class="fld"><span class="lb">المصدر</span>${r.s?`<span>${o.src?esc(o.src):'اتضاف من زرار +'}</span>`:`<button class="link" data-act="kbi-day" style="align-self:flex-start">التعليم الانفرادي · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})} ←</button>`}</div>`,
    foot:`<button class="btn danger" data-act="kbi-del">امسح</button><button class="btn" data-act="close-sheet">تمام</button>`}})}
-function openKBNew(type,text){view.kbi=null;view.kbn={type,t:text||'',tags:[],src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():''};view.kbiTag=false;
+function openKBNew(type,text,prev){view.kbi=null;view.nd=null;view.kbn=prev?{...prev,type}:{type,t:text||'',tags:[],src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():''};view.kbiTag=false;keepDraft();
   openSheet(()=>{const s=view.kbn;if(!s)return {head:'',body:''};return {head:`<span class="eyebrow">إضافة لعلمي</span><h2 class="title">${s.type==='حديث'?'حديث جديد':s.type==='آية'?'آية جديدة':'قصة جديدة'}</h2>`,
    body:`${addSeg('kbn-mode',KBT_R[s.type])}<textarea class="inp" id="kbnText" data-act="kbn-text" placeholder="${s.type==='حديث'?'نص الحديث، وراويه لو تعرفه':s.type==='آية'?'الآية، واسم السورة ورقمها':'القصة باختصار، ومن أي كتاب'}" style="min-height:140px">${esc(s.t)}</textarea>
     <div class="kbt"><span class="small muted">صوّر الصفحة أو سجّل بصوتك</span>${toolsHTML('kbn','data-kbn="1"')}</div>
-    <div class="fld"><span class="lb">التصنيفات</span>${tagPick(s.tags,'kbi-tag','kbi-tagnew','kbiTag')}</div>
-    <div class="fld"><span class="lb">سمعته فين؟ (اختياري)</span><div class="chips">${db.noteCfg.srcs.map(o=>`<button class="chip" data-act="kbn-src" data-v="${esc(o)}" aria-pressed="${s.src===o}">${esc(o)}</button>`).join('')}</div></div>`,
-   foot:'<button class="btn ghost" data-act="close-sheet">إلغاء</button><button class="btn" data-act="kbn-save">احفظ</button>'}});
+    <div class="fld"><span class="lb">التصنيفات</span><div class="tagrow">${(s.tags||[]).map(x=>`<span class="tg">${esc(x)}</span>`).join('')}<button class="tg add" data-act="kbi-tagbox">${ico('tag')}${(s.tags||[]).length?'تعديل':'تصنيف'}</button></div>${view.kbiTag?tagPick(s.tags||[],'kbi-tag','kbi-tagnew','kbiTag'):''}</div>
+    <div class="fld"><span class="lb">سمعته فين؟ (اختياري)</span>${srcSel('kbn-srcsel',s.src)}</div>`,
+   foot:'<button class="btn ghost" data-act="close-sheet">بعدين</button><button class="btn" data-act="kbn-save">احفظ</button>'}});
   setTimeout(()=>{const el=$('#kbnText');el&&!el.value&&el.focus()},350)}
 function renderNotes(){const v=view.nview||'days';
   return `<p class="lead">دفتر الفوايد: اللي بتطلع بيه من البيانات والحلقات والمواقف، عشان ترجعله وتعمل بيه.</p>
@@ -807,19 +809,32 @@ function notesList(){const q=view.nq.trim(),v=view.nview||'days',L=db.notes.filt
   return keys.map(key=>{const arr=G.get(key),lab=v==='days'?(key?fmt(key,{weekday:'long',day:'numeric',month:'long'}):'من غير تاريخ')+(arr[0].mosque?' · '+esc(arr[0].mosque):''):esc(key);
     return `<section class="slot">${key||v!=='star'?`<div class="slot-h"><span>${lab}</span><span class="tm">${num(arr.length)}</span></div>`:''}<div class="ncards">${arr.map(noteCard).join('')}</div></section>`}).join('')}
 function autoSrc(){return ({fajr:'بيان الفجر',duha:'حلقة التعليم',dhuhr:'حديثين الظهر',asr:'بيان العصر',maghrib:'الترغيب',isha:'بيان العشاء',night:'خاطرة'})[windowNow().key]||''}
+/* drafts: what you typed stays until you save it, even if the sheet closes by mistake */
+const DRAFT='waqfa.draft';
+const getDraft=()=>{try{return JSON.parse(localStorage.getItem(DRAFT)||'null')}catch(e){return null}};
+function keepDraft(){try{const n=view.nd,k=view.kbn;
+  if(n&&!n.id&&((n.text||'').trim()||(n.by||'').trim()))localStorage.setItem(DRAFT,JSON.stringify({kind:'nd',v:n}));
+  else if(k&&(k.t||'').trim())localStorage.setItem(DRAFT,JSON.stringify({kind:'kbn',v:k}));
+  else if((n&&!n.id)||k)localStorage.removeItem(DRAFT)}catch(e){}}
+const dropDraft=()=>{try{localStorage.removeItem(DRAFT)}catch(e){}};
+let ndT=0;function ndApply(){const s=view.nd;if(!s)return;if(!s.id)return keepDraft();const n=db.notes.find(x=>x.id===s.id);if(!n)return;
+  const txt=(s.text||'').trim();if(!txt)return;clearTimeout(ndT);ndT=setTimeout(()=>{Object.assign(n,{text:txt,src:s.src,topics:s.topics,by:(s.by||'').trim(),star:s.star});save()},500)}
+const draftNote=()=>{const d=getDraft();return d&&d.v?d:null};
+const srcSel=(act,cur)=>`<select class="inp" data-act="${act}"><option value="">من غير مصدر</option>${db.noteCfg.srcs.map(o=>`<option ${cur===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
 function openNote(id,quick){const n=id&&db.notes.find(x=>x.id===id);
-  view.nd=n?{id,text:n.text,src:n.src||'',topics:[...(n.topics||[])],by:n.by||'',star:!!n.star,mode:'note'}:{text:'',src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():'',topics:[],by:'',star:false,mode:'note',quick:!!quick};
+  const dr=!n&&draftNote();if(dr&&dr.kind==='kbn')return openKBNew(dr.v.type,dr.v.t,dr.v);
+  view.nd=n?{id,text:n.text,src:n.src||'',topics:[...(n.topics||[])],by:n.by||'',star:!!n.star,mode:'note'}:dr?{...dr.v,quick:!!quick,restored:true}:{text:'',src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():'',topics:[],by:'',star:false,mode:'note',quick:!!quick};view.ndTop=false;
   openSheet(()=>{const s=view.nd,cfg=db.noteCfg,chips=(arr,act,on)=>`<div class="chips">${arr.map(o=>`<button class="chip" data-act="${act}" data-v="${esc(o)}" aria-pressed="${on(o)}">${esc(o)}</button>`).join('')}</div>`;
     return {head:`<span class="eyebrow">${n?fmt(n.k,{weekday:'long',day:'numeric',month:'long'})+(n.mosque?' · '+esc(n.mosque):''):'إضافة'}</span><h2 class="title">${n?'الفائدة':s.mode==='plan'?'خطوة في خطة النهارده':'فائدة جديدة'}</h2>`,
      body:(s.quick?`${addSeg('nd-mode',s.mode)}`:'')
-      +`<textarea class="inp" data-act="nd-text" id="ndText" placeholder="${s.mode==='plan'?'الخطوة':'الفائدة أو الرسالة اللي جاتلك'}" style="min-height:130px">${esc(s.text)}</textarea>`
-      +(s.mode==='note'?`<div class="fld"><span class="lb">المصدر</span>${chips(cfg.srcs,'nd-src',o=>s.src===o)}<span class="small muted">بيتحدد لوحده حسب الوقت، وتقدر تغيّره.</span></div>
-       <div class="fld"><span class="lb">الموضوع</span>${chips(cfg.topics,'nd-top',o=>s.topics.includes(o))}</div>
+      +(s.restored?`<div class="ch small"><span class="muted">رجّعنالك اللي كنت كاتبه</span><button class="link" data-act="nd-clear">ابدأ من جديد</button></div>`:'')+`<textarea class="inp" data-act="nd-text" id="ndText" placeholder="${s.mode==='plan'?'الخطوة':'الفائدة أو الرسالة اللي جاتلك'}" style="min-height:130px">${esc(s.text)}</textarea>`
+      +(s.mode==='note'?`<div class="fld"><span class="lb">المصدر</span>${srcSel('nd-srcsel',s.src)}</div>
+       <div class="fld"><span class="lb">الموضوع</span><div class="tagrow">${s.topics.map(o=>`<span class="tg">${esc(o)}</span>`).join('')}<button class="tg add" data-act="nd-topbox">${ico('tag')}${s.topics.length?'تعديل':'اختار موضوع'}</button></div>${view.ndTop?`<div class="tagbox">${chips(cfg.topics,'nd-top',o=>s.topics.includes(o))}</div>`:''}</div>
        <div class="fld"><span class="lb">مين قالها؟ (اختياري)</span><input class="inp" data-act="nd-by" value="${esc(s.by)}" placeholder="الاسم"></div>
        <button class="chip" data-act="nd-star" aria-pressed="${s.star}" style="align-self:flex-start">${s.star?'★ مميّزة':'☆ ميّزها'}</button>
        <button class="link" data-act="ncfg" style="align-self:flex-start">ضيف مصدر أو موضوع جديد</button>
        ${n?'<button class="btn ghost" data-act="nd-plan">حوّلها لخطوة في خطة بكرة</button>':''}`:''),
-     foot:n?'<button class="btn danger" data-act="nd-del">امسح</button><button class="btn" data-act="nd-save">احفظ</button>':'<button class="btn ghost" data-act="close-sheet">إلغاء</button><button class="btn" data-act="nd-save">احفظ</button>'}});
+     foot:n?'<button class="btn danger" data-act="nd-del">امسح</button><button class="btn" data-act="nd-save">تمام</button>':'<button class="btn ghost" data-act="close-sheet">بعدين</button><button class="btn" data-act="nd-save">احفظ</button>'}});
   if(!n)setTimeout(()=>{const x=$('#ndText');x&&x.focus()},350)}
 function openTagMgr(){view.tagEdit='';openSheet(()=>{const T=allTags();
   return {head:'<span class="eyebrow">علمي</span><h2 class="title">المواضيع والتصنيفات</h2>',
@@ -1121,19 +1136,21 @@ document.addEventListener('click',ev=>{
   if(a==='open')return openDeed(id);
   if(a==='close-sheet')return closeSheet();
   if(a==='quick')return openNote(null,true);
-  if(a==='nd-mode'&&KBT[v]){const tx=(($('#ndText')||{}).value||'');return openKBNew(KBT[v],tx)}
-  if(a==='kbn-mode'){const tx=(($('#kbnText')||{}).value||'');if(KBT[v]){view.kbn.type=KBT[v];view.kbn.t=tx;return paintSheet()}openNote(null,true);view.nd.mode=v;view.nd.text=tx;return paintSheet()}
+  if(a==='nd-mode'&&KBT[v]){const tx=(($('#ndText')||{}).value||'');dropDraft();return openKBNew(KBT[v],tx)}
+  if(a==='kbn-mode'){const tx=(($('#kbnText')||{}).value||'');if(KBT[v]){view.kbn.type=KBT[v];view.kbn.t=tx;keepDraft();return paintSheet()}view.kbn=null;dropDraft();openNote(null,true);view.nd.mode=v;view.nd.text=tx;keepDraft();return paintSheet()}
   /* notes */
   if(a==='note-new')return openNote(null);
   if(a==='note-open')return openNote(id);
-  if(a==='nd-mode'){view.nd.mode=v;return paintSheet()}
-  if(a==='nd-src'){view.nd.src=view.nd.src===v?'':v;return paintSheet()}
-  if(a==='nd-top'){toggle(view.nd.topics,v);return paintSheet()}
-  if(a==='nd-star'){view.nd.star=!view.nd.star;return paintSheet()}
+  if(a==='nd-mode'){view.nd.mode=v;keepDraft();return paintSheet()}
+  if(a==='nd-src'){view.nd.src=view.nd.src===v?'':v;ndApply();return paintSheet()}
+  if(a==='nd-topbox'){view.ndTop=!view.ndTop;return paintSheet()}
+  if(a==='nd-clear'){dropDraft();const q=view.nd.quick;view.nd={text:'',src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():'',topics:[],by:'',star:false,mode:'note',quick:q};return paintSheet()}
+  if(a==='nd-top'){toggle(view.nd.topics,v);ndApply();return paintSheet()}
+  if(a==='nd-star'){view.nd.star=!view.nd.star;ndApply();return paintSheet()}
   if(a==='nd-save'){const s=view.nd,txt=(s.text||'').trim();if(!txt){toast('اكتب الأول');return}
-    if(s.mode==='plan'){plan(dayKey()).push({id:uid('p'),t:txt,done:false});save();closeSheet();toast('اتضافت لخطة النهارده');return}
+    if(s.mode==='plan'){plan(dayKey()).push({id:uid('p'),t:txt,done:false});dropDraft();save();closeSheet();toast('اتضافت لخطة النهارده');return}
     const o={text:txt,src:s.src,topics:s.topics,by:(s.by||'').trim(),star:s.star};if(s.id)Object.assign(db.notes.find(x=>x.id===s.id),o);else db.notes.push({id:uid('n'),k:dayKey(),mosque:curMosque(),...o});
-    save();closeSheet();toast(s.id?'اتحفظت':'اتحفظت الفائدة ✓');return}
+    if(!s.id)dropDraft();save();closeSheet();toast(s.id?'اتحفظت':'اتحفظت الفائدة ✓');return}
   if(a==='nd-del'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟';return}db.notes=db.notes.filter(x=>x.id!==view.nd.id);save();closeSheet();return}
   if(a==='nd-plan'){plan(shift(dayKey(),1)).push({id:uid('p'),t:(view.nd.text||'').trim(),done:false});save();toast('اتضافت لخطة بكرة');return}
   if(a==='nview'){view.nview=v;return render()}
@@ -1189,11 +1206,11 @@ document.addEventListener('click',ev=>{
   if(a==='kbi-day'){const r=view.kbi;closeSheet(true);return openDeed(r.id,r.k)}
   if(a==='kbi-tagbox'){view.kbiTag=!view.kbiTag;return paintSheet()}
   if(a==='kbi-tag'||a==='kbi-tagnew'){const s=a==='kbi-tag'?v:($('#kbiTag')||{}).value||'',x=s.trim().replace(/^#/,'');if(!x)return;const o=view.kbi?kbRef(view.kbi).o:view.kbn;if(!o)return;
-    const on=a==='kbi-tagnew'||!(o.tags||[]).includes(x);o.tags=(o.tags||[]).filter(y=>y!==x);if(on)o.tags.push(x);db.tags=db.tags||[];if(!db.tags.includes(x))db.tags.push(x);if(view.kbi)kbRef(view.kbi).save();return paintSheet()}
+    const on=a==='kbi-tagnew'||!(o.tags||[]).includes(x);o.tags=(o.tags||[]).filter(y=>y!==x);if(on)o.tags.push(x);db.tags=db.tags||[];if(!db.tags.includes(x))db.tags.push(x);if(view.kbi)kbRef(view.kbi).save();else keepDraft();return paintSheet()}
   if(a==='kbi-del'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟';return}kbRef(view.kbi).del();closeSheet();toast('اتمسح');return}
-  if(a==='kbn-type'){view.kbn.type=v;return paintSheet()}
+  if(a==='kbn-type'){view.kbn.type=v;keepDraft();return paintSheet()}
   if(a==='kbn-src'){view.kbn.src=view.kbn.src===v?'':v;return paintSheet()}
-  if(a==='kbn-save'){const s=view.kbn,tx=(($('#kbnText')||{}).value||s.t||'').trim();if(!tx){toast('اكتب الأول');return}db.kb=db.kb||[];db.kb.push({id:uid('kb'),k:dayKey(),type:s.type,t:tx,tags:s.tags||[],src:s.src||''});save();view.kbn=null;closeSheet();toast(`اتحفظ في علمي ✓`);return}
+  if(a==='kbn-save'){const s=view.kbn,tx=(($('#kbnText')||{}).value||s.t||'').trim();if(!tx){toast('اكتب الأول');return}db.kb=db.kb||[];db.kb.push({id:uid('kb'),k:dayKey(),type:s.type,t:tx,tags:s.tags||[],src:s.src||''});dropDraft();save();view.kbn=null;closeSheet();toast(`اتحفظ في علمي ✓`);return}
   if(a==='p40-edit')return openP40();
   if(a==='p40-add'){const v2=$('#p40-new').value.trim();if(!v2){toast('اكتب البند الأول');return}db.p40.push({id:uid('p40'),text:v2,link:$('#p40-newlink').value||null});save();paintSheet();render();toast('اتضاف');return}
   if(a==='p40-del'){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}db.p40=db.p40.filter(x=>x.id!==id);save();paintSheet();return render()}
@@ -1302,6 +1319,8 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   const f=db.faults.find(x=>x.id===id);
   if(a==='f-name'&&f){f.name=v.trim()||f.name;return upd()}
   if(a==='f-detail'&&f){f.detail=v.trim();save();return}
+  if(a==='nd-srcsel'&&view.nd){view.nd.src=v;ndApply();return}
+  if(a==='kbn-srcsel'&&view.kbn){view.kbn.src=v;keepDraft();return}
   if(a==='kbi-text'){const r=kbRef(view.kbi);if(r.o){r.o.t=v.trim();r.save()}return}
   if(a==='kbn-text'){view.kbn.t=v;return}
   if(a==='f-txt'&&f){f[el.dataset.k]=v.trim();save();return}
@@ -1313,7 +1332,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   if(a==='shura'){const sh=shuraOf(j,view.day),[g,ff]=el.dataset.path.split('.');(sh[g]||(sh[g]={}))[ff]=v.trim();save();return}
   if(a==='assign'){const sh=shuraOf(j,view.day),x=sh.assign[el.dataset.v]||(sh.assign[el.dataset.v]={});x.who=v.trim();save();return}
 });
-document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(ev.target.matches('textarea.inp'))fitTA(ev.target.parentNode);if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='nd-text'&&view.nd)view.nd.text=ev.target.value;if(a==='nd-by'&&view.nd)view.nd.by=ev.target.value});
+document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(ev.target.matches('textarea.inp'))fitTA(ev.target.parentNode);if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='nd-text'&&view.nd){view.nd.text=ev.target.value;ndApply()}if(a==='nd-by'&&view.nd){view.nd.by=ev.target.value;ndApply()}if(a==='kbn-text'&&view.kbn){view.kbn.t=ev.target.value;keepDraft()}});
 document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='kbiTag'){ev.preventDefault();const b=document.querySelector('[data-act="kbi-tagnew"]');if(b)b.click();return}if(ev.key==='Enter'&&ev.target.id==='tagnew'){ev.preventDefault();const b=document.querySelector('[data-act="tag-new"]');if(b)b.click();return}if(ev.key==='Enter'&&ev.target.id&&ev.target.id.startsWith('pl-')){ev.preventDefault();const b=document.querySelector(`[data-act="pl-add"][data-k="${ev.target.id.slice(3)}"]`);b&&b.click()}});
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 let lastTouch=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouch<300&&!e.target.closest('input,textarea,select'))e.preventDefault();lastTouch=n},{passive:false});
