@@ -204,6 +204,12 @@ select.inp{appearance:none;-webkit-appearance:none;background-image:url("data:im
 .note-c{display:flex;flex-direction:column;gap:2px;border-inline-start:3px solid var(--forest);background:var(--fog);border-radius:12px;padding:10px 14px;font-size:14px}
 .pk{gap:12px}.pk .ck{flex:0 0 24px;height:24px;border-radius:8px;border:1.5px solid var(--line);display:grid;place-items:center}.pk .ck svg{width:14px;height:14px}.pk.on .ck{background:var(--forest);border-color:var(--forest);color:#fff}.pk .t b{font-weight:400;font-size:15px}
 .link.danger{color:var(--alert)}
+.rtb{display:flex;gap:6px;position:sticky;top:-1px;z-index:2;background:var(--cream);padding:4px 0}
+.rtb button{width:40px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--white);font-weight:800;display:grid;place-items:center}.rtb button svg{width:16px;height:16px}
+.rt-hl-amber{background:#fbe7c2!important}.rt-hl-lime{background:#d3ecdc!important}
+.rt-c-forest::after,.rt-c-alert::after{content:'';width:16px;height:16px;border-radius:50%;background:var(--forest)}.rt-c-alert::after{background:var(--alert)}
+.rich{min-height:140px;line-height:2;font-size:17px;white-space:normal;outline:none;-webkit-user-select:text;user-select:text}.rich b{font-weight:700}
+.rv{line-height:2}
 .dh .t{gap:6px}.dh .meter{height:6px}
 .prog{grid-template-columns:repeat(auto-fit,minmax(60px,1fr))}
 .dstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.ds{aspect-ratio:1;border-radius:10px;font-size:12px;font-weight:600;background:var(--fog);color:var(--muted)}
@@ -806,6 +812,26 @@ function renderProgress(){const today=dayKey(),[y,mo]=view.month.split('-').map(
 const noteMeta=n=>[n.src,...(n.topics||[])].filter(Boolean);
 const noteCard=n=>`<button class="ncard" data-act="note-open" data-id="${n.id}"><p>${esc(n.text)}</p><span class="nm">${n.star?'<span class="star">★</span>':''}${noteMeta(n).map(x=>`<span class="badge">${esc(x)}</span>`).join('')}${n.by?`<span class="small muted">— ${esc(n.by)}</span>`:''}</span></button>`;
 /* ---------- علمي: الأحاديث والآيات والقصص + الفوايد + التصنيفات ---------- */
+/* rich text: bold, highlight and colour, kept as clean HTML next to the plain text */
+const RT=[['bold','B','عريض'],['hl-amber','','تظليل أصفر'],['hl-lime','','تظليل أخضر'],['c-forest','','أخضر'],['c-alert','','أحمر'],['clear','','بدون تنسيق']];
+const rtBar=()=>`<div class="rtb">${RT.map(([v,l,n])=>`<button data-act="rt" data-v="${v}" class="rt-${v}" aria-label="${n}">${v==='clear'?ico('x'):l}</button>`).join('')}</div>`;
+const richBox=(act,o,extra='')=>`${rtBar()}<div class="inp rich" contenteditable="true" data-act="${act}" ${extra}>${o.h?o.h:esc(o.t||'').replace(/\n/g,'<br>')}</div>`;
+function cleanHTML(html){const box=document.createElement('div');box.innerHTML=html;const out=document.createElement('div');
+  const ok=v=>/^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\))$/i.test((v||'').trim());
+  const walk=(src,dst)=>src.childNodes.forEach(n=>{if(n.nodeType===3){dst.appendChild(document.createTextNode(n.textContent));return}if(n.nodeType!==1)return;
+    const tag=n.tagName.toLowerCase();if(tag==='br'){dst.appendChild(document.createElement('br'));return}
+    let el=null;const st=n.style||{},bold=tag==='b'||tag==='strong'||/^(bold|[6-9]00)$/.test(st.fontWeight||''),col=n.getAttribute&&n.getAttribute('color')||st.color,bg=st.backgroundColor||(tag==='mark'?'#fbe7c2':'');
+    if(tag==='div'||tag==='p'){if(dst.childNodes.length)dst.appendChild(document.createElement('br'));walk(n,dst);return}
+    if(bold||ok(col)||ok(bg)){el=document.createElement(bold&&!ok(col)&&!ok(bg)?'b':'span');if(el.tagName==='SPAN'){if(bold)el.style.fontWeight='700';if(ok(col))el.style.color=col;if(ok(bg))el.style.backgroundColor=bg}walk(n,el);dst.appendChild(el)}else walk(n,dst)});
+  walk(box,out);return out.innerHTML.replace(/(<br>)+$/,'')}
+let rtRange=null,rtT=0;document.addEventListener('selectionchange',()=>{const s=getSelection();if(s.rangeCount&&s.anchorNode&&s.anchorNode.parentElement&&s.anchorNode.parentElement.closest('.rich'))rtRange=s.getRangeAt(0).cloneRange()});
+document.addEventListener('mousedown',e=>{if(e.target.closest('.rtb'))e.preventDefault()});
+function rtApply(v){const box=document.querySelector('.rich');if(!box)return;box.focus();const s=getSelection();if(rtRange){s.removeAllRanges();s.addRange(rtRange)}
+  try{document.execCommand('styleWithCSS',false,true)}catch(e){}
+  const C={'hl-amber':['hiliteColor','#fbe7c2'],'hl-lime':['hiliteColor','#d3ecdc'],'c-forest':['foreColor','#1c9151'],'c-alert':['foreColor','#c8101b']};
+  if(v==='bold')document.execCommand('bold');else if(v==='clear'){document.execCommand('removeFormat');document.execCommand('hiliteColor',false,'transparent')}else if(C[v])document.execCommand(C[v][0],false,C[v][1]);
+  box.dispatchEvent(new Event('input',{bubbles:true}))}
+const richView=x=>x.h?x.h:esc(x.text||x.t||'');
 const kbCard=x=>`<button class="ncard" data-act="kb-open" ${x.sid?`data-s="${x.sid}"`:`data-k="${x.k}" data-id="${x.id}" data-f="${x.f}" data-e="${x.eid}"`}><span class="nm"><span class="badge done">${esc(x.type)}</span><span class="small muted">${kbNext(x)}</span></span><p>${esc(x.text)}</p>${x.tags.length?`<span class="tagrow">${x.tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}</span>`:''}</button>`;
 function allTags(){const kb=kbItems(),m=new Map();const add=(s,key)=>{if(!s)return;const o=m.get(s)||{kb:0,notes:0};if(key)o[key]++;m.set(s,o)};
   (db.tags||[]).forEach(s=>add(s));(db.noteCfg.topics||[]).forEach(s=>add(s));kb.forEach(x=>x.tags.forEach(s=>add(s,'kb')));db.notes.forEach(n=>(n.topics||[]).forEach(s=>add(s,'notes')));
@@ -833,7 +859,7 @@ function tagPick(tags,act,newAct,inputId){const all=[...new Set([...(db.tags||[]
 function openKBItem(r){view.kbi=r;view.kbiTag=false;view.kbn=null;openSheet(()=>{const R2=kbRef(r),o=R2.o;if(!o){closeSheet();return {head:'',body:''}}
   const x=kbItems().find(y=>r.s?y.sid===r.s:(y.k===r.k&&y.id===r.id&&y.f===r.f&&y.eid===r.e))||{},type=x.type||o.type,tags=o.tags||[],dk=r.s?o.k:r.k;
   return {head:`<span class="eyebrow">${esc(type)} · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})}</span><h2 class="title">${KBTITLE[type]||esc(type)}</h2>`,
-   body:`<textarea class="inp ftext" data-act="kbi-text" style="min-height:140px">${esc(o.t||'')}</textarea>
+   body:`${richBox('kbi-rich',o)}
     <div class="fld"><span class="lb">التصنيفات</span><div class="tagrow">${tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}<button class="tg add" data-act="kbi-tagbox">${ico('tag')}${tags.length?'تعديل':'تصنيف'}</button></div>${view.kbiTag?tagPick(tags,'kbi-tag','kbi-tagnew','kbiTag'):''}</div>
     <div class="fld"><span class="lb">المراجعة</span><span class="small muted">${x.k?kbNext(x):''}</span></div>
     <div class="fld"><span class="lb">المصدر</span>${r.s?`<span>${o.src?esc(o.src):'اتضاف من زرار +'}</span>`:`<button class="link" data-act="kbi-day" style="align-self:flex-start">التعليم الانفرادي · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})} ←</button>`}</div>`,
@@ -872,16 +898,16 @@ function keepDraft(){try{const n=view.nd,k=view.kbn;
   else if((n&&!n.id)||k)localStorage.removeItem(DRAFT)}catch(e){}}
 const dropDraft=()=>{try{localStorage.removeItem(DRAFT)}catch(e){}};
 let ndT=0;function ndApply(){const s=view.nd;if(!s)return;if(!s.id)return keepDraft();const n=db.notes.find(x=>x.id===s.id);if(!n)return;
-  const txt=(s.text||'').trim();if(!txt)return;clearTimeout(ndT);ndT=setTimeout(()=>{Object.assign(n,{text:txt,src:s.src,topics:s.topics,by:(s.by||'').trim(),star:s.star});save()},500)}
+  const txt=(s.text||'').trim();if(!txt)return;clearTimeout(ndT);ndT=setTimeout(()=>{Object.assign(n,{text:txt,h:s.h||'',src:s.src,topics:s.topics,by:(s.by||'').trim(),star:s.star});save()},500)}
 const draftNote=()=>{const d=getDraft();return d&&d.v?d:null};
 const srcSel=(act,cur)=>`<select class="inp" data-act="${act}"><option value="">من غير مصدر</option>${db.noteCfg.srcs.map(o=>`<option ${cur===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
 function openNote(id,quick){const n=id&&db.notes.find(x=>x.id===id);
   const dr=!n&&draftNote();if(dr&&dr.kind==='kbn')return openKBNew(dr.v.type,dr.v.t,dr.v);
-  view.nd=n?{id,text:n.text,src:n.src||'',topics:[...(n.topics||[])],by:n.by||'',star:!!n.star,mode:'note'}:dr?{...dr.v,quick:!!quick,restored:true}:{text:'',src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():'',topics:[],by:'',star:false,mode:'note',quick:!!quick};view.ndTop=false;
+  view.nd=n?{id,text:n.text,h:n.h||'',src:n.src||'',topics:[...(n.topics||[])],by:n.by||'',star:!!n.star,mode:'note'}:dr?{...dr.v,quick:!!quick,restored:true}:{text:'',src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():'',topics:[],by:'',star:false,mode:'note',quick:!!quick};view.ndTop=false;
   openSheet(()=>{const s=view.nd,cfg=db.noteCfg,chips=(arr,act,on)=>`<div class="chips">${arr.map(o=>`<button class="chip" data-act="${act}" data-v="${esc(o)}" aria-pressed="${on(o)}">${esc(o)}</button>`).join('')}</div>`;
     return {head:`<span class="eyebrow">${n?fmt(n.k,{weekday:'long',day:'numeric',month:'long'})+(n.mosque?' · '+esc(n.mosque):''):'إضافة'}</span><h2 class="title">${n?'الفائدة':s.mode==='plan'?'خطوة في خطة النهارده':'فائدة جديدة'}</h2>`,
      body:(s.quick?`${addSeg('nd-mode',s.mode)}`:'')
-      +(s.restored?`<div class="ch small"><span class="muted">رجّعنالك اللي كنت كاتبه</span><button class="link" data-act="nd-clear">جديد</button></div>`:'')+`<textarea class="inp" data-act="nd-text" id="ndText" placeholder="${s.mode==='plan'?'الخطوة':'الفائدة أو الرسالة اللي جاتلك'}" style="min-height:130px">${esc(s.text)}</textarea>`
+      +(s.restored?`<div class="ch small"><span class="muted">رجّعنالك اللي كنت كاتبه</span><button class="link" data-act="nd-clear">جديد</button></div>`:'')+(s.id?richBox('nd-rich',{t:s.text,h:s.h}):`<textarea class="inp" data-act="nd-text" id="ndText" placeholder="${s.mode==='plan'?'الخطوة':'الفائدة أو الرسالة اللي جاتلك'}" style="min-height:130px">${esc(s.text)}</textarea>`)
       +(s.mode==='note'?`<div class="fld"><span class="lb">المصدر</span>${srcSel('nd-srcsel',s.src)}</div>
        <div class="fld"><span class="lb">الموضوع</span><div class="tagrow">${s.topics.map(o=>`<span class="tg">${esc(o)}</span>`).join('')}<button class="tg add" data-act="nd-topbox">${ico('tag')}${s.topics.length?'تعديل':'اختار موضوع'}</button></div>${view.ndTop?`<div class="tagbox">${chips(cfg.topics,'nd-top',o=>s.topics.includes(o))}</div>`:''}</div>
        <div class="fld"><span class="lb">مين قالها؟ (اختياري)</span><input class="inp" data-act="nd-by" value="${esc(s.by)}" placeholder="الاسم"></div>
@@ -1050,8 +1076,8 @@ function tagRow(o,A,key){const tg=o.tags||[],open=view.tagFor===key;
 function setTag(d,fid,eid,tag,on){const e=E(d.id);e.a=e.a||{};const arr=kbArr(e.a[fid]),o=arr.find(x=>x.id===eid);if(!o)return;
   o.tags=(o.tags||[]).filter(x=>x!==tag);if(on)o.tags.push(tag);db.tags=db.tags||[];if(!db.tags.includes(tag))db.tags.push(tag);e.a[fid]=arr;save()}
 function kbItems(){const out=[];Object.keys(db.logs).sort().reverse().forEach(k=>{const l=db.logs[k];for(const id in l){const d=byId(id),e=l[id];if(!d||!e||!e.a)continue;
-    fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{const v=(o.t||'').trim();if(v)out.push({k,id,f:f.id,eid:o.id,type:f.kb,text:v,tags:o.tags||[]})}))}});
-  (db.kb||[]).forEach(x=>{if((x.t||'').trim())out.push({k:x.k,sid:x.id,type:x.type,text:x.t.trim(),tags:x.tags||[],src:x.src||''})});
+    fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{const v=(o.t||'').trim();if(v)out.push({k,id,f:f.id,eid:o.id,type:f.kb,text:v,h:o.h||'',tags:o.tags||[]})}))}});
+  (db.kb||[]).forEach(x=>{if((x.t||'').trim())out.push({k:x.k,sid:x.id,type:x.type,text:x.t.trim(),h:x.h||'',tags:x.tags||[],src:x.src||''})});
   return out.sort((a,b)=>b.k.localeCompare(a.k))}
 /* spaced repetition (Leitner): remembered well -> longer gap, forgot -> back tomorrow */
 const KB_INT=[1,1,3,7,14,30,60,120];
@@ -1068,7 +1094,7 @@ function reviewCard(){if(view.day!==dayKey())return '';const td=kbToday();if(!td
   let h=`<section class="card rise"><div class="ch"><h2>مراجعة اليوم</h2><span class="badge ${cur?'':'done'}">${num(dn)} من ${num(keys.length)}</span></div>`;
   if(cur){const x=map.get(cur),w=x.text.split(/\s+/),cue=w.slice(0,3).join(' ')+(w.length>3?' …':''),open=view.kbRev===cur;
     h+=`<div class="ch"><span class="badge done">${esc(x.type)}</span><span class="small muted">كتبته ${fmt(x.k,{weekday:'long',day:'numeric',month:'long'})}</span></div>`;
-    h+=open?`<p class="ftext">${esc(x.text)}</p><span class="lb">فاكر قد إيه؟</span><div class="seg">${[['0','نسيت'],['1','بالعافية'],['2','فاكر كويس']].map(([v,l])=>`<button data-act="kb-rate" data-v="${v}" data-k="${esc(cur)}">${l}</button>`).join('')}</div>`
+    h+=open?`<p class="ftext rv">${richView(x)}</p><span class="lb">فاكر قد إيه؟</span><div class="seg">${[['0','نسيت'],['1','بالعافية'],['2','فاكر كويس']].map(([v,l])=>`<button data-act="kb-rate" data-v="${v}" data-k="${esc(cur)}">${l}</button>`).join('')}</div>`
       :`<p class="small muted">حاول تفتكره كله الأول، وبعدين اكشفه:</p><p class="ftext" style="color:var(--muted)">${esc(cue)}</p><button class="btn" data-act="kb-reveal" data-k="${esc(cur)}">اكشف</button>`}
   else h+=`<p class="lead">خلّصت مراجعة النهارده ✓</p><button class="btn ghost" data-act="kb-more">كمان واحدة</button>`;
   return h+'</section>'}
@@ -1233,7 +1259,7 @@ document.addEventListener('click',ev=>{
   if(a==='nd-star'){view.nd.star=!view.nd.star;ndApply();return paintSheet()}
   if(a==='nd-save'){const s=view.nd,txt=(s.text||'').trim();if(!txt){toast('اكتب الأول');return}
     if(s.mode==='plan'){plan(dayKey()).push({id:uid('p'),t:txt,done:false});dropDraft();save();closeSheet();toast('اتضافت لخطة النهارده');return}
-    const o={text:txt,src:s.src,topics:s.topics,by:(s.by||'').trim(),star:s.star};if(s.id)Object.assign(db.notes.find(x=>x.id===s.id),o);else db.notes.push({id:uid('n'),k:dayKey(),mosque:curMosque(),...o});
+    const o={text:txt,src:s.src,topics:s.topics,by:(s.by||'').trim(),star:s.star};if(s.id)o.h=s.h||'';if(s.id)Object.assign(db.notes.find(x=>x.id===s.id),o);else db.notes.push({id:uid('n'),k:dayKey(),mosque:curMosque(),...o});
     if(!s.id)dropDraft();save();closeSheet();toast(s.id?'اتحفظت':'اتحفظت الفائدة ✓');return}
   if(a==='nd-del'){if(!b.dataset.sure){b.dataset.sure=1;b.classList.add('sure');b.textContent='متأكد؟';return}db.notes=db.notes.filter(x=>x.id!==view.nd.id);save();closeSheet();return}
   if(a==='nd-plan'){plan(shift(dayKey(),1)).push({id:uid('p'),t:(view.nd.text||'').trim(),done:false});save();toast('اتضافت لخطة بكرة');return}
@@ -1361,6 +1387,7 @@ document.addEventListener('click',ev=>{
   if(a==='dhist'){view.dhN=view.range||14;return openDeedHist(id)}
   if(a==='dh-n'){view.dhN=Number(v);return paintSheet()}
   if(a==='dh-day'){const k=b.dataset.k,i2=view.dhId;view.kbiBack=null;closeSheet(true);view.dhBack=i2;return openDeed(i2,k)}
+  if(a==='rt')return rtApply(v);
   if(a==='f-sug')return suggestFault(id);
   if(a==='f-ename'){view.fEditName=!view.fEditName;return paintSheet()}
   if(a==='r-edit'){view.rEdit=v;return paintSheet()}
@@ -1437,7 +1464,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   if(a==='shura'){const sh=shuraOf(j,view.day),[g,ff]=el.dataset.path.split('.');(sh[g]||(sh[g]={}))[ff]=v.trim();save();return}
   if(a==='assign'){const sh=shuraOf(j,view.day),x=sh.assign[el.dataset.v]||(sh.assign[el.dataset.v]={});x.who=v.trim();save();return}
 });
-document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(ev.target.matches('textarea.inp'))fitTA(ev.target.parentNode);if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='pq'){view.pq=ev.target.value;const el=$('#pkl'),f=db.faults.find(x=>x.id===view.kbiBack);if(el&&f)el.innerHTML=pickList(kbItems().filter(x=>!view.pq||x.text.includes(view.pq)),vName(f))}if(a==='nd-text'&&view.nd){view.nd.text=ev.target.value;ndApply()}if(a==='nd-by'&&view.nd){view.nd.by=ev.target.value;ndApply()}if(a==='kbn-text'&&view.kbn){view.kbn.t=ev.target.value;keepDraft()}});
+document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(ev.target.matches('textarea.inp'))fitTA(ev.target.parentNode);if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='kbi-rich'||a==='nd-rich'){const el=ev.target.closest('.rich'),h=cleanHTML(el.innerHTML),tx=(el.innerText??el.textContent).trim();if(a==='nd-rich'&&view.nd){view.nd.text=tx;view.nd.h=h;ndApply()}else if(view.kbi){const r=kbRef(view.kbi);if(r.o){r.o.t=tx;r.o.h=h;clearTimeout(rtT);rtT=setTimeout(()=>r.save(),500)}}return}if(a==='pq'){view.pq=ev.target.value;const el=$('#pkl'),f=db.faults.find(x=>x.id===view.kbiBack);if(el&&f)el.innerHTML=pickList(kbItems().filter(x=>!view.pq||x.text.includes(view.pq)),vName(f))}if(a==='nd-text'&&view.nd){view.nd.text=ev.target.value;ndApply()}if(a==='nd-by'&&view.nd){view.nd.by=ev.target.value;ndApply()}if(a==='kbn-text'&&view.kbn){view.kbn.t=ev.target.value;keepDraft()}});
 document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='kbiTag'){ev.preventDefault();const b=document.querySelector('[data-act="kbi-tagnew"]');if(b)b.click();return}if(ev.key==='Enter'&&ev.target.id==='tagnew'){ev.preventDefault();const b=document.querySelector('[data-act="tag-new"]');if(b)b.click();return}if(ev.key==='Enter'&&ev.target.id&&ev.target.id.startsWith('pl-')){ev.preventDefault();const b=document.querySelector(`[data-act="pl-add"][data-k="${ev.target.id.slice(3)}"]`);b&&b.click()}});
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 let lastTouch=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouch<300&&!e.target.closest('input,textarea,select'))e.preventDefault();lastTouch=n},{passive:false});
