@@ -203,7 +203,11 @@ select.inp{appearance:none;-webkit-appearance:none;background-image:url("data:im
 .prog{display:grid;grid-template-columns:repeat(3,1fr);text-align:center}.prog b{font-size:24px;font-variant-numeric:tabular-nums;display:block}.prog small{font-size:12px;color:var(--muted)}.prog span{font-size:12px;color:var(--muted)}
 .note-c{display:flex;flex-direction:column;gap:2px;border-inline-start:3px solid var(--forest);background:var(--fog);border-radius:12px;padding:10px 14px;font-size:14px}
 .pk{gap:12px}.pk .ck{flex:0 0 24px;height:24px;border-radius:8px;border:1.5px solid var(--line);display:grid;place-items:center}.pk .ck svg{width:14px;height:14px}.pk.on .ck{background:var(--forest);border-color:var(--forest);color:#fff}.pk .t b{font-weight:400;font-size:15px}
-.link.danger{color:var(--alert)}.dcard{padding:18px 18px 10px}.dcard p{display:block;-webkit-line-clamp:unset;font-size:17px;line-height:2}.dc-f{display:flex;justify-content:flex-end}.ib.sm{width:32px;height:32px;flex-basis:32px;border:0;background:transparent}
+.link.danger{color:var(--alert)}
+.dh .t{gap:6px}.dh .meter{height:6px}
+.prog{grid-template-columns:repeat(auto-fit,minmax(60px,1fr))}
+.dstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.ds{aspect-ratio:1;border-radius:10px;font-size:12px;font-weight:600;background:var(--fog);color:var(--muted)}
+.ds.done{background:var(--forest);color:#fff}.ds.part{background:var(--amber);color:var(--ink)}.ds.miss{background:rgba(200,16,27,.12);color:var(--alert)}.dcard{padding:18px 18px 10px}.dcard p{display:block;-webkit-line-clamp:unset;font-size:17px;line-height:2}.dc-f{display:flex;justify-content:flex-end}.ib.sm{width:32px;height:32px;flex-basis:32px;border:0;background:transparent}
 .mv{display:inline-flex;gap:6px;flex:0 0 auto}.mv button{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--white);display:grid;place-items:center}.mv button svg{width:18px;height:18px}.mv button:disabled{opacity:.25}
 .ordbar{display:flex;justify-content:space-between;align-items:center}
 .tgb{background:var(--forest-deep);color:#fff;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px}.tgb .eyebrow{color:var(--neon)}.tgb .small.muted{color:rgba(255,255,255,.6)}
@@ -623,7 +627,7 @@ function openSheet(renderFn,opts={}){closeSheet(true);sheetRender=renderFn;const
 const fitTA=(root=document)=>root.querySelectorAll('textarea.inp').forEach(x=>{x.style.height='auto';x.style.height=(x.scrollHeight+2)+'px'});
 function paintSheet(keepScroll=true){if(!sheetEl)return;const r=sheetRender();const b=sheetEl.querySelector('.sh-b'),st=b.scrollTop;
   sheetEl.querySelector('.hh').innerHTML=r.head;b.innerHTML=r.body;sheetEl.querySelector('.sh-f').innerHTML=r.foot||'<button class="btn" data-act="close-sheet">تمام</button>';fitTA(b);if(keepScroll)b.scrollTop=st}
-function closeSheet(silent){if(sheetEl){sheetEl.remove();sheetEl=null;document.body.classList.remove('lock');if(!silent){render();if(view.kbiBack){const fb=view.kbiBack;view.kbiBack=null;openFault(fb)}}}}
+function closeSheet(silent){if(sheetEl){sheetEl.remove();sheetEl=null;document.body.classList.remove('lock');if(!silent){render();if(view.kbiBack){const fb=view.kbiBack;view.kbiBack=null;openFault(fb)}else if(view.dhBack){const db2=view.dhBack;view.dhBack=null;openDeedHist(db2)}}}}
 function openDeed(id,k=view.day){const d=byId(id);if(!d)return;
   openSheet(()=>{const s=stOf(d,k);return {head:`<div class="ch"><span class="eyebrow">${esc((CATS.find(c=>c[0]===d.cat)||[])[1]||'')}${k!==dayKey()?' · '+fmt(k,{weekday:'long',day:'numeric',month:'long'}):''}</span>${badge(s)}</div><h2 class="title">${esc(dname(d,k))}</h2>`,body:deedBody(d,k)}})}
 
@@ -762,6 +766,23 @@ function renderHarvest(){const k=view.day,H=harvest(k),{m,cats}=H,y=metrics(shif
   const tp=plan(shift(k,1));if(tp.length)h+=`<section class="card rise"><h2>خطة بكرة</h2>${tp.map(x=>`<p>• ${esc(x.t)}</p>`).join('')}</section>`;
   if((r.thanks||'').trim())h+=`<section class="card rise"><span class="eyebrow">الحمد لله على</span><p>${esc(r.thanks)}</p></section>`;
   return h+`<p class="ayah">﴿بَلِ الْإِنسَانُ عَلَىٰ نَفْسِهِ بَصِيرَةٌ﴾</p><div style="height:90px"></div>`}
+/* ---------- أداء عمل واحد في فترة ---------- */
+function openDeedHist(id){view.dhId=id;openSheet(()=>{const d=db.deeds.find(x=>x.id===id);if(!d){closeSheet();return {head:'',body:''}}
+  const n=view.dhN||14,td=dayKey(),ks=Array.from({length:n},(_,i)=>shift(td,i-n+1)).filter(k=>fits(d,k)),S=ks.map(k=>({k,...dScore(d,k)})),v=avg(S.map(x=>x.v));
+  const cnt={done:0,part:0,miss:0,none:0};S.forEach(x=>cnt[x.s||'none']++);
+  const fields=[...(d.perf||[]),...(d.heart||[])].filter(f=>['one','many','num'].includes(f.type));
+  const brk=f=>{const vals=ks.map(k=>ans((db.logs[k]||{})[d.id],f.id)).filter(x=>x!=null&&x!==''&&!(Array.isArray(x)&&!x.length));if(!vals.length)return '';
+    if(f.type==='num')return `<div class="fld"><span class="lb">${esc(f.label)}</span><span>المتوسط <b><bdi>${Math.round(avg(vals.map(Number))*10)/10}</bdi></b>${f.unit?' '+esc(f.unit):''}</span></div>`;
+    const c={};vals.flat().forEach(x=>c[x]=(c[x]||0)+1);const e=Object.entries(c).sort((a,b)=>b[1]-a[1]),mx=e[0][1];
+    return `<div class="fld"><span class="lb">${esc(f.label)}</span>${e.map(([o,m])=>`<div class="bar-row"><span>${esc(o)}</span><div class="meter"><i style="width:${m/mx*100}%"></i></div><b>${num(m)}</b></div>`).join('')}</div>`};
+  const notes=ks.slice().reverse().map(k=>{const e=(db.logs[k]||{})[d.id];if(!e||!e.a)return '';const tx=[...(d.perf||[]),...(d.heart||[]),...CLOSE].filter(f=>f.type==='text'&&!f.kb).map(f=>ans(e,f.id)).filter(x=>typeof x==='string'&&x.trim());return tx.length?`<div class="lgi"><span class="small muted">${fmt(k,{weekday:'short',day:'numeric',month:'short'})}</span>${tx.map(x=>`<p>${esc(x)}</p>`).join('')}</div>`:''}).join('');
+  return {head:`<span class="eyebrow">أداء العمل</span><h2 class="title">${esc(d.name)}</h2>`,
+   body:`<div class="chips">${[[7,'أسبوع'],[14,'أسبوعين'],[30,'شهر'],[40,'٤٠']].map(([x,l])=>`<button class="chip" data-act="dh-n" data-v="${x}" aria-pressed="${n===x}">${l}</button>`).join('')}</div>
+    <div class="prog"><div><b>${v==null?'–':num(Math.round(v*100),'%')}</b><span>الأداء</span></div><div><b>${num(cnt.done)}</b><span>تم</span></div><div><b>${num(cnt.part)}</b><span>جزئي</span></div><div><b>${num(cnt.miss+cnt.none)}</b><span>فاتني</span></div></div>
+    <div class="dstrip">${S.map(x=>`<button class="ds ${x.s||'none'}" data-act="dh-day" data-k="${x.k}" title="${x.k}"><bdi>${Number(x.k.slice(8))}</bdi></button>`).join('')}</div>
+    ${fields.map(brk).join('')}
+    ${notes?`<section class="fold open"><div class="fold-h"><span>ملاحظاتك</span></div><div class="fold-b">${notes}</div></section>`:''}`,
+   foot:'<button class="btn" data-act="close-sheet">تمام</button>'}})}
 function renderProgress(){const today=dayKey(),[y,mo]=view.month.split('-').map(Number),first=new Date(y,mo-1,1,12),days=new Date(y,mo,0).getDate(),off=(first.getDay()+1)%7;
   let h=top('التقدّم','تطوري',gearBtn);
   h+=`<section class="card rise"><div class="ch"><button class="iconbtn" data-act="month" data-n="-1" aria-label="الشهر اللي فات">${ico('back')}</button><h2>${new Intl.DateTimeFormat('ar-EG-u-nu-latn',{month:'long',year:'numeric'}).format(first)}</h2><button class="iconbtn" data-act="month" data-n="1" aria-label="الشهر الجاي" style="transform:scaleX(-1)">${ico('back')}</button></div>
@@ -774,6 +795,8 @@ function renderProgress(){const today=dayKey(),[y,mo]=view.month.split('-').map(
   h+=`<section class="card rise"><div class="ch"><h2>آخر ${num(n)} يوم</h2><div class="chips">${[[7,'أسبوع'],[14,'أسبوعين'],[40,'٤٠']].map(([v,t])=>`<button class="chip" data-act="range" data-v="${v}" aria-pressed="${n===v}">${t}</button>`).join('')}</div></div>
    ${ch('أعمال اليوم',M.map(m=>m.rec?m.pct:null),1,pc)}${ch('حضور القلب في الصلاة',M.map(m=>m.heart),1,pc,'من إجاباتك في وقفة القلب')}${ch('جودة الأعمال',M.map(m=>m.quality),1,pc,'متوسط كل أسئلة وقفة القلب')}
    ${ch('الآداب وأصول العمل',M.map(m=>m.adab),1,pc)}${ch('تنفيذ خطة اليوم',M.map(m=>m.plan),1,pc)}${ch('مرات الوقوع في العيوب',M.map(m=>m.rec?m.faults:null),Math.max(3,...M.map(m=>m.faults)),v=>num(v),'كل ما الخط ينزل، كل ما أحسن')}</section>`;
+  {const D=db.deeds.filter(d=>d.on&&!d.period).map(d=>{const v=avg(ks.filter(k=>fits(d,k)).map(k=>dScore(d,k).v));return {d,v}}).filter(x=>x.v!=null);
+   h+=`<section class="card rise"><div class="ch"><h2>كل عمل</h2><span class="small muted">آخر <bdi>${n}</bdi> يوم</span></div><div class="list">${D.map(({d,v})=>`<button class="row dh" data-act="dhist" data-id="${d.id}"><span class="t"><b>${esc(d.name)}</b><div class="meter"><i style="width:${Math.round(v*100)}%"></i></div></span><b class="pc ${v<.5?'lo':v<.8?'md':'hi'}">${num(Math.round(v*100),'%')}</b></button>`).join('')}</div></section>`}
   const dist={},fl={};M.forEach(m=>{m.distract.forEach(x=>dist[x]=(dist[x]||0)+1);Object.entries(m.fc).forEach(([id,c])=>fl[id]=(fl[id]||0)+Number(c||0))});
   const bars=(o,nameOf)=>{const e=Object.entries(o).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,5),mx=e.length?e[0][1]:1;return e.length?e.map(([k,v])=>`<div class="bar-row"><span>${esc(nameOf(k))}</span><div class="meter"><i style="width:${v/mx*100}%"></i></div><b>${num(v)}</b></div>`).join(''):'<p class="small muted">لسه مفيش بيانات كفاية.</p>'};
   h+=`<section class="card rise"><h2>بقع في إيه؟</h2><div class="insight"><span class="eyebrow">أكتر حاجة بتشغلني في الصلاة</span>${bars(dist,x=>x)}</div><div class="insight"><span class="eyebrow">أكتر عيوب بقع فيها</span>${bars(fl,id=>(db.faults.find(f=>f.id===id)||{name:'عيب اتمسح'}).name)}</div></section>`;
@@ -1335,6 +1358,9 @@ document.addEventListener('click',ev=>{
   if(a==='f-stage'){const f=db.faults.find(x=>x.id===id);if(!f)return;f.stg=f.stg||[];const k=dayKey(),last=f.stg[f.stg.length-1];if(last&&last[0]===k)last[1]=Number(v);else f.stg.push([k,Number(v)]);buzz();return upd()}
   if(a==='f-fold'){view.fOpen=view.fOpen||{};view.fOpen[v]=!view.fOpen[v];return paintSheet()}
   if(a==='f-kb'){const f=db.faults.find(x=>x.id===id);if(!f)return;view.kbnBack=f.id;return openKBNew(v,'',{type:v,t:'',tags:[vName(f)],src:''})}
+  if(a==='dhist'){view.dhN=view.range||14;return openDeedHist(id)}
+  if(a==='dh-n'){view.dhN=Number(v);return paintSheet()}
+  if(a==='dh-day'){const k=b.dataset.k,i2=view.dhId;view.kbiBack=null;closeSheet(true);view.dhBack=i2;return openDeed(i2,k)}
   if(a==='f-sug')return suggestFault(id);
   if(a==='f-ename'){view.fEditName=!view.fEditName;return paintSheet()}
   if(a==='r-edit'){view.rEdit=v;return paintSheet()}
