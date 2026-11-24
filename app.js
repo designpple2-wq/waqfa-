@@ -328,7 +328,7 @@ function render(){
   document.querySelectorAll('nav.tabs [data-tab]').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===view.tab&&!view.sub?'page':'false'));
   const s=view.sub;let h;
   if(s==='review')h=renderReview();else if(s==='khuruj')h=renderKhuruj();else if(s==='shura')h=renderShura();else if(s==='settings')h=renderSettings();else if(s==='custom')h=renderCustom();else if(s==='cat')h=renderCat();else if(s==='sched')h=renderSched();else if(s==='harvest')h=renderHarvest();
-  else if(s==='col')h=renderCol();
+  else if(s==='col')h=renderCol();else if(s==='sess')h=renderSess();
   else if(APP==='zad')h=view.tab==='lib'?renderIlm():view.tab==='cols'?renderCols():view.tab==='mem'?renderMem():renderZHome();
   else h=view.tab==='today'?renderToday():view.tab==='progress'?renderProgress():(view.tab==='ilm'||view.tab==='notes')?renderIlm():renderZad();
   $('#app').innerHTML=h;
@@ -558,7 +558,7 @@ function renderTags(){const T=allTags();
   return `<div class="ch"><p class="lead" style="flex:1">اختار تصنيف، يطلعلك كل اللي كتبته فيه.</p><button class="btn ghost sm" data-act="tagmgr">تعديل</button></div>
    ${T.length?`<div class="tgrid">${T.map(o=>`<button class="tcell" data-act="itag" data-v="${esc(o.s)}"><b>${esc(o.s)}</b><span class="small muted">${o.kb+o.notes?num(o.kb+o.notes):'فاضي'}</span></button>`).join('')}</div>`:'<p class="empty">لسه مفيش تصنيفات.</p>'}`}
 /* ================= زاد ================= */
-function kbRateOnly(key,q2){const today=dayKey(),r=Object.assign({box:0,reps:0},(db.kbr=db.kbr||{})[key]);
+function kbRateOnly(key,q2){return srsRate(key,q2);const today=dayKey(),r=Object.assign({box:0,reps:0},(db.kbr=db.kbr||{})[key]);
   if(q2===0){r.box=1;r.due=kbAdd(today,1)}else if(q2===1){r.box=Math.max(1,r.box);r.due=kbAdd(today,Math.max(1,Math.round(KB_INT[r.box]/2)))}else{r.box=Math.min(7,r.box+1);r.due=kbAdd(today,KB_INT[r.box])}
   r.last=today;r.reps=(r.reps||0)+1;db.kbr[key]=r;buzz();save()}
 function memStats(){const all=kbItems(),R2=db.kbr||{},td=dayKey();let mast=0,learn=0,neu=0,due=0;
@@ -566,10 +566,35 @@ function memStats(){const all=kbItems(),R2=db.kbr||{},td=dayKey();let mast=0,lea
   let streak=0;for(let k=td;streak<400;k=shift(k,-1)){const d=(db.kbDay||{})[k];if(d&&Object.keys(d.done||{}).length)streak++;else if(k!==td)break;else{}if(k<'2020')break}
   return {all,mast,learn,neu,due,streak}}
 const colOf=k=>{if(k.startsWith('n|'))return null;return kbItems().find(x=>kbKey(x)===k)};
+function sessQueue(only){const td=dayKey(),R2=db.kbr||{},all=only?only:kbItems();
+  const due=all.filter(x=>{const r=R2[kbKey(x)];return r&&r.reps&&r.due<=td}).sort((a,b)=>R2[kbKey(a)].due.localeCompare(R2[kbKey(b)].due));
+  const dd=(db.kbDay||{})[td]||{},newDone=Object.keys(dd.done||{}).filter(k=>{const r=R2[k];return r&&r.reps===1&&r.last===td}).length;
+  const lim=only?999:Math.max(0,(db.settings.zadNew??5)-newDone),neu=all.filter(x=>!(R2[kbKey(x)]||{}).reps).slice().reverse().slice(0,lim);
+  return {due,neu,q:[...due,...neu].map(kbKey)}}
+function startSess(only,label){const Q=sessQueue(only);if(!Q.q.length){toast(only?'المجموعة فاضية':'مفيش مراجعة دلوقتي. ممتاز');return}
+  view.sess={q:Q.q,i:0,open:false,t0:Date.now(),min:view.sessMin??15,stats:{n:0,ok:0},again:{},label:label||''};view.sub='sess';render();scrollTo(0,0)}
+function renderSess(){const S=view.sess;if(!S){view.sub=null;return renderZHome()}const map=new Map(kbItems().map(x=>[kbKey(x),x]));
+  const el=Math.floor((Date.now()-S.t0)/60000),over=S.min&&el>=S.min;
+  if(S.i>=S.q.length||S.done){const pct=S.stats.n?Math.round(S.stats.ok/S.stats.n*100):0;
+    return backTop('خلّصت الجلسة','مراجعة','sess-end')+`<section class="card rise sess-end"><div class="prog"><div><b>${num(S.stats.n)}</b><span>راجعت</span></div><div><b>${num(pct,'%')}</b><span>افتكرت</span></div><div><b>${num(Math.max(1,el))}</b><span>دقيقة</span></div></div><p class="lead" style="text-align:center">${pct>=80?'ما شاء الله، حفظك قوي':'كمّل، التكرار هو اللي بيثبّت'}</p></section>
+     <button class="btn block rise" data-act="sess-end">تمام</button>${sessQueue().q.length?`<button class="link rise" data-act="sess-go" style="align-self:center">كمّل مراجعة</button>`:''}`}
+  const key=S.q[S.i],x=map.get(key);if(!x){S.i++;return renderSess()}const r=(db.kbr||{})[key],isNew=!r||!r.reps;
+  const words=x.text.split(/\s+/),hint=words.slice(0,Math.min(8,Math.ceil(words.length/4))).join(' ');
+  const nx=[0,1,2,3].map(q=>ivLabel(srsNext(r,q).ivl));
+  return `<header class="sess-top rise"><button class="iconbtn" data-act="sess-end" aria-label="إنهاء">${ico('x')}</button><div class="meter"><i style="width:${Math.round(S.i/S.q.length*100)}%"></i></div><span class="small muted"><bdi>${S.i+1}/${S.q.length}</bdi>${S.min?` · <bdi>${el}/${S.min}</bdi> د`:''}</span></header>
+   ${over?'<p class="note-c">خلص الوقت اللي حددته. تقدر تكمّل أو تنهي.</p>':''}
+   <section class="card sess-card rise"><div class="ch"><span class="badge ${isNew?'':'done'}">${isNew?'جديد':esc(x.type)}</span>${x.tags.length?`<span class="small muted">${esc(x.tags.slice(0,2).join(' · '))}</span>`:''}</div>
+    ${S.open?`<div class="rv sess-txt">${richView(x)}</div>`:`<p class="sess-hint">${esc(hint)} …</p><p class="small muted">افتكره كله، وبعدين اكشف.</p>`}</section>
+   ${S.open?`<div class="rate4 rise">${[['نسيت',0],['صعب',1],['كويس',2],['سهل',3]].map(([l,q])=>`<button data-act="sess-rate" data-v="${q}" class="q${q}"><b>${l}</b><span>${nx[q]}</span></button>`).join('')}</div>`
+     :`<button class="btn block rise" data-act="sess-open">اكشف</button>`}`}
+function zadReviewCard(){const Q=sessQueue(),m=view.sessMin??15;
+  return `<section class="card rv-hero rise"><span class="eyebrow">مراجعة اليوم</span><div class="ch"><h2 style="font-size:28px"><bdi>${Q.due.length}</bdi> <small>مستحق</small> · <bdi>${Q.neu.length}</bdi> <small>جديد</small></h2></div>
+   <div class="chips">${[[10,'١٠ د'],[15,'١٥ د'],[30,'٣٠ د'],[0,'لحد ما أخلّص']].map(([v,l])=>`<button class="chip" data-act="sess-min" data-v="${v}" aria-pressed="${m===v}">${l}</button>`).join('')}</div>
+   <button class="btn block" data-act="sess-go" ${Q.q.length?'':'disabled'}>${Q.q.length?'ابدأ المراجعة':'خلّصت النهارده ✓'}</button></section>`}
 function renderZHome(){const S=memStats(),recent=S.all.slice(0,4);
   return top(fmt(dayKey(),{weekday:'long',day:'numeric',month:'long'}),'زاد',gearBtn)+
   `<section class="prog card rise"><div><b>${num(S.all.length)}</b><span>في المكتبة</span></div><div><b>${num(S.mast)}</b><span>محفوظ</span></div><div><b>${num(S.streak)}</b><span>يوم مراجعة</span></div></section>`
-  +reviewCard()
+  +zadReviewCard()
   +`<button class="card journey rise" data-act="quiz" data-key="" style="text-align:start"><span class="ic">${ico('spark')}</span><span class="t"><b>اختبار سريع</b><span class="small muted">حديث بكلمات مخفية، تكمّلها من حفظك</span></span>${ico('fwd')}</button>`
   +(recent.length?`<section class="slot rise"><div class="slot-h"><span>أضيف مؤخرًا</span><button class="link" data-tab="lib">الكل</button></div><div class="ncards">${recent.map(kbCard).join('')}</div></section>`:`<p class="empty">ابدأ بإضافة أول حديث من زرار +</p>`)}
 function renderCols(){const C=db.cols||[];
@@ -577,7 +602,7 @@ function renderCols(){const C=db.cols||[];
    <div class="row-in rise"><input class="inp" id="colNew" placeholder="مجموعة جديدة"><button class="btn ghost sm icon" data-act="col-add" aria-label="أضف">${ico('plus')}</button></div>`}
 function renderCol(){const c=(db.cols||[]).find(x=>x.id===view.colId);if(!c){view.sub=null;return renderCols()}const O=view.colOrder;
   const its=c.items.map(k=>({k,x:colOf(k)})).filter(o=>o.x);
-  return backTop(c.name,`${num(its.length)} عنصر`,'back')+`<div class="ch rise"><button class="btn ghost sm" data-act="col-pick">${ico('plus')} من المكتبة</button><span class="hd-act">${its.length>1?`<button class="btn ghost sm" data-act="col-order">${O?'خلّصت':'رتّب'}</button>`:''}<button class="ib dz" data-act="col-del" aria-label="امسح المجموعة">${ico('trash')}</button></span></div>
+  return backTop(c.name,`${num(its.length)} عنصر`,'back')+(its.length?`<button class="btn block rise" data-act="col-rev">راجع المجموعة</button>`:'')+`<div class="ch rise"><button class="btn ghost sm" data-act="col-pick">${ico('plus')} من المكتبة</button><span class="hd-act">${its.length>1?`<button class="btn ghost sm" data-act="col-order">${O?'خلّصت':'رتّب'}</button>`:''}<button class="ib dz" data-act="col-del" aria-label="امسح المجموعة">${ico('trash')}</button></span></div>
    <div class="ncards rise">${its.map((o,i)=>O?`<div class="check"><div class="t"><span>${esc(o.x.text.slice(0,70))}…</span></div>${mvBtns('col-mv',`data-key="${esc(o.k)}"`,i,its.length)}</div>`:kbCard(o.x)).join('')||'<p class="empty">ضيف من المكتبة.</p>'}</div>`}
 function openColPick(){openSheet(()=>{const c=db.cols.find(x=>x.id===view.colId),q=view.pq||'',all=kbItems().filter(x=>!q||x.text.includes(q));
   return {head:`<span class="eyebrow">${esc(c.name)}</span><h2 class="title">اختار من المكتبة</h2>`,body:`<input class="inp" data-act="cpq" placeholder="دوّر" value="${esc(q)}"><div class="list" id="cpl">${colPickList(all,c)}</div>`,foot:'<button class="btn" data-act="close-sheet">تمام</button>'}})}
@@ -604,7 +629,9 @@ function renderIlm(){const v=view.ilm||'kb',n=kbItems().length+db.notes.length;
    +(v==='notes'?renderNotes():v==='tags'?renderTags():renderKB())}
 /* ---------- عنصر واحد من بنك المعرفة ---------- */
 const KBT={hadith:'حديث',aya:'آية',qissa:'قصة',sum:'ملخص'},KBT_R={'حديث':'hadith','آية':'aya','قصة':'qissa','ملخص':'sum'},KBTITLE={'حديث':'الحديث','آية':'الآية','قصة':'القصة','ملخص':'الملخص'};
-const addSeg=(act,cur)=>`<div class="seg seg5">${(APP==='zad'?[['hadith','حديث'],['aya','آية'],['qissa','قصة'],['sum','ملخص'],['note','فائدة']]:[['note','فائدة'],['hadith','حديث'],['aya','آية'],['qissa','قصة'],['plan','خطوة']]).map(([x,l])=>`<button data-act="${act}" data-v="${x}" aria-pressed="${cur===x}">${l}</button>`).join('')}</div>`;
+const ZTYPES=()=>db.kbTypes&&db.kbTypes.length?db.kbTypes:['حديث','آية','قصة','ملخص','فائدة'];
+const addSeg=(act,cur)=>APP==='zad'?`<div class="chips tsel">${ZTYPES().map(x=>`<button class="chip" data-act="kbn-type" data-v="${esc(x)}" aria-pressed="${(view.kbn||{}).type===x}">${esc(x)}</button>`).join('')}<button class="chip" data-act="kbt-new" aria-label="نوع جديد">+ نوع</button></div>`
+  :`<div class="seg seg5">${[['note','فائدة'],['hadith','حديث'],['aya','آية'],['qissa','قصة'],['plan','خطوة']].map(([x,l])=>`<button data-act="${act}" data-v="${x}" aria-pressed="${cur===x}">${l}</button>`).join('')}</div>`;
 function kbRef(r){if(r.s){const o=(db.kb||[]).find(x=>x.id===r.s);return {o,save:()=>save(),del:()=>{db.kb=db.kb.filter(x=>x.id!==r.s);save()}}}
   const e=(db.logs[r.k]||{})[r.id];if(!e||!e.a)return {o:null,save(){},del(){}};const arr=kbArr(e.a[r.f]),o=arr.find(x=>x.id===r.e);
   return {o,save:()=>{e.a[r.f]=arr;save()},del:()=>{e.a[r.f]=arr.filter(x=>x.id!==r.e);save()}}}
@@ -621,7 +648,7 @@ function openKBItem(r){view.kbi=r;view.kbiTag=false;view.kbn=null;openSheet(()=>
     <div class="fld"><span class="lb">المصدر</span>${r.s?`<span>${o.src?esc(o.src):'اتضاف من زرار +'}</span>`:`<button class="link" data-act="kbi-day" style="align-self:flex-start">التعليم الانفرادي · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})} ←</button>`}</div>`,
    foot:`<button class="btn danger icon" data-act="kbi-del" aria-label="امسح">${ico('trash')}</button><button class="btn" data-act="close-sheet">تمام</button>`}})}
 function openKBNew(type,text,prev){view.kbi=null;view.nd=null;view.kbn=prev?{...prev,type}:{type,t:text||'',tags:[],src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():''};view.kbiTag=false;keepDraft();
-  openSheet(()=>{const s=view.kbn;if(!s)return {head:'',body:''};return {head:`<span class="eyebrow">إضافة لعلمي</span><h2 class="title">${{'حديث':'حديث جديد','آية':'آية جديدة','قصة':'قصة جديدة','ملخص':'ملخص درس أو كتاب'}[s.type]||'جديد'}</h2>`,
+  openSheet(()=>{const s=view.kbn;if(!s)return {head:'',body:''};return {head:`<span class="eyebrow">إضافة لعلمي</span><h2 class="title">${{'حديث':'حديث جديد','آية':'آية جديدة','قصة':'قصة جديدة','ملخص':'ملخص درس أو كتاب'}[s.type]||(s.type+' جديد')}</h2>`,
    body:`${addSeg('kbn-mode',KBT_R[s.type])}<textarea class="inp" id="kbnText" data-act="kbn-text" placeholder="${{'حديث':'نص الحديث، وراويه لو تعرفه','آية':'الآية، واسم السورة ورقمها','قصة':'القصة باختصار، ومن أي كتاب','ملخص':'اسم الدرس أو الكتاب، وأهم النقاط'}[s.type]||''}" style="min-height:140px">${esc(s.t)}</textarea>
     <div class="kbt"><span class="small muted">صوّر الصفحة أو سجّل بصوتك</span>${toolsHTML('kbn','data-kbn="1"')}</div>
     <div class="fld"><span class="lb">التصنيفات</span><div class="tagrow">${(s.tags||[]).map(x=>`<span class="tg">${esc(x)}</span>`).join('')}<button class="tg add" data-act="kbi-tagbox">${ico('tag')}${(s.tags||[]).length?'تعديل':'تصنيف'}</button></div>${view.kbiTag?tagPick(s.tags||[],'kbi-tag','kbi-tagnew','kbiTag'):''}</div>
@@ -838,6 +865,17 @@ function kbItems(){const out=[];Object.keys(db.logs).sort().reverse().forEach(k=
 /* spaced repetition (Leitner): remembered well -> longer gap, forgot -> back tomorrow */
 const KB_INT=[1,1,3,7,14,30,60,120];
 const kbKey=x=>x.sid?`s|${x.sid}`:`${x.k}|${x.id}|${x.f}`+(x.eid&&x.eid!=='0'?'|'+x.eid:'');
+/* SRS (SM-2 style): every item has its own ease. q: 0 نسيت · 1 صعب · 2 كويس · 3 سهل */
+function srsNext(r,q){r=Object.assign({reps:0,ease:2.5,ivl:0,lapses:0},r||{});if(!r.ivl&&r.box)r.ivl=KB_INT[Math.min(r.box,KB_INT.length-1)]||1;
+  let iv=r.ivl||0,e=r.ease||2.5;
+  if(q===0){iv=1;e=Math.max(1.3,e-.2);r.lapses=(r.lapses||0)+1}
+  else if(q===1){iv=Math.max(1,Math.round((iv||1)*1.2));e=Math.max(1.3,e-.15)}
+  else if(q===2){iv=!r.reps||!iv?1:(iv<3?3:Math.round(iv*e))}
+  else{iv=!r.reps||!iv?3:Math.round(Math.max(iv,2)*e*1.3);e+=.15}
+  iv=Math.min(iv,365);return {...r,ivl:iv,ease:Math.round(e*100)/100,reps:(r.reps||0)+1,box:iv>=21?5:iv>=7?3:iv>=3?2:1}}
+const ivLabel=n=>n<=1?'بكرة':n<30?`${num(n)} يوم`:n<365?`${num(Math.round(n/30))} شهر`:'سنة';
+function srsRate(key,q){const td=dayKey();db.kbr=db.kbr||{};const r=srsNext(db.kbr[key],q);r.last=td;r.due=shift(td,r.ivl);db.kbr[key]=r;
+  db.kbDay=db.kbDay||{};const d=db.kbDay[td]||(db.kbDay[td]={keys:[],done:{}});d.done=d.done||{};d.done[key]=q;save();return r}
 const kbAdd=(k,n)=>shift(k,n);
 function kbEligible(){const today=dayKey();db.kbr=db.kbr||{};return kbItems().filter(x=>x.k<today)}
 function kbDueSort(arr){const st=x=>db.kbr[kbKey(x)]||{};return arr.slice().sort((a,b)=>(st(a).due||a.k).localeCompare(st(b).due||b.k))}
@@ -1056,7 +1094,7 @@ document.addEventListener('click',ev=>{
     const el=document.querySelector(`[data-act="kbtext"][data-id="${id}"][data-f="${fid}"][data-e="${nid}"]`);if(el)el.focus();return}
   if(a==='kbdel'&&d){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}const e=E(id);e.a[fid]=kbArr(e.a[fid]).filter(o=>o.id!==b.dataset.e);save();if(sheetEl)paintSheet();else render();return}
   if(a==='kb-reveal'){view.kbRev=b.dataset.k;return render()}
-  if(a==='kb-rate'){const key=b.dataset.k,today=dayKey(),r=Object.assign({box:0,reps:0},(db.kbr=db.kbr||{})[key]),q2=Number(v);if(b.dataset.quiz){kbRateOnly(key,q2);view.qz=null;closeSheet();toast(q2===0?'هيرجعلك بكرة':'تمام');return}
+  if(a==='kb-rate'){const key=b.dataset.k,q2=Number(v);if(b.dataset.quiz){const r3=srsRate(key,q2);view.qz=null;closeSheet();toast(`هيرجعلك ${ivLabel(r3.ivl)}`);return}{const r3=srsRate(key,q2);const td=kbToday();if(td)td.done[key]=q2;view.kbRev=null;buzz();save();render();toast(`هيرجعلك ${ivLabel(r3.ivl)}`);return}
     if(q2===0){r.box=1;r.due=kbAdd(today,1)}else if(q2===1){r.box=Math.max(1,r.box);r.due=kbAdd(today,Math.max(1,Math.round(KB_INT[r.box]/2)))}else{r.box=Math.min(7,r.box+1);r.due=kbAdd(today,KB_INT[r.box])}
     r.last=today;r.reps++;db.kbr[key]=r;const td=kbToday();if(td)td.done[key]=q2;view.kbRev=null;buzz();save();render();toast(q2===0?'هيرجعلك بكرة':q2===1?`هيرجعلك بعد ${diffDays(today,r.due)} يوم`:`ممتاز. هيرجعلك بعد ${diffDays(today,r.due)} يوم`);return}
   if(a==='kb-more'){const td=kbToday();if(!td)return;const nx=kbDueSort(kbEligible().filter(x=>!td.keys.includes(kbKey(x))))[0];if(!nx){toast('راجعت كل اللي عندك النهارده');return}td.keys.push(kbKey(nx));save();return render()}
@@ -1145,6 +1183,13 @@ document.addEventListener('click',ev=>{
   if(a==='dh-day'){const k=b.dataset.k,i2=view.dhId;view.kbiBack=null;closeSheet(true);view.dhBack=i2;return openDeed(i2,k)}
   if(a==='rt')return rtApply(v);
   if(a==='go-zad'){location.href='zad/';return}
+  if(a==='sess-go'){closeSheet(true);return startSess()}
+  if(a==='sess-min'){view.sessMin=Number(v);return render()}
+  if(a==='sess-open'){view.sess.open=true;return render()}
+  if(a==='sess-rate'){const S=view.sess,key=S.q[S.i],q=Number(v);S.seen=S.seen||{};if(!S.seen[key]){srsRate(key,q);S.seen[key]=1}buzz();S.stats.n++;if(q>=2)S.stats.ok++;if(q===0&&!S.again[key]){S.again[key]=1;S.q.push(key)}S.i++;S.open=false;render();scrollTo(0,0);return}
+  if(a==='sess-end'){if(view.sess&&!view.sess.done&&view.sess.i<view.sess.q.length&&view.sess.stats.n){view.sess.done=true;return render()}view.sess=null;view.sub=null;render();scrollTo(0,0);return}
+  if(a==='col-rev'){const c=db.cols.find(x=>x.id===view.colId);return startSess(c.items.map(colOf).filter(Boolean),c.name)}
+  if(a==='kbt-new'){const n2=prompt('اسم النوع الجديد');const s2=(n2||'').trim();if(!s2)return;db.kbTypes=[...ZTYPES()];if(!db.kbTypes.includes(s2))db.kbTypes.push(s2);if(view.kbn)view.kbn.type=s2;save();return paintSheet()}
   if(a==='quiz'){closeSheet(true);return openQuiz(b.dataset.key||'')}
   if(a==='qz-rev'){view.qz.shown[b.dataset.i]=1;return paintSheet()}
   if(a==='qz-all'){view.qz.hide.forEach((h,i)=>{if(h)view.qz.shown[i]=1});return paintSheet()}

@@ -295,3 +295,9 @@ body.wz nav.tabs{display:none}
 .rise{animation:rise .5s var(--ease) both}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.rv-hero{background:var(--ink);color:#fff;border:0}.rv-hero .eyebrow{color:var(--neon)}.rv-hero h2 small{font-size:15px;font-weight:400;color:rgba(255,255,255,.7)}.rv-hero .chip{background:transparent;color:#fff;border-color:rgba(255,255,255,.25)}.rv-hero .chip[aria-pressed="true"]{background:var(--neon);color:var(--ink);border-color:var(--neon)}.rv-hero .btn{background:var(--neon);color:var(--ink)}
+.sess-top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding-top:8px}.sess-top .meter{height:6px}
+.sess-card{min-height:46vh;display:flex;flex-direction:column;gap:14px}.sess-hint{font-size:20px;line-height:2;font-weight:600}.sess-txt{font-size:18px}
+.rate4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.rate4 button{border-radius:16px;padding:10px 4px;display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);background:var(--white)}.rate4 b{font-size:15px}.rate4 span{font-size:12px;color:var(--muted)}
+.rate4 .q0{border-color:rgba(200,16,27,.35)}.rate4 .q0 b{color:var(--alert)}.rate4 .q2{border-color:var(--forest)}.rate4 .q2 b,.rate4 .q3 b{color:var(--forest)}
+.tsel{flex-wrap:wrap}
