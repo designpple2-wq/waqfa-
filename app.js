@@ -545,7 +545,7 @@ function rtApply(v){const box=document.querySelector('.rich');if(!box)return;
   if(k==='fc'||k==='hc'||k==='fb'||k==='fs'){view.rtPal='';const w=document.querySelector('.rtw');if(w)w.outerHTML=rtBar()}
   box.dispatchEvent(new Event('input',{bubbles:true}))}
 const richView=x=>x.h?x.h:esc(x.text||x.t||'');
-const kbCard=x=>`<button class="ncard" data-act="kb-open" ${x.sid?`data-s="${x.sid}"`:`data-k="${x.k}" data-id="${x.id}" data-f="${x.f}" data-e="${x.eid}"`}><span class="nm"><span class="badge done">${esc(x.type)}</span><span class="small muted">${kbNext(x)}</span></span><p>${esc(x.text)}</p>${x.tags.length?`<span class="tagrow">${x.tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}</span>`:''}</button>`;
+const kbCard=x=>`<button class="ncard" data-act="kb-open" ${kbAttr(x)}><span class="nm"><span class="badge done">${esc(x.type)}</span><span class="small muted">${x.by?esc(x.by)+' · ':''}${kbNext(x)}</span></span><p>${esc(x.text)}</p>${x.tags.length?`<span class="tagrow">${x.tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}</span>`:''}</button>`;
 function allTags(){const kb=kbItems(),m=new Map();const add=(s,key)=>{if(!s)return;const o=m.get(s)||{kb:0,notes:0};if(key)o[key]++;m.set(s,o)};
   (db.tags||[]).forEach(s=>add(s));(db.noteCfg.topics||[]).forEach(s=>add(s));kb.forEach(x=>x.tags.forEach(s=>add(s,'kb')));db.notes.forEach(n=>(n.topics||[]).forEach(s=>add(s,'notes')));
   return [...m].map(([s,o])=>({s,...o})).sort((a,b)=>(b.kb+b.notes)-(a.kb+a.notes))}
@@ -566,6 +566,7 @@ function memStats(){const all=kbItems(),R2=db.kbr||{},td=dayKey();let mast=0,lea
   let streak=0;for(let k=td;streak<400;k=shift(k,-1)){const d=(db.kbDay||{})[k];if(d&&Object.keys(d.done||{}).length)streak++;else if(k!==td)break;else{}if(k<'2020')break}
   return {all,mast,learn,neu,due,streak}}
 const colOf=k=>{if(k.startsWith('n|'))return null;return kbItems().find(x=>kbKey(x)===k)};
+const kbAttr=x=>x.cid?`data-c="${x.cid}"`:x.sid?`data-s="${x.sid}"`:`data-k="${x.k}" data-id="${x.id}" data-f="${x.f}" data-e="${x.eid}"`;
 function sessQueue(only){const td=dayKey(),R2=db.kbr||{},all=only?only:kbItems();
   const due=all.filter(x=>{const r=R2[kbKey(x)];return r&&r.reps&&r.due<=td}).sort((a,b)=>R2[kbKey(a)].due.localeCompare(R2[kbKey(b)].due));
   const dd=(db.kbDay||{})[td]||{},newDone=Object.keys(dd.done||{}).filter(k=>{const r=R2[k];return r&&r.reps===1&&r.last===td}).length;
@@ -632,20 +633,20 @@ const KBT={hadith:'حديث',aya:'آية',qissa:'قصة',sum:'ملخص'},KBT_R={
 const ZTYPES=()=>db.kbTypes&&db.kbTypes.length?db.kbTypes:['حديث','آية','قصة','ملخص','فائدة'];
 const addSeg=(act,cur)=>APP==='zad'?`<div class="chips tsel">${ZTYPES().map(x=>`<button class="chip" data-act="kbn-type" data-v="${esc(x)}" aria-pressed="${(view.kbn||{}).type===x}">${esc(x)}</button>`).join('')}<button class="chip" data-act="kbt-new" aria-label="نوع جديد">+ نوع</button></div>`
   :`<div class="seg seg5">${[['note','فائدة'],['hadith','حديث'],['aya','آية'],['qissa','قصة'],['plan','خطوة']].map(([x,l])=>`<button data-act="${act}" data-v="${x}" aria-pressed="${cur===x}">${l}</button>`).join('')}</div>`;
-function kbRef(r){if(r.s){const o=(db.kb||[]).find(x=>x.id===r.s);return {o,save:()=>save(),del:()=>{db.kb=db.kb.filter(x=>x.id!==r.s);save()}}}
+function kbRef(r){if(r.c){const o=(db.shared||{})[r.c];return {o,save:()=>{if(o){o._dirty=1;save()}},del:()=>{if(o){o.deleted=true;o._dirty=1;save()}}}}if(r.s){const o=(db.kb||[]).find(x=>x.id===r.s);return {o,save:()=>save(),del:()=>{db.kb=db.kb.filter(x=>x.id!==r.s);save()}}}
   const e=(db.logs[r.k]||{})[r.id];if(!e||!e.a)return {o:null,save(){},del(){}};const arr=kbArr(e.a[r.f]),o=arr.find(x=>x.id===r.e);
   return {o,save:()=>{e.a[r.f]=arr;save()},del:()=>{e.a[r.f]=arr.filter(x=>x.id!==r.e);save()}}}
 function tagPick(tags,act,newAct,inputId){const all=[...new Set([...(db.tags||[]),...(db.noteCfg.topics||[]),...tags])];
   return `<div class="tagbox">${all.length?`<div class="tagrow">${all.map(x=>`<button class="chip" data-act="${act}" data-v="${esc(x)}" aria-pressed="${tags.includes(x)}">${esc(x)}</button>`).join('')}</div>`:''}
     <div class="row-in"><input class="inp" id="${inputId}" placeholder="تصنيف جديد، زي: الصبر"><button class="btn ghost sm" data-act="${newAct}">أضف</button></div></div>`}
 function openKBItem(r){view.kbi=r;view.kbiTag=false;view.kbn=null;openSheet(()=>{const R2=kbRef(r),o=R2.o;if(!o){closeSheet();return {head:'',body:''}}
-  const x=kbItems().find(y=>r.s?y.sid===r.s:(y.k===r.k&&y.id===r.id&&y.f===r.f&&y.eid===r.e))||{},type=x.type||o.type,tags=o.tags||[],dk=r.s?o.k:r.k;
+  const x=kbItems().find(y=>r.c?y.cid===r.c:r.s?y.sid===r.s:(y.k===r.k&&y.id===r.id&&y.f===r.f&&y.eid===r.e))||{},type=x.type||o.type,tags=o.tags||[],dk=r.c||r.s?o.k:r.k;
   return {head:`<span class="eyebrow">${esc(type)} · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})}</span><h2 class="title">${KBTITLE[type]||esc(type)}</h2>`,
    body:`${richBox('kbi-rich',o)}
     <div class="fld"><span class="lb">التصنيفات</span><div class="tagrow">${tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}<button class="tg add" data-act="kbi-tagbox">${ico('tag')}${tags.length?'تعديل':'تصنيف'}</button></div>${view.kbiTag?tagPick(tags,'kbi-tag','kbi-tagnew','kbiTag'):''}</div>
     ${(db.cols||[]).length?`<div class="fld"><span class="lb">المجموعات</span><div class="tagrow">${db.cols.map(c=>`<button class="chip" data-act="col-tog" data-c="${c.id}" data-key="${esc(kbKey(x))}" aria-pressed="${c.items.includes(kbKey(x))}">${esc(c.name)}</button>`).join('')}</div></div>`:''}
     <div class="fld"><div class="ch"><span class="lb">المراجعة</span><button class="link" data-act="quiz" data-key="${esc(kbKey(x))}">اختبر نفسك</button></div><span class="small muted">${x.k?kbNext(x):''}</span></div>
-    <div class="fld"><span class="lb">المصدر</span>${r.s?`<span>${o.src?esc(o.src):'اتضاف من زرار +'}</span>`:`<button class="link" data-act="kbi-day" style="align-self:flex-start">التعليم الانفرادي · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})} ←</button>`}</div>`,
+    <div class="fld"><span class="lb">المصدر</span>${r.c?`<span>${esc(o.by||'')} · ${esc(o.src||'الحلقة')}</span>`:r.s?`<span>${o.src?esc(o.src):'اتضاف من زرار +'}</span>`:`<button class="link" data-act="kbi-day" style="align-self:flex-start">التعليم الانفرادي · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})} ←</button>`}</div>`,
    foot:`<button class="btn danger icon" data-act="kbi-del" aria-label="امسح">${ico('trash')}</button><button class="btn" data-act="close-sheet">تمام</button>`}})}
 function openKBNew(type,text,prev){view.kbi=null;view.nd=null;view.kbn=prev?{...prev,type}:{type,t:text||'',tags:[],src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():''};view.kbiTag=false;keepDraft();
   openSheet(()=>{const s=view.kbn;if(!s)return {head:'',body:''};return {head:`<span class="eyebrow">إضافة لعلمي</span><h2 class="title">${{'حديث':'حديث جديد','آية':'آية جديدة','قصة':'قصة جديدة','ملخص':'ملخص درس أو كتاب'}[s.type]||(s.type+' جديد')}</h2>`,
@@ -775,7 +776,40 @@ async function syncNow(){if(!auth||sync.busy)return paintCloud();if(!navigator.o
       saveLocal()}
     sync.state='ok';sync.msg=''}
   catch(e){sync.state='error';if(!sync.msg)sync.msg=errAr(e.message)}
-  sync.busy=false;paintCloud();if(view.sub==='settings'&&!sheetEl&&!document.activeElement.matches('input,textarea'))render()}
+  sync.busy=false;paintCloud();circleSync();if(view.sub==='settings'&&!sheetEl&&!document.activeElement.matches('input,textarea'))render()}
+/* ===== الحلقة: library shared with friends; reviews stay personal ===== */
+const myPre=()=>auth?auth.uid.slice(0,8)+':':'';
+function myLibrary(){const out={},P=myPre();
+  (db.kb||[]).forEach(x=>{if((x.t||'').trim())out[P+'s:'+x.id]={type:x.type,t:x.t,h:x.h||'',tags:x.tags||[],k:x.k,src:x.src||''}});
+  (db.notes||[]).forEach(n=>{if((n.text||'').trim())out[P+'n:'+n.id]={type:'فائدة',t:n.text,h:n.h||'',tags:n.topics||[],k:n.k,src:n.src||''}});
+  Object.entries(db.logs||{}).forEach(([k,l])=>Object.entries(l||{}).forEach(([id,e])=>{const d=db.deeds.find(x=>x.id===id);if(!d||!e||!e.a)return;
+    fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{if((o.t||'').trim())out[P+'l:'+k+'|'+id+'|'+f.id+'|'+o.id]={type:f.kb,t:o.t,h:o.h||'',tags:o.tags||[],k,src:''}}))}));
+  return out}
+let cBusy=false;
+async function circleSync(){if(!auth||!db.circle||cBusy||!navigator.onLine)return;cBusy=true;
+  try{const C=db.circle,M=db.cmeta=db.cmeta||{pull:'1970-01-01T00:00:00Z',h:{}},mine=myLibrary(),rows=[],P=myPre();
+    Object.entries(mine).forEach(([id,d])=>{const h=JSON.stringify(d);if(M.h[id]!==h){rows.push({circle_id:C.id,id,data:d,deleted:false,author_email:auth.email});M.h[id]=h}});
+    Object.keys(M.h).forEach(id=>{if(!mine[id]){rows.push({circle_id:C.id,id,data:{},deleted:true,author_email:auth.email});delete M.h[id]}});
+    Object.entries(db.shared||{}).forEach(([id,x])=>{if(x._dirty){const {_dirty,by,byId,...d}=x;rows.push({circle_id:C.id,id,data:d,deleted:!!x.deleted});delete x._dirty}});
+    for(let i=0;i<rows.length;i+=200)await rest('circle_items?on_conflict=circle_id,id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows.slice(i,i+200))});
+    const got=await rest(`circle_items?circle_id=eq.${C.id}&updated_at=gt.${encodeURIComponent(M.pull)}&select=id,author_id,author_email,data,deleted,updated_at&order=updated_at.asc&limit=2000`)||[];
+    db.shared=db.shared||{};let ch=false;
+    got.forEach(r=>{if(r.updated_at>M.pull)M.pull=r.updated_at;
+      if(r.id.startsWith(P)){const loc=mine[r.id];if(!r.deleted&&loc&&JSON.stringify(r.data)!==M.h[r.id]&&r.id.slice(P.length).startsWith('s:')){const o=(db.kb||[]).find(x=>'s:'+x.id===r.id.slice(P.length));if(o){Object.assign(o,{t:r.data.t,h:r.data.h,tags:r.data.tags});M.h[r.id]=JSON.stringify(myLibrary()[r.id]);ch=true}}return}
+      if(r.deleted){if(db.shared[r.id]){delete db.shared[r.id];ch=true}}else{db.shared[r.id]={...r.data,by:(r.author_email||'').split('@')[0],byId:r.author_id};ch=true}});
+    if(rows.length||got.length)save();if(ch&&!sheetEl)render()}
+  catch(e){console.warn('circle',e)}finally{cBusy=false}}
+async function circleCall(fn,arg){const tk=await token();const r=await fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify(arg)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.message||'HTTP '+r.status);return j}
+async function circleMembers(){if(!db.circle||!auth)return;try{view.cmem=await rest(`circle_members?circle_id=eq.${db.circle.id}&select=email,user_id,joined_at&order=joined_at`);if(view.sub==='settings')render()}catch(e){}}
+function circleCard(){if(!auth)return `<section class="card"><h2>الحلقة</h2><p class="small muted">سجّل دخول الأول، وبعدين تقدر تذاكر مع صاحبك.</p></section>`;
+  const C=db.circle;if(!C)return `<section class="card"><h2>الحلقة</h2><p class="small muted">كل حاجة أي حد يضيفها بتظهر عند الكل، والمراجعة فردية.</p>
+   <div class="row-in"><input class="inp" id="cName" placeholder="اسم الحلقة"><button class="btn sm" data-act="c-new">اعمل حلقة</button></div>
+   <div class="row-in"><input class="inp" id="cCode" placeholder="كود من صاحبك" style="text-transform:uppercase" dir="ltr"><button class="btn ghost sm" data-act="c-join">ادخل</button></div></section>`;
+  if(!view.cmem)circleMembers();
+  return `<section class="card"><div class="ch"><h2>${esc(C.name)}</h2><span class="badge done">حلقة</span></div>
+   <div class="ch"><span class="small muted">الكود</span><b dir="ltr" style="font-size:22px;letter-spacing:3px">${esc(C.code)}</b><button class="btn ghost sm" data-act="c-share">ابعته</button></div>
+   ${(view.cmem||[]).map(m=>`<div class="ch small"><span>${esc((m.email||'').split('@')[0])}${m.user_id===auth.uid?' (انت)':''}</span><span class="muted">${fmt(m.joined_at.slice(0,10),{day:'numeric',month:'short'})}</span></div>`).join('')}
+   <button class="link danger" data-act="c-leave" style="align-self:flex-start">اخرج من الحلقة</button></section>`}
 async function doLogin(signup){const email=$('#acc-email').value.trim(),password=$('#acc-pass').value;if(!email||password.length<6){toast('اكتب الإيميل وباسورد ٦ حروف على الأقل');return}
   sync.msg='';toast(signup?'بنعمل الحساب…':'بندخّلك…');
   try{const j=await sbAuth(signup?'signup':'token?grant_type=password',{email,password});
@@ -860,11 +894,12 @@ function setTag(d,fid,eid,tag,on){const e=E(d.id);e.a=e.a||{};const arr=kbArr(e.
   o.tags=(o.tags||[]).filter(x=>x!==tag);if(on)o.tags.push(tag);db.tags=db.tags||[];if(!db.tags.includes(tag))db.tags.push(tag);e.a[fid]=arr;save()}
 function kbItems(){const out=[];Object.keys(db.logs).sort().reverse().forEach(k=>{const l=db.logs[k];for(const id in l){const d=byId(id),e=l[id];if(!d||!e||!e.a)continue;
     fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{const v=(o.t||'').trim();if(v)out.push({k,id,f:f.id,eid:o.id,type:f.kb,text:v,h:o.h||'',tags:o.tags||[]})}))}});
+  Object.entries(db.shared||{}).forEach(([id,x])=>{if(!x.deleted&&(x.t||'').trim())out.push({k:x.k||'2000-01-01',cid:id,type:x.type,text:x.t.trim(),h:x.h||'',tags:x.tags||[],src:x.src||'',by:x.by})});
   (db.kb||[]).forEach(x=>{if((x.t||'').trim())out.push({k:x.k,sid:x.id,type:x.type,text:x.t.trim(),h:x.h||'',tags:x.tags||[],src:x.src||''})});
   return out.sort((a,b)=>b.k.localeCompare(a.k))}
 /* spaced repetition (Leitner): remembered well -> longer gap, forgot -> back tomorrow */
 const KB_INT=[1,1,3,7,14,30,60,120];
-const kbKey=x=>x.sid?`s|${x.sid}`:`${x.k}|${x.id}|${x.f}`+(x.eid&&x.eid!=='0'?'|'+x.eid:'');
+const kbKey=x=>x.cid?`c|${x.cid}`:x.sid?`s|${x.sid}`:`${x.k}|${x.id}|${x.f}`+(x.eid&&x.eid!=='0'?'|'+x.eid:'');
 /* SRS (SM-2 style): every item has its own ease. q: 0 نسيت · 1 صعب · 2 كويس · 3 سهل */
 function srsNext(r,q){r=Object.assign({reps:0,ease:2.5,ivl:0,lapses:0},r||{});if(!r.ivl&&r.box)r.ivl=KB_INT[Math.min(r.box,KB_INT.length-1)]||1;
   let iv=r.ivl||0,e=r.ease||2.5;
@@ -942,7 +977,7 @@ function openFault(id){openSheet(()=>{const f=db.faults.find(x=>x.id===id);if(!f
   const txt=(k,l,ph)=>`<div class="fld"><span class="lb">${l}</span><textarea class="inp" data-act="f-txt" data-id="${f.id}" data-k="${k}" placeholder="${esc(ph)}">${esc(f[k]??'')}</textarea></div>`;
   const fold=(k,l,body)=>`<section class="fold ${op[k]?'open':''}"><button class="fold-h" data-act="f-fold" data-v="${k}"><span>${l}</span>${ico(op[k]?'up':'down')}</button>${op[k]?`<div class="fold-b">${body}</div>`:''}</section>`;
   const lg=(f.log||[]).slice().reverse(),edit=view.fEditName;
-  const items=[...rl.kb.map(x=>`<button class="tgb-i" data-act="kb-open" data-back="${f.id}" ${x.sid?`data-s="${x.sid}"`:`data-k="${x.k}" data-id="${x.id}" data-f="${x.f}" data-e="${x.eid}"`}><span class="badge">${esc(x.type)}</span><p>${esc(x.text)}</p>${x.text.length>140?'<span class="more">اقرا كله</span>':''}</button>`),
+  const items=[...rl.kb.map(x=>`<button class="tgb-i" data-act="kb-open" data-back="${f.id}" ${kbAttr(x)}><span class="badge">${esc(x.type)}</span><p>${esc(x.text)}</p>${x.text.length>140?'<span class="more">اقرا كله</span>':''}</button>`),
     ...rl.nt.map(n=>`<button class="tgb-i" data-act="note-open" data-back="${f.id}" data-id="${n.id}"><span class="badge">فائدة</span><p>${esc(n.text)}</p>${n.text.length>140?'<span class="more">اقرا كله</span>':''}</button>`)];
   return {head:`<div class="ch"><div><h2 class="title">${esc(v)}</h2>${f.name&&f.virtue?`<span class="small muted">ضد ${esc(f.name)}</span>`:''}</div><span class="hd-act">${stgDots(st)}<button class="ib" data-act="f-ename" aria-label="تعديل الاسم">${ico('pen')}</button><button class="ib dz" data-act="f-del" data-id="${f.id}" aria-label="امسح">${ico('trash')}</button></span></div>`,
    body:`${edit?`<div class="tagbox"><div class="fld"><span class="lb">الخُلق</span><input class="inp" data-act="f-txt" data-id="${f.id}" data-k="virtue" value="${esc(f.virtue||'')}" placeholder="التواضع"></div><div class="fld"><span class="lb">ضده</span><input class="inp" data-act="f-txt" data-id="${f.id}" data-k="name" value="${esc(f.name||'')}" placeholder="الكبر"></div></div>`:''}
@@ -964,11 +999,11 @@ function openFault(id){openSheet(()=>{const f=db.faults.find(x=>x.id===id);if(!f
 function openKBPick(fid){view.kbiBack=fid;view.pq='';openSheet(()=>{const f=db.faults.find(x=>x.id===fid),v=vName(f),q=view.pq||'',all=kbItems().filter(x=>!q||x.text.includes(q));
   return {head:`<span class="eyebrow">اختار لـ ${esc(v)}</span><h2 class="title">من علمي</h2>`,
    body:`<input class="inp" data-act="pq" placeholder="دوّر" value="${esc(q)}"><div class="list" id="pkl">${pickList(all,v)}</div>`,foot:'<button class="btn" data-act="close-sheet">تمام</button>'}})}
-const pickList=(all,v)=>all.map(x=>{const on=x.tags.includes(v);return `<button class="row pk ${on?'on':''}" data-act="pk" ${x.sid?`data-s="${x.sid}"`:`data-k="${x.k}" data-id="${x.id}" data-f="${x.f}" data-e="${x.eid}"`}><span class="ck">${on?ico('ok'):''}</span><span class="t"><b>${esc(x.text.slice(0,90))}${x.text.length>90?'…':''}</b><span>${esc(x.type)}</span></span></button>`}).join('')||'<p class="empty">مفيش حاجة في علمي لسه.</p>';
+const pickList=(all,v)=>all.map(x=>{const on=x.tags.includes(v);return `<button class="row pk ${on?'on':''}" data-act="pk" ${kbAttr(x)}><span class="ck">${on?ico('ok'):''}</span><span class="t"><b>${esc(x.text.slice(0,90))}${x.text.length>90?'…':''}</b><span>${esc(x.type)}</span></span></button>`}).join('')||'<p class="empty">مفيش حاجة في علمي لسه.</p>';
 
 
 /* ---------- settings & customize ---------- */
-function renderSettings(){const s=db.settings;if(APP==='zad')return backTop('الإعدادات','زاد','back')+accountCard()+`<a class="card journey" href="../" style="text-align:start;color:inherit;text-decoration:none"><span class="ic">${ico('nafs')}</span><span class="t"><b>وقفة</b><span class="small muted">محاسبة النفس</span></span>${ico('fwd')}</a>`;
+function renderSettings(){const s=db.settings;if(APP==='zad')return backTop('الإعدادات','زاد','back')+accountCard()+circleCard()+`<a class="card journey" href="../" style="text-align:start;color:inherit;text-decoration:none"><span class="ic">${ico('nafs')}</span><span class="t"><b>وقفة</b><span class="small muted">محاسبة النفس</span></span>${ico('fwd')}</a>`;
   return backTop('الإعدادات','وقفة','back')+accountCard()+`
   <button class="card journey" data-act="go" data-v="sched" style="text-align:start"><span class="ic">${ico('salah')}</span><span class="t"><b>جدول اليوم</b><span class="small muted">برنامج الخروج ومواعيده، والعمل الجاي</span></span>${ico('fwd')}</button>
   <a class="card journey" href="widget.html" style="text-align:start;color:inherit;text-decoration:none"><span class="ic">${ico('map')}</span><span class="t"><b>ويدجت للشاشة الرئيسية</b><span class="small muted">الصلاة الجاية والعمل الجاي على شاشة الآيفون</span></span>${ico('fwd')}</a>
@@ -1106,7 +1141,7 @@ document.addEventListener('click',ev=>{
   if(a==='tag-tog'&&d){setTag(d,fid,b.dataset.e,v,b.getAttribute('aria-pressed')!=='true');return sheetEl?paintSheet():render()}
   if(a==='tag-new'&&d){const inp=$('#tagnew'),s=(inp&&inp.value||'').trim().replace(/^#/,'');if(!s)return;setTag(d,fid,b.dataset.e,s,true);return sheetEl?paintSheet():render()}
   if(a==='kb-rand'){const n=kbItems().length;if(n)view.kbPick=Math.floor(Math.random()*n);return render()}
-  if(a==='kb-open')return openKBItem(b.dataset.s?{s:b.dataset.s}:{k:b.dataset.k,id,f:b.dataset.f,e:b.dataset.e});
+  if(a==='kb-open')return openKBItem(b.dataset.c?{c:b.dataset.c}:b.dataset.s?{s:b.dataset.s}:{k:b.dataset.k,id,f:b.dataset.f,e:b.dataset.e});
   if(a==='kbi-day'){const r=view.kbi;closeSheet(true);return openDeed(r.id,r.k)}
   if(a==='kbi-tagbox'){view.kbiTag=!view.kbiTag;return paintSheet()}
   if(a==='kbi-tag'||a==='kbi-tagnew'){const s=a==='kbi-tag'?v:($('#kbiTag')||{}).value||'',x=s.trim().replace(/^#/,'');if(!x)return;const o=view.kbi?kbRef(view.kbi).o:view.kbn;if(!o)return;
@@ -1190,6 +1225,11 @@ document.addEventListener('click',ev=>{
   if(a==='sess-end'){if(view.sess&&!view.sess.done&&view.sess.i<view.sess.q.length&&view.sess.stats.n){view.sess.done=true;return render()}view.sess=null;view.sub=null;render();scrollTo(0,0);return}
   if(a==='col-rev'){const c=db.cols.find(x=>x.id===view.colId);return startSess(c.items.map(colOf).filter(Boolean),c.name)}
   if(a==='kbt-new'){const n2=prompt('اسم النوع الجديد');const s2=(n2||'').trim();if(!s2)return;db.kbTypes=[...ZTYPES()];if(!db.kbTypes.includes(s2))db.kbTypes.push(s2);if(view.kbn)view.kbn.type=s2;save();return paintSheet()}
+  if(a==='c-new'||a==='c-join'){const val=(($(a==='c-new'?'#cName':'#cCode')||{}).value||'').trim();if(a==='c-join'&&!val){toast('اكتب الكود');return}
+    (async()=>{try{const j=await circleCall(a==='c-new'?'create_circle':'join_circle',a==='c-new'?{cname:val}:{ccode:val});if(j.error){toast('الكود ده مش موجود');return}
+      db.circle={id:j.id,name:j.name,code:j.code};db.cmeta={pull:'1970-01-01T00:00:00Z',h:{}};save();view.cmem=null;render();toast(a==='c-new'?'اتعملت. ابعت الكود لصاحبك':'دخلت الحلقة ✓');await circleSync();render()}catch(e){toast('محتاج نت، جرّب تاني')}})();return}
+  if(a==='c-share'){const C=db.circle,msg=`تعالى نذاكر مع بعض على زاد\nالكود: ${C.code}\nhttps://designpple2-wq.github.io/waqfa-/zad/`;if(navigator.share)navigator.share({text:msg}).catch(()=>{});else{navigator.clipboard&&navigator.clipboard.writeText(msg);toast('اتنسخ')}return}
+  if(a==='c-leave'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟ الحاجات اللي من غيرك هتختفي عندك';return}(async()=>{try{await rest(`circle_members?circle_id=eq.${db.circle.id}&user_id=eq.${auth.uid}`,{method:'DELETE'})}catch(e){}db.circle=null;db.shared={};db.cmeta=null;save();render()})();return}
   if(a==='quiz'){closeSheet(true);return openQuiz(b.dataset.key||'')}
   if(a==='qz-rev'){view.qz.shown[b.dataset.i]=1;return paintSheet()}
   if(a==='qz-all'){view.qz.hide.forEach((h,i)=>{if(h)view.qz.shown[i]=1});return paintSheet()}
@@ -1204,7 +1244,7 @@ document.addEventListener('click',ev=>{
   if(a==='f-ename'){view.fEditName=!view.fEditName;return paintSheet()}
   if(a==='r-edit'){view.rEdit=v;return paintSheet()}
   if(a==='f-pick')return openKBPick(id);
-  if(a==='pk'){const f=db.faults.find(x=>x.id===view.kbiBack),vv=vName(f),R2=kbRef(b.dataset.s?{s:b.dataset.s}:{k:b.dataset.k,id:b.dataset.id,f:b.dataset.f,e:b.dataset.e});if(!R2.o)return;
+  if(a==='pk'){const f=db.faults.find(x=>x.id===view.kbiBack),vv=vName(f),R2=kbRef(b.dataset.c?{c:b.dataset.c}:b.dataset.s?{s:b.dataset.s}:{k:b.dataset.k,id:b.dataset.id,f:b.dataset.f,e:b.dataset.e});if(!R2.o)return;
     const tg=R2.o.tags||[];R2.o.tags=tg.includes(vv)?tg.filter(x=>x!==vv):[...tg,vv];db.tags=db.tags||[];if(!db.tags.includes(vv))db.tags.push(vv);R2.save();buzz();return paintSheet()}
   if(a==='fr-add'){const f=db.faults.find(x=>x.id===id);f.rules=f.rules||[];const nr={id:uid('r'),a:'',b:''};f.rules.push(nr);view.rEdit=nr.id;save();paintSheet();const ins=sheetEl.querySelectorAll('[data-act=fr][data-k=a]');ins.length&&ins[ins.length-1].focus();return}
   if(a==='fr-del'){const f=db.faults.find(x=>x.id===id);f.rules=(f.rules||[]).filter(x=>x.id!==b.dataset.r);save();return paintSheet()}
@@ -1286,4 +1326,5 @@ setInterval(()=>{if(auth&&db.meta.dirty)syncNow()},120000);
 setInterval(()=>{if(view.tab==='today'&&!view.sub&&!sheetEl&&!document.activeElement.matches('input,textarea,select')){const k=dayKey();if(view.day!==k&&view.day===shift(k,-1))view.day=k;render()}},60000);
 render();
 if(auth)syncNow();
+setInterval(()=>{if(!document.hidden)circleSync()},45000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)circleSync()});
 })();
