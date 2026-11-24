@@ -809,7 +809,7 @@ function circleCard(){if(!auth)return `<section class="card"><h2>الحلقة</h
   return `<section class="card"><div class="ch"><h2>${esc(C.name)}</h2><span class="badge done">حلقة</span></div>
    <div class="ch"><span class="small muted">الكود</span><b dir="ltr" style="font-size:22px;letter-spacing:3px">${esc(C.code)}</b><button class="btn ghost sm" data-act="c-share">ابعته</button></div>
    ${(view.cmem||[]).map(m=>`<div class="ch small"><span>${esc((m.email||'').split('@')[0])}${m.user_id===auth.uid?' (انت)':''}</span><span class="muted">${fmt(m.joined_at.slice(0,10),{day:'numeric',month:'short'})}</span></div>`).join('')}
-   <button class="link danger" data-act="c-leave" style="align-self:flex-start">اخرج من الحلقة</button></section>`}
+   ${C.owner?`<button class="link danger" data-act="c-leave" style="align-self:flex-start">اقفل الحلقة عندي</button>`:''}</section>`}
 async function doLogin(signup){const email=$('#acc-email').value.trim(),password=$('#acc-pass').value;if(!email||password.length<6){toast('اكتب الإيميل وباسورد ٦ حروف على الأقل');return}
   sync.msg='';toast(signup?'بنعمل الحساب…':'بندخّلك…');
   try{const j=await sbAuth(signup?'signup':'token?grant_type=password',{email,password});
@@ -1227,7 +1227,7 @@ document.addEventListener('click',ev=>{
   if(a==='kbt-new'){const n2=prompt('اسم النوع الجديد');const s2=(n2||'').trim();if(!s2)return;db.kbTypes=[...ZTYPES()];if(!db.kbTypes.includes(s2))db.kbTypes.push(s2);if(view.kbn)view.kbn.type=s2;save();return paintSheet()}
   if(a==='c-new'||a==='c-join'){const val=(($(a==='c-new'?'#cName':'#cCode')||{}).value||'').trim();if(a==='c-join'&&!val){toast('اكتب الكود');return}
     (async()=>{try{const j=await circleCall(a==='c-new'?'create_circle':'join_circle',a==='c-new'?{cname:val}:{ccode:val});if(j.error){toast('الكود ده مش موجود');return}
-      db.circle={id:j.id,name:j.name,code:j.code};db.cmeta={pull:'1970-01-01T00:00:00Z',h:{}};save();view.cmem=null;render();toast(a==='c-new'?'اتعملت. ابعت الكود لصاحبك':'دخلت الحلقة ✓');await circleSync();render()}catch(e){toast('محتاج نت، جرّب تاني')}})();return}
+      db.circle={id:j.id,name:j.name,code:j.code,owner:a==='c-new'};db.cmeta={pull:'1970-01-01T00:00:00Z',h:{}};save();view.cmem=null;render();toast(a==='c-new'?'اتعملت. ابعت الكود لصاحبك':'دخلت الحلقة ✓');await circleSync();render()}catch(e){toast('محتاج نت، جرّب تاني')}})();return}
   if(a==='c-share'){const C=db.circle,msg=`تعالى نذاكر مع بعض على زاد\nالكود: ${C.code}\nhttps://designpple2-wq.github.io/waqfa-/zad/`;if(navigator.share)navigator.share({text:msg}).catch(()=>{});else{navigator.clipboard&&navigator.clipboard.writeText(msg);toast('اتنسخ')}return}
   if(a==='c-leave'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟ الحاجات اللي من غيرك هتختفي عندك';return}(async()=>{try{await rest(`circle_members?circle_id=eq.${db.circle.id}&user_id=eq.${auth.uid}`,{method:'DELETE'})}catch(e){}db.circle=null;db.shared={};db.cmeta=null;save();render()})();return}
   if(a==='quiz'){closeSheet(true);return openQuiz(b.dataset.key||'')}
