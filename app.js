@@ -834,12 +834,15 @@ const cloudState=()=>!auth?['miss','مش محفوظ أونلاين']:sync.busy?[
 const cloudChip=()=>{const [c,l]=cloudState();return `<span class="badge ${c}" data-cloud>${l}</span>`};
 function paintCloud(){document.querySelectorAll('[data-cloud]').forEach(el=>el.outerHTML=cloudChip())}
 function timeAgo(iso){const m=Math.round((Date.now()-Date.parse(iso))/60000);return m<1?'من شوية':m<60?`من ${num(m)} دقيقة`:m<1440?`من ${num(Math.round(m/60))} ساعة`:fmt(keyOf(new Date(iso)),{day:'numeric',month:'long'})}
+const typing=()=>{const a=document.activeElement;return !!(a&&a.matches&&a.matches('input,textarea,select,[contenteditable="true"]'))};let bgPend=false;
+function bgPaint(){if(typing()){bgPend=true;return}bgPend=false;if(sheetEl)paintSheet();else render()}
+document.addEventListener('focusout',()=>setTimeout(()=>{if(bgPend&&!typing())bgPaint()},350));
 async function syncNow(force){if(!auth||sync.busy)return paintCloud();if(!navigator.onLine){sync.state='offline';return paintCloud()}
   sync.busy=true;paintCloud();let retry=false;
   try{const rows=await rest(`user_data?select=data,updated_at&user_id=eq.${auth.uid}`),r=rows&&rows[0];
     if(r&&r.updated_at!==db.meta.base){const rem=migrate(r.data);
       if(db.meta.dirty||!db.meta.base){db=mergeDB(db,rem);db.meta.dirty=true}else{db=rem;db.meta={...db.meta,dirty:false}}
-      db.meta.base=r.updated_at;db.meta.syncedAt=r.updated_at;saveLocal();if(sheetEl)paintSheet();else render()}
+      db.meta.base=r.updated_at;db.meta.syncedAt=r.updated_at;saveLocal();bgPaint()}
     if(!r||db.meta.dirty){const ed=db.meta.editAt;db.meta.cv=2;
       const out=await rest('user_data?on_conflict=user_id&select=updated_at',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify({user_id:auth.uid,data:db,device:navigator.userAgent.slice(0,90)})});
       const u=out&&out[0]&&out[0].updated_at;if(u){db.meta.base=u;db.meta.syncedAt=u}if(db.meta.editAt===ed)db.meta.dirty=false;
@@ -847,7 +850,7 @@ async function syncNow(force){if(!auth||sync.busy)return paintCloud();if(!naviga
       saveLocal()}
     sync.state='ok';sync.msg=''}
   catch(e){if(/stale/.test(e.message||'')&&!force){retry=true;db.meta.dirty=true}else{sync.state='error';if(!sync.msg)sync.msg=errAr(e.message)}}
-  sync.busy=false;paintCloud();if(retry){setTimeout(()=>syncNow(true),400);return}circleSync();if(view.sub==='settings'&&!sheetEl&&!document.activeElement.matches('input,textarea'))render()}
+  sync.busy=false;paintCloud();if(retry){setTimeout(()=>syncNow(true),400);return}circleSync();if(view.sub==='settings'&&!sheetEl&&!typing())render()}
 /* ===== الحلقة: library shared with friends; reviews stay personal ===== */
 const myPre=()=>auth?auth.uid.slice(0,8)+':':'';
 function myLibrary(){const out={},P=myPre();
@@ -868,7 +871,7 @@ async function circleSync(){if(!auth||!db.circle||cBusy||!navigator.onLine)retur
     got.forEach(r=>{if(r.updated_at>M.pull)M.pull=r.updated_at;
       if(r.id.startsWith(P)){const loc=mine[r.id];if(!r.deleted&&loc&&JSON.stringify(r.data)!==M.h[r.id]&&r.id.slice(P.length).startsWith('s:')){const o=(db.kb||[]).find(x=>'s:'+x.id===r.id.slice(P.length));if(o){Object.assign(o,{t:r.data.t,h:r.data.h,tags:r.data.tags,ti:r.data.ti||o.ti});M.h[r.id]=JSON.stringify(myLibrary()[r.id]);ch=true}}return}
       if(r.deleted){if(db.shared[r.id]){delete db.shared[r.id];ch=true}}else{db.shared[r.id]={...r.data,by:(r.author_email||'').split('@')[0],byId:r.author_id};ch=true}});
-    if(ch)save();else if(rows.length||got.length)saveLocal();if(ch&&!sheetEl)render()}
+    if(ch)save();else if(rows.length||got.length)saveLocal();if(ch&&!sheetEl&&!typing())render()}
   catch(e){console.warn('circle',e)}finally{cBusy=false}}
 async function circleCall(fn,arg){const r=await afetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{},body:JSON.stringify(arg)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.message||'HTTP '+r.status);return j}
 async function circleMembers(){if(!db.circle||!auth)return;try{view.cmem=await rest(`circle_members?circle_id=eq.${db.circle.id}&select=email,user_id,joined_at&order=joined_at`);if(view.sub==='settings')render()}catch(e){}}
