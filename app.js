@@ -683,6 +683,7 @@ async function capRun(){const c=capOf(),notes=(($('#capText')||{}).value||c.t||'
     if(j.docFailed&&c.mode!=='sum')toast('الترتيب ما اشتغلش المرة دي، طلّعت النصوص بس. جرّب تاني بعد شوية');else if(j.itemsFailed)toast('رتّب البيان، بس ما لحقش يطلّع النصوص لوحدها');
     const sm=j.summary&&j.summary.sections&&j.summary.sections.length?[{type:'ملخص',sum:j.summary,title:j.summary.title||'ملخص البيان',text:'',confidence:'high',on:true,from:'كل ملاحظاتك'}]:[];if(sm.length)sm[0].text=capSumText(sm[0]);
     if(j.doc&&j.doc.sections&&j.doc.sections.length){const dd={type:'بيان',doc:j.doc,title:j.doc.title||'البيان',confidence:'high',on:true,from:'كل ملاحظاتك'};dd.text=docText(dd);sm.unshift(dd)}
+    const cc=(db.caps||[]).find(x=>x.id===c.id);if(cc&&cc!==c){Object.assign(c,{...cc,items:c.items});db.caps[db.caps.indexOf(cc)]=c}else if(!cc){db.caps=db.caps||[];db.caps.unshift(c)}
     c.items=[...sm,...(j.items||[]).filter(x=>x&&x.text).map(x=>({...x,type:['حديث','آية','قصة','فائدة'].includes(x.type)?x.type:'فائدة',on:x.confidence!=='low'}))];save();if(!c.items.length)toast('مالقيتش حاجة واضحة')}
   catch(e){toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':e.message)}finally{clearTimeout(tm);view.capBusy=false;
     if(sheetEl&&sheetRender===capR)paintSheet();else if((c.items||[]).length){if(!sheetEl){db.capCur=c.id;openCap()}else toast('خلص ✓ افتح + ← التقاط من بيان')}}}
@@ -1029,10 +1030,10 @@ function fGrad(f){const s=f.stg||[];if(fStage(f)<5)return false;let i=s.length-1
 function fStreak(id){const td=dayKey();let n=0;const ks=Object.keys(db.logs).filter(k=>db.logs[k].tazkiya).sort();if(!ks.length)return 0;
   for(let k=td;k>=ks[0]&&n<400;k=shift(k,-1)){if(Number((ans((db.logs[k]||{}).tazkiya,'f')||{})[id]||0)>0)break;n++}return n}
 function fRel(f){const keys=[vName(f),f.name].filter(Boolean);return {kb:kbItems().filter(x=>x.tags.some(s=>keys.includes(s))),nt:db.notes.filter(n=>(n.topics||[]).some(s=>keys.includes(s))).slice().reverse()}}
-async function suggestFault(id,auto){const f=db.faults.find(x=>x.id===id);if(!f)return;if(!auth){if(!auto)toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){if(!auto)toast('محتاج نت');return}
+async function suggestFault(id,auto){let f=db.faults.find(x=>x.id===id);if(!f)return;if(!auth){if(!auto)toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){if(!auto)toast('محتاج نت');return}
   view.fSug=id;if(sheetEl)paintSheet();const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),100000);
   try{const r=await afetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{},body:JSON.stringify({task:'tazkiya',virtue:f.virtue||'',fault:f.name||''})});
-    const j=await r.json().catch(()=>({}));if(!r.ok||!j.plan)throw new Error(r.status===401?'الجلسة خلصت. ادخل تاني من ⚙︎':j.error==='rate'?'استنى دقيقة وجرّب تاني':'الخدمة زحمة دلوقتي. جرّب كمان شوية');
+    const j=await r.json().catch(()=>({}));f=db.faults.find(x=>x.id===id)||f;if(!r.ok||!j.plan)throw new Error(r.status===401?'الجلسة خلصت. ادخل تاني من ⚙︎':j.error==='rate'?'استنى دقيقة وجرّب تاني':'الخدمة زحمة دلوقتي. جرّب كمان شوية');
     const P=j.plan,s=x=>String(x||'').trim();if(!f.virtue&&s(P.virtue))f.virtue=s(P.virtue);if(!f.name&&s(P.fault))f.name=s(P.fault);
     f.rules=f.rules||[];(P.rules||[]).forEach(x=>{const ra=s(x.if||x.a),rb=s(x.then||x.b);if(ra&&rb&&!f.rules.some(y=>y.a===ra))f.rules.push({id:uid('r'),a:ra,b:rb})});
     ['drill','signs','when','kaff'].forEach(k=>{if(!s(f[k])&&s(P[k]))f[k]=s(P[k])});save();toast('اقترحت عليك ✓ عدّل اللي مش مناسبك')}
