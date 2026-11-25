@@ -245,7 +245,7 @@ const jDay=(j,k=dayKey())=>diffDays(j.start,k)+1;
 const plan=k=>db.plans[k]||(db.plans[k]=[]);
 const p40done=(it,k)=>(((db.logs[k]||{})._p40)||[]).includes(it.id)||(it.link&&byId(it.link)&&['done','part'].includes(stOf(byId(it.link),k)));
 const fPct=f=>f.hist.length?f.hist[f.hist.length-1][1]:null;
-function toast(t){document.querySelectorAll('.toast').forEach(x=>x.remove());const el=document.createElement('div');el.className='toast';el.textContent=t;document.body.appendChild(el);setTimeout(()=>el.remove(),1900)}
+function toast(t){document.querySelectorAll('.toast').forEach(x=>x.remove());const el=document.createElement('div');el.className='toast';el.textContent=String(t).replace(/<[^>]*>/g,'');document.body.appendChild(el);setTimeout(()=>el.remove(),1900)}
 const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}};
 
 /* ================= metrics ================= */
