@@ -675,10 +675,11 @@ async function capRun(){const c=capOf(),notes=(($('#capText')||{}).value||c.t||'
   if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت. اللي كتبته متحفظ، كمّله لما النت يرجع');return}
   view.capBusy=true;paintSheet();const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),150000);
   try{const r=await afetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{},body:JSON.stringify({task:'organize',notes,mode:c.mode==='sum'?'sum':'tidy'})});
-    const j=await r.json().catch(()=>({}));if(!r.ok||!j.items)throw new Error(r.status===401?'الجلسة خلصت. ادخل تاني من ⚙︎':j.error==='rate'?'استنى دقيقة وجرّب تاني':'الخدمة زحمة دلوقتي. جرّب كمان شوية');
+    const j=await r.json().catch(()=>({}));if(!r.ok||!j.items)throw new Error(r.status===401?'الجلسة خلصت. ادخل تاني من ⚙︎':j.error==='rate'?'استنى دقيقة وجرّب تاني':'خدمة الذكاء المجانية زحمة دلوقتي. كلامك متحفظ، جرّب بعد شوية');
+    if(j.docFailed&&c.mode!=='sum')toast('الترتيب ما اشتغلش المرة دي، طلّعت النصوص بس. جرّب تاني بعد شوية');else if(j.itemsFailed)toast('رتّب البيان، بس ما لحقش يطلّع النصوص لوحدها');
     const sm=j.summary&&j.summary.sections&&j.summary.sections.length?[{type:'ملخص',sum:j.summary,title:j.summary.title||'ملخص البيان',text:'',confidence:'high',on:true,from:'كل ملاحظاتك'}]:[];if(sm.length)sm[0].text=capSumText(sm[0]);
     if(j.doc&&j.doc.sections&&j.doc.sections.length){const dd={type:'بيان',doc:j.doc,title:j.doc.title||'البيان',confidence:'high',on:true,from:'كل ملاحظاتك'};dd.text=docText(dd);sm.unshift(dd)}
-    c.items=[...sm,...j.items.filter(x=>x&&x.text).map(x=>({...x,type:['حديث','آية','قصة','فائدة'].includes(x.type)?x.type:'فائدة',on:x.confidence!=='low'}))];save();if(!c.items.length)toast('مالقيتش حاجة واضحة')}
+    c.items=[...sm,...(j.items||[]).filter(x=>x&&x.text).map(x=>({...x,type:['حديث','آية','قصة','فائدة'].includes(x.type)?x.type:'فائدة',on:x.confidence!=='low'}))];save();if(!c.items.length)toast('مالقيتش حاجة واضحة')}
   catch(e){toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':e.message)}finally{clearTimeout(tm);view.capBusy=false;
     if(sheetEl&&sheetRender===capR)paintSheet();else if((capOf().items||[]).length){if(!sheetEl)openCap();else toast('خلص ✓ افتح + ← التقاط من بيان')}}}
 /* ✦ صحّح وكمّل: one item, checked and completed by AI */
