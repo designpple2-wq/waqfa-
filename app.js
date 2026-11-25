@@ -656,10 +656,10 @@ const capList=c=>{const L=(db.caps||[]).filter(x=>x.id!==c.id&&(x.t||'').trim())
   return `<div class="fld"><span class="lb">بيانات قبل كده</span><div class="list">${L.slice(0,15).map(x=>`<div class="row"><button class="t" data-act="cap-pick" data-v="${x.id}" style="text-align:start"><b>${esc(x.src||'بيان')} · ${fmt(x.k,{weekday:'long',day:'numeric',month:'long'})}</b><span>${esc((x.t||'').trim().split('\n')[0].slice(0,60))}</span></button>${x.added?`<span class="badge done">اتضاف ${num(x.added)}</span>`:(x.items||[]).length?'<span class="badge part">جاهز للمراجعة</span>':''}${xbtn('cap-del',`data-v="${x.id}"`)}</div>`).join('')}</div></div>`};
 const tgtCap=()=>({key:'cap',kind:'ملاحظات من بيان',put:txt=>{const c=capOf();c.t=(c.t||'').trim()?c.t.trim()+'\n'+txt:txt;save();return '#capText'}});
 const CONF={high:['done','متأكد'],medium:['part','غالبًا'],low:['miss','اتأكد منه']};
-function openCap(){view.kbn=null;view.nd=null;openSheet(capR)}
+function openCap(){view.kbn=null;view.nd=null;view.capEdit=false;openSheet(capR)}
 function capR(){const c=capOf(),sum=c.mode==='sum';
   if(view.capBusy)return {head:`<span class="eyebrow">التقاط من بيان</span><h2 class="title">${sum?'بيلخّص':'بينظّم ويصحّح'}…</h2>`,body:`<p class="lead">${sum?'بيعمل ملخص مرتب للبيان':'بيرتّب كلامك كله في أقسام، ويصحّح الإملاء، ويكمّل الآيات والأحاديث جوّه، من غير ما يشيل حاجة'}، وبيطلّع كل حديث وآية وقصة لوحدها.</p><p class="small muted">ممكن ياخد دقيقة أو اتنين. تقدر تقفل، هيكمّل لوحده ويفتحلك النتيجة لما يخلص.</p>`,foot:'<button class="btn ghost" data-act="close-sheet">اقفل وهو يكمّل</button>'};
-  if(c.items&&c.items.length)return {head:`<span class="eyebrow">راجع قبل ما تضيف</span><h2 class="title">لقيت ${num(c.items.length)}</h2>`,
+  if(c.items&&c.items.length&&!view.capEdit)return {head:`<span class="eyebrow">راجع قبل ما تضيف</span><h2 class="title">لقيت ${num(c.items.length)}</h2>`,
     body:`<p class="small muted">علّم على اللي متأكد منه. اللي مكتوب عليه "اتأكد منه" راجعه في كتاب الأول.</p>${c.items.map((x,i)=>{const cf=CONF[x.confidence]||CONF.low;return `<section class="capi ${x.on?'on':''}">
       <div class="ch"><button class="pk-ck" data-act="cap-on" data-i="${i}" aria-label="اختار">${x.on?ico('ok'):''}</button><span class="badge ${x.sum||x.doc?'ink':cf[0]}">${x.sum?'الملخص':x.doc?'البيان مرتّب':cf[1]}</span>
        <select class="inp sm" data-act="cap-type" data-i="${i}">${[...new Set([...ZTYPES(),x.type])].map(o=>`<option ${o===x.type?'selected':''}>${esc(o)}</option>`).join('')}</select></div>
@@ -673,11 +673,11 @@ function capR(){const c=capOf(),sum=c.mode==='sum';
     <p class="small muted">${sum?'هيطلّع ملخص مختصر للبيان، والنصوص لوحدها.':'كلامك كله يفضل زي ما هو، بس مترتّب ومتصحّح، والآيات والأحاديث كاملة.'}</p>
     <textarea class="inp" id="capText" data-act="cap-text" style="min-height:220px" placeholder="اكتب زي ما تحب، من غير ترتيب&#10;نقط البيان، أو أطراف أحاديث وآيات&#10;مثلًا: إنما الأعمال&#10;ومن يتق الله يجعل له">${esc(c.t||'')}</textarea>
     <div class="kbt"><span class="small muted">أو سجّل بصوتك</span>${toolsHTML('cap','data-capm="1"')}</div>
-    ${(c.t||'').trim()?'<button class="link" data-act="cap-new" style="align-self:flex-start">+ بيان جديد</button>':''}${capList(c)}`,
+    ${(c.items||[]).length?`<button class="link" data-act="cap-res" style="align-self:flex-start">← ارجع للنتيجة (${num(c.items.length)})</button>`:''}${(c.t||'').trim()?'<button class="link" data-act="cap-new" style="align-self:flex-start">+ بيان جديد</button>':''}${capList(c)}`,
    foot:`<button class="btn" data-act="cap-run">${ico('spark')} ${sum?'لخّص':'نظّم وصحّح'}</button>`}}
 async function capRun(){const c=capOf(),notes=(($('#capText')||{}).value||c.t||'').trim();c.t=notes;save();if(!notes){toast('اكتب حاجة الأول');return}
   if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت. اللي كتبته متحفظ، كمّله لما النت يرجع');return}
-  view.capBusy=true;paintSheet();const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),150000);
+  view.capBusy=true;view.capEdit=false;paintSheet();const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),150000);
   try{const r=await afetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{},body:JSON.stringify({task:'organize',notes,mode:c.mode==='sum'?'sum':'tidy'})});
     const j=await r.json().catch(()=>({}));if(!r.ok||!j.items)throw new Error(r.status===401?'الجلسة خلصت. ادخل تاني من ⚙︎':j.error==='rate'?'استنى دقيقة وجرّب تاني':'خدمة الذكاء المجانية زحمة دلوقتي. كلامك متحفظ، جرّب بعد شوية');
     if(j.docFailed&&c.mode!=='sum')toast('الترتيب ما اشتغلش المرة دي، طلّعت النصوص بس. جرّب تاني بعد شوية');else if(j.itemsFailed)toast('رتّب البيان، بس ما لحقش يطلّع النصوص لوحدها');
@@ -1308,15 +1308,16 @@ document.addEventListener('click',ev=>{
   if(a==='c-leave'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟ الحاجات اللي من غيرك هتختفي عندك';return}(async()=>{try{await rest(`circle_members?circle_id=eq.${db.circle.id}&user_id=eq.${auth.uid}`,{method:'DELETE'})}catch(e){}db.circle=null;db.shared={};db.cmeta=null;save();render()})();return}
   if(a==='cap-open'){dropDraft();return openCap()}
   if(a==='cap-run')return capRun();
-  if(a==='cap-new'){const t=$('#capText');if(t)capOf().t=t.value;db.capCur=null;capOf();save();return paintSheet()}
-  if(a==='cap-pick'){const t=$('#capText');if(t)capOf().t=t.value;db.capCur=b.dataset.v;save();return paintSheet()}
+  if(a==='cap-new'){view.capEdit=false;const t=$('#capText');if(t)capOf().t=t.value;db.capCur=null;capOf();save();return paintSheet()}
+  if(a==='cap-pick'){view.capEdit=false;const t=$('#capText');if(t)capOf().t=t.value;db.capCur=b.dataset.v;save();return paintSheet()}
   if(a==='cap-del'){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}db.caps=db.caps.filter(x=>x.id!==b.dataset.v);save();return paintSheet()}
   if(a==='cap-mode'){const c=capOf(),t=$('#capText');if(t)c.t=t.value;c.mode=b.dataset.v;save();return paintSheet()}
   if(a==='fix-run')return fixRun(v);
   if(a==='fix-use')return fixUse();
   if(a==='fix-x'){view.fix=null;return paintSheet()}
   if(a==='cap-on'){const x=capOf().items[b.dataset.i];x.on=!x.on;save();return paintSheet()}
-  if(a==='cap-back'){capOf().items=null;save();return paintSheet()}
+  if(a==='cap-back'){view.capEdit=true;return paintSheet()}
+  if(a==='cap-res'){view.capEdit=false;return paintSheet()}
   if(a==='cap-add')return capAdd();
   if(a==='quiz'){closeSheet(true);return openQuiz(b.dataset.key||'')}
   if(a==='qz-rev'){view.qz.shown[b.dataset.i]=1;return paintSheet()}
