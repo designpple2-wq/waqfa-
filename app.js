@@ -630,7 +630,7 @@ function renderIlm(){const v=view.ilm||'kb',n=kbItems().length+db.notes.length;
    +(v==='notes'?renderNotes():v==='tags'?renderTags():renderKB())}
 /* ---------- عنصر واحد من بنك المعرفة ---------- */
 const KBT={hadith:'حديث',aya:'آية',qissa:'قصة',sum:'ملخص'},KBT_R={'حديث':'hadith','آية':'aya','قصة':'qissa','ملخص':'sum'},KBTITLE={'حديث':'الحديث','آية':'الآية','قصة':'القصة','ملخص':'الملخص'};
-const ZTYPES=()=>db.kbTypes&&db.kbTypes.length?db.kbTypes:['حديث','آية','قصة','ملخص','فائدة'];
+const ZTYPES=()=>db.kbTypes&&db.kbTypes.length?db.kbTypes:['حديث','آية','قصة','بيان','ملخص','فائدة'];
 const addSeg=(act,cur)=>APP==='zad'?`<div class="chips tsel">${ZTYPES().map(x=>`<button class="chip" data-act="kbn-type" data-v="${esc(x)}" aria-pressed="${(view.kbn||{}).type===x}">${esc(x)}</button>`).join('')}<button class="chip" data-act="kbt-new" aria-label="نوع جديد">+ نوع</button></div>`
   :`<div class="seg seg5">${[['note','فائدة'],['hadith','حديث'],['aya','آية'],['qissa','قصة'],['plan','خطوة']].map(([x,l])=>`<button data-act="${act}" data-v="${x}" aria-pressed="${cur===x}">${l}</button>`).join('')}</div>`;
 function kbRef(r){if(r.c){const o=(db.shared||{})[r.c];return {o,save:()=>{if(o){o._dirty=1;save()}},del:()=>{if(o){o.deleted=true;o._dirty=1;save()}}}}if(r.s){const o=(db.kb||[]).find(x=>x.id===r.s);return {o,save:()=>save(),del:()=>{db.kb=db.kb.filter(x=>x.id!==r.s);save()}}}
@@ -652,11 +652,12 @@ function openKBItem(r){view.kbi=r;view.fix=null;view.kbiTag=false;view.kbn=null;
 const capOf=()=>db.cap||(db.cap={t:'',src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():'',k:dayKey(),items:null});
 const tgtCap=()=>({key:'cap',kind:'ملاحظات من بيان',put:txt=>{const c=capOf();c.t=(c.t||'').trim()?c.t.trim()+'\n'+txt:txt;save();return '#capText'}});
 const CONF={high:['done','متأكد'],medium:['part','غالبًا'],low:['miss','اتأكد منه']};
-function openCap(){view.kbn=null;view.nd=null;openSheet(()=>{const c=capOf();
-  if(view.capBusy)return {head:'<span class="eyebrow">التقاط من بيان</span><h2 class="title">بينظّم ويكمّل…</h2>',body:'<p class="lead">بيعمل ملخص مرتب، ويطلّع الأحاديث والآيات والقصص بنصها الصحيح ومصدرها. ممكن ياخد دقيقة.</p>',foot:''};
+function openCap(){view.kbn=null;view.nd=null;openSheet(capR)}
+function capR(){const c=capOf(),sum=c.mode==='sum';
+  if(view.capBusy)return {head:`<span class="eyebrow">التقاط من بيان</span><h2 class="title">${sum?'بيلخّص':'بينظّم ويصحّح'}…</h2>`,body:`<p class="lead">${sum?'بيعمل ملخص مرتب للبيان':'بيرتّب كلامك كله في أقسام، ويصحّح الإملاء، ويكمّل الآيات والأحاديث جوّه، من غير ما يشيل حاجة'}، وبيطلّع كل حديث وآية وقصة لوحدها.</p><p class="small muted">ممكن ياخد دقيقة أو اتنين. تقدر تقفل، هيكمّل لوحده ويفتحلك النتيجة لما يخلص.</p>`,foot:'<button class="btn ghost" data-act="close-sheet">اقفل وهو يكمّل</button>'};
   if(c.items&&c.items.length)return {head:`<span class="eyebrow">راجع قبل ما تضيف</span><h2 class="title">لقيت ${num(c.items.length)}</h2>`,
     body:`<p class="small muted">علّم على اللي متأكد منه. اللي مكتوب عليه "اتأكد منه" راجعه في كتاب الأول.</p>${c.items.map((x,i)=>{const cf=CONF[x.confidence]||CONF.low;return `<section class="capi ${x.on?'on':''}">
-      <div class="ch"><button class="pk-ck" data-act="cap-on" data-i="${i}" aria-label="اختار">${x.on?ico('ok'):''}</button><span class="badge ${x.sum?'ink':cf[0]}">${x.sum?'الملخص':cf[1]}</span>
+      <div class="ch"><button class="pk-ck" data-act="cap-on" data-i="${i}" aria-label="اختار">${x.on?ico('ok'):''}</button><span class="badge ${x.sum||x.doc?'ink':cf[0]}">${x.sum?'الملخص':x.doc?'البيان مرتّب':cf[1]}</span>
        <select class="inp sm" data-act="cap-type" data-i="${i}">${[...new Set([...ZTYPES(),x.type])].map(o=>`<option ${o===x.type?'selected':''}>${esc(o)}</option>`).join('')}</select></div>
       <input class="inp ti" data-act="cap-ti" data-i="${i}" value="${esc(x.title||'')}" placeholder="العنوان"><textarea class="inp" data-act="cap-txt" data-i="${i}">${esc(x.text||'')}</textarea>
       ${x.source?`<span class="small">${esc(x.source)}</span>`:''}${x.note?`<span class="small" style="color:var(--alert)">${esc(x.note)}</span>`:''}
@@ -664,17 +665,21 @@ function openCap(){view.kbn=null;view.nd=null;openSheet(()=>{const c=capOf();
     foot:`<button class="btn ghost" data-act="cap-back">رجوع</button><button class="btn" data-act="cap-add">ضيف (${num(c.items.filter(x=>x.on).length)})</button>`};
   return {head:'<span class="eyebrow">التقاط من بيان</span><h2 class="title">اكتب اللي تلحقه</h2>',
    body:`<div class="fld"><span class="lb">البيان</span>${srcSel('cap-src',c.src)}</div>
+    <div class="seg"><button data-act="cap-mode" data-v="tidy" aria-pressed="${!sum}">نظّم وصحّح وكمّل</button><button data-act="cap-mode" data-v="sum" aria-pressed="${sum}">لخّص</button></div>
+    <p class="small muted">${sum?'هيطلّع ملخص مختصر للبيان، والنصوص لوحدها.':'كلامك كله يفضل زي ما هو، بس مترتّب ومتصحّح، والآيات والأحاديث كاملة.'}</p>
     <textarea class="inp" id="capText" data-act="cap-text" style="min-height:220px" placeholder="اكتب زي ما تحب، من غير ترتيب&#10;نقط البيان، أو أطراف أحاديث وآيات&#10;مثلًا: إنما الأعمال&#10;ومن يتق الله يجعل له">${esc(c.t||'')}</textarea>
     <div class="kbt"><span class="small muted">أو سجّل بصوتك</span>${toolsHTML('cap','data-capm="1"')}</div>`,
-   foot:`<button class="btn" data-act="cap-run">${ico('spark')} نظّم وكمّل</button>`}})}
+   foot:`<button class="btn" data-act="cap-run">${ico('spark')} ${sum?'لخّص':'نظّم وصحّح'}</button>`}}
 async function capRun(){const c=capOf(),notes=(($('#capText')||{}).value||c.t||'').trim();c.t=notes;save();if(!notes){toast('اكتب حاجة الأول');return}
   if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت. اللي كتبته متحفظ، كمّله لما النت يرجع');return}
   view.capBusy=true;paintSheet();const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),150000);
-  try{const r=await afetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{},body:JSON.stringify({task:'organize',notes})});
+  try{const r=await afetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{},body:JSON.stringify({task:'organize',notes,mode:c.mode==='sum'?'sum':'tidy'})});
     const j=await r.json().catch(()=>({}));if(!r.ok||!j.items)throw new Error(r.status===401?'الجلسة خلصت. ادخل تاني من ⚙︎':j.error==='rate'?'استنى دقيقة وجرّب تاني':'الخدمة زحمة دلوقتي. جرّب كمان شوية');
     const sm=j.summary&&j.summary.sections&&j.summary.sections.length?[{type:'ملخص',sum:j.summary,title:j.summary.title||'ملخص البيان',text:'',confidence:'high',on:true,from:'كل ملاحظاتك'}]:[];if(sm.length)sm[0].text=capSumText(sm[0]);
+    if(j.doc&&j.doc.sections&&j.doc.sections.length){const dd={type:'بيان',doc:j.doc,title:j.doc.title||'البيان',confidence:'high',on:true,from:'كل ملاحظاتك'};dd.text=docText(dd);sm.unshift(dd)}
     c.items=[...sm,...j.items.filter(x=>x&&x.text).map(x=>({...x,type:['حديث','آية','قصة','فائدة'].includes(x.type)?x.type:'فائدة',on:x.confidence!=='low'}))];save();if(!c.items.length)toast('مالقيتش حاجة واضحة')}
-  catch(e){toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':e.message)}finally{clearTimeout(tm);view.capBusy=false;if(sheetEl)paintSheet()}}
+  catch(e){toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':e.message)}finally{clearTimeout(tm);view.capBusy=false;
+    if(sheetEl&&sheetRender===capR)paintSheet();else if((capOf().items||[]).length){if(!sheetEl)openCap();else toast('خلص ✓ افتح + ← التقاط من بيان')}}}
 /* ✦ صحّح وكمّل: one item, checked and completed by AI */
 async function fixRun(where){const txt=where==='kbn'?(($('#kbnText')||{}).value||'').trim():((kbRef(view.kbi).o||{}).t||'').trim();
   if(!txt){toast('اكتب حاجة الأول');return}if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
@@ -692,9 +697,14 @@ function fixUse(){const F=view.fix,x=F&&F.res;if(!x)return;const body=(x.text||'
   if(F.where==='kbn'){const s=view.kbn;s.t=body+src;s.h=h;if(x.title)s.ti=x.title;if(['حديث','آية','قصة','فائدة'].includes(x.type)&&ZTYPES().includes(x.type))s.type=x.type;if(x.tags&&x.tags.length)s.tags=[...new Set([...(s.tags||[]),...x.tags.slice(0,2)])];keepDraft()}
   else{const r=kbRef(view.kbi);if(r.o){r.o.t=body+src;r.o.h=h;if(x.title&&!r.o.ti)r.o.ti=x.title;r.save()}}
   view.fix=null;paintSheet();toast('اتعدّل ✓')}
+const docText=x=>x.doc.sections.map(s=>(s.heading||'')+'\n'+(s.lines||[]).join('\n')).join('\n\n');
+const docHTML=x=>x.doc.sections.map(s=>{let h=`<h3>${esc(s.heading||'')}</h3>`,ul=[];const fl=()=>{if(ul.length){h+='<ul>'+ul.map(l=>`<li>${esc(l)}</li>`).join('')+'</ul>';ul=[]}};
+  (s.lines||[]).forEach(l=>{l=String(l).trim();if(!l)return;if(/^[•\-–]\s*/.test(l)){ul.push(l.replace(/^[•\-–]\s*/,''));return}fl();h+=/^[﴿«]/.test(l)?`<blockquote>${esc(l)}</blockquote>`:`<div>${esc(l)}</div>`});fl();return h}).join('');
 const capSumText=x=>x.sum.sections.map(s=>(s.heading||'')+'\n'+(s.points||[]).map(p=>'• '+p).join('\n')).join('\n\n');
 function capAdd(){const c=capOf(),sel=(c.items||[]).filter(x=>x.on);if(!sel.length){toast('علّم على حاجة الأول');return}db.kb=db.kb||[];const k=dayKey();
-  sel.forEach(x=>{if(x.sum&&x.text===capSumText(x)){db.kb.push({id:uid('kb'),k,type:'ملخص',ti:x.title,t:x.text,h:x.sum.sections.map(s=>`<h3>${esc(s.heading||'')}</h3><ul>${(s.points||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>`).join(''),tags:[],src:c.src||''});return}
+  sel.forEach(x=>{if(x.type&&db.kbTypes&&db.kbTypes.length&&!db.kbTypes.includes(x.type))db.kbTypes.push(x.type);
+    if(x.doc&&x.text===docText(x)){db.kb.push({id:uid('kb'),k,type:x.type||'بيان',ti:x.title,t:x.text,h:docHTML(x),tags:[],src:c.src||''});return}
+    if(x.sum&&x.text===capSumText(x)){db.kb.push({id:uid('kb'),k,type:'ملخص',ti:x.title,t:x.text,h:x.sum.sections.map(s=>`<h3>${esc(s.heading||'')}</h3><ul>${(s.points||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>`).join(''),tags:[],src:c.src||''});return}
     const tx=(x.text||'').trim()+(x.source?`\n(${x.source})`:'');db.kb.push({id:uid('kb'),k,type:x.type,ti:(x.title||'').trim()||(x.text||'').trim().split(/\s+/).slice(0,6).join(' '),t:tx,
     h:esc((x.text||'').trim()).replace(/\n/g,'<br>')+(x.source?`<br><span style="color: rgb(90, 103, 94);">(${esc(x.source)})</span>`:''),tags:(x.tags||[]).slice(0,3),src:c.src||''})});
   db.cap=null;save();closeSheet();toast(`اتضاف ${num(sel.length)} لبنك المعرفة ✓`)}
@@ -1288,6 +1298,7 @@ document.addEventListener('click',ev=>{
   if(a==='c-leave'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟ الحاجات اللي من غيرك هتختفي عندك';return}(async()=>{try{await rest(`circle_members?circle_id=eq.${db.circle.id}&user_id=eq.${auth.uid}`,{method:'DELETE'})}catch(e){}db.circle=null;db.shared={};db.cmeta=null;save();render()})();return}
   if(a==='cap-open'){dropDraft();return openCap()}
   if(a==='cap-run')return capRun();
+  if(a==='cap-mode'){const c=capOf(),t=$('#capText');if(t)c.t=t.value;c.mode=b.dataset.v;save();return paintSheet()}
   if(a==='fix-run')return fixRun(v);
   if(a==='fix-use')return fixUse();
   if(a==='fix-x'){view.fix=null;return paintSheet()}
