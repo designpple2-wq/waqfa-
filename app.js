@@ -862,9 +862,9 @@ async function circleSync(){if(!auth||!db.circle||cBusy||!navigator.onLine)retur
     const got=await rest(`circle_items?circle_id=eq.${C.id}&updated_at=gt.${encodeURIComponent(M.pull)}&select=id,author_id,author_email,data,deleted,updated_at&order=updated_at.asc&limit=2000`)||[];
     db.shared=db.shared||{};let ch=false;
     got.forEach(r=>{if(r.updated_at>M.pull)M.pull=r.updated_at;
-      if(r.id.startsWith(P)){const loc=mine[r.id];if(!r.deleted&&loc&&JSON.stringify(r.data)!==M.h[r.id]&&r.id.slice(P.length).startsWith('s:')){const o=(db.kb||[]).find(x=>'s:'+x.id===r.id.slice(P.length));if(o){Object.assign(o,{t:r.data.t,h:r.data.h,tags:r.data.tags});M.h[r.id]=JSON.stringify(myLibrary()[r.id]);ch=true}}return}
+      if(r.id.startsWith(P)){const loc=mine[r.id];if(!r.deleted&&loc&&JSON.stringify(r.data)!==M.h[r.id]&&r.id.slice(P.length).startsWith('s:')){const o=(db.kb||[]).find(x=>'s:'+x.id===r.id.slice(P.length));if(o){Object.assign(o,{t:r.data.t,h:r.data.h,tags:r.data.tags,ti:r.data.ti||o.ti});M.h[r.id]=JSON.stringify(myLibrary()[r.id]);ch=true}}return}
       if(r.deleted){if(db.shared[r.id]){delete db.shared[r.id];ch=true}}else{db.shared[r.id]={...r.data,by:(r.author_email||'').split('@')[0],byId:r.author_id};ch=true}});
-    if(rows.length||got.length)save();if(ch&&!sheetEl)render()}
+    if(ch)save();else if(rows.length||got.length)saveLocal();if(ch&&!sheetEl)render()}
   catch(e){console.warn('circle',e)}finally{cBusy=false}}
 async function circleCall(fn,arg){const r=await afetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{},body:JSON.stringify(arg)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.message||'HTTP '+r.status);return j}
 async function circleMembers(){if(!db.circle||!auth)return;try{view.cmem=await rest(`circle_members?circle_id=eq.${db.circle.id}&select=email,user_id,joined_at&order=joined_at`);if(view.sub==='settings')render()}catch(e){}}
