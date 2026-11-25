@@ -173,7 +173,10 @@ function normNotes(d){if((d.kb||[]).some(x=>x.type==='فائدة')){d.kbr=d.kbr|
 function load(){try{const s=localStorage.getItem(KEY);if(s)return migrate(JSON.parse(s))}catch(e){}return blank()}
 function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
 let pushT=null;
-function save(){db.meta=db.meta||{};db.meta.dirty=true;db.meta.editAt=Date.now();saveLocal();if(auth){clearTimeout(pushT);pushT=setTimeout(syncNow,2500)}paintCloud()}
+const MKEYS=['notes','p40','journeys','people','duas','faults','deeds','kb','cols','caps'];
+function idsOf(d){const S=new Set();MKEYS.forEach(k=>(d[k]||[]).forEach(o=>o&&o.id&&S.add(o.id)));(d.gsecs||[]).forEach(g=>{S.add(g.id);(g.items||[]).forEach(o=>o&&o.id&&S.add(o.id))});Object.values(d.goals||{}).forEach(a=>(a||[]).forEach(o=>o&&o.id&&S.add(o.id)));return S}
+let lastIds=null;const markGone=()=>{const now=idsOf(db);if(lastIds){db.gone=db.gone||{};const t=Date.now();lastIds.forEach(id=>{if(!now.has(id))db.gone[id]=t})}lastIds=now};
+function save(){db.meta=db.meta||{};markGone();db.meta.dirty=true;db.meta.editAt=Date.now();saveLocal();if(auth){clearTimeout(pushT);pushT=setTimeout(syncNow,2500)}paintCloud()}
 
 /* ================= dates & prayer times ================= */
 const pad=n=>String(n).padStart(2,'0');
@@ -202,7 +205,7 @@ const city=()=>db.settings.useLoc&&db.settings.loc?['loc','موقعك',db.settin
 const timesFor=k=>{const c=city();return prayerTimes(fromKey(k),c[2],c[3])};
 
 /* ================= model helpers ================= */
-db=load();if(db._mg){delete db._mg;setTimeout(()=>save(),800)}
+db=load();lastIds=idsOf(db);if(db._mg){delete db._mg;setTimeout(()=>save(),800)}
 let view={tab:APP==='zad'?'zhome':'today',day:dayKey(),filter:'all',step:0,zad:'goals',ntag:'',nq:'',month:dayKey().slice(0,7),ready:0};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -317,7 +320,7 @@ function openSheet(renderFn,opts={}){closeSheet(true);sheetRender=renderFn;const
   sh.addEventListener('touchmove',e=>{if(y0==null)return;const d=e.touches[0].clientY-y0,dx=Math.abs(e.touches[0].clientX-x0);if(!drag){if(d>8&&d>dx){drag=true;sh.style.transition='none'}else if(d<-4||dx>8){y0=null;return}else return}
     dy=Math.max(0,d);sh.style.transform=`translateY(${dy}px)`;s.style.background=`rgba(27,27,27,${Math.max(.05,.4-dy/900)})`;if(e.cancelable)e.preventDefault()},{passive:false});
   sh.addEventListener('touchend',()=>{if(!drag){y0=null;return}sh.style.transition='transform .25s var(--ease)';if(dy>110){sh.style.transform='translateY(100%)';setTimeout(()=>closeSheet(),180)}else{sh.style.transform='';s.style.background=''}y0=null;drag=false});document.body.classList.add('lock');sheetEl=s;paintSheet();const b0=s.querySelector('.sh-b');setTimeout(()=>fitTA(b0),60);if(document.fonts)document.fonts.ready.then(()=>fitTA(b0))}
-const scrollers=el=>{const L=[];for(let p=el.parentElement;p;p=p.parentElement)if(p.scrollHeight>p.clientHeight+1)L.push([p,p.scrollTop]);L.push([document.scrollingElement,document.scrollingElement.scrollTop]);return L};
+const scrollers=el=>{const L=[];for(let p=el.parentElement;p;p=p.parentElement)if(p.scrollHeight>p.clientHeight+1)L.push([p,p.scrollTop]);const se=document.scrollingElement||document.documentElement;if(se)L.push([se,se.scrollTop]);return L};
 const fitTA=(root=document)=>root.querySelectorAll('textarea.inp').forEach(x=>{const S=scrollers(x),h0=x.offsetHeight;x.style.height=h0+'px';x.style.height='0px';const want=Math.max(x.scrollHeight+2,parseFloat(getComputedStyle(x).minHeight)||0);x.style.height=want+'px';S.forEach(([p,t])=>{if(p)p.scrollTop=t});
   if(x===document.activeElement&&want>h0&&x.selectionEnd>=x.value.length-2){const r=x.getBoundingClientRect(),vh=window.visualViewport?window.visualViewport.height:innerHeight,sp=S[0]&&S[0][0];if(sp&&r.bottom>vh-12)sp.scrollTop+=r.bottom-vh+40}});
 function paintSheet(keepScroll=true){if(!sheetEl)return;const r=sheetRender();const b=sheetEl.querySelector('.sh-b'),st=b.scrollTop;
@@ -652,8 +655,10 @@ function openKBItem(r){view.kbi=r;view.fix=null;view.kbiTag=false;view.kbn=null;
     <div class="fld"><span class="lb">المصدر</span>${r.c?`<span>${esc(o.by||'')} · ${esc(o.src||'الحلقة')}</span>`:r.s?`<span>${o.src?esc(o.src):'اتضاف من زرار +'}</span>`:`<button class="link" data-act="kbi-day" style="align-self:flex-start">التعليم الانفرادي · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})} ←</button>`}</div>`,
    foot:`<button class="btn danger icon" data-act="kbi-del" aria-label="امسح">${ico('trash')}</button><button class="btn" data-act="close-sheet">تمام</button>`}})}
 /* ===== التقاط من بيان: write fragments, AI completes them, you approve ===== */
-function capOf(){db.caps=db.caps||[];if(db.cap){if(db.cap.t||db.cap.items){db.cap.id=db.cap.id||uid('cap');db.caps.unshift(db.cap);db.capCur=db.cap.id}db.cap=null}
-  let c=db.caps.find(x=>x.id===db.capCur);if(!c){db.caps=db.caps.filter(x=>(x.t||'').trim()||(x.items||[]).length);c={id:uid('cap'),t:'',src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():'',k:dayKey(),items:null};db.caps.unshift(c);db.capCur=c.id}return c}
+const CCK='waqfa.capcur';let capCurV=(()=>{try{return localStorage.getItem(CCK)}catch(e){return null}})();
+const setCapCur=v=>{capCurV=v;try{v?localStorage.setItem(CCK,v):localStorage.removeItem(CCK)}catch(e){}};
+function capOf(){db.caps=db.caps||[];if(db.cap){const t=(db.cap.t||'').trim();if((t||db.cap.items)&&!(db.gone||{}).caplegacy&&!db.caps.some(x=>x.id==='caplegacy'||((x.t||'').trim()===t&&t))){db.cap.id='caplegacy';db.caps.push(db.cap);if(!db.caps.some(x=>x.id===capCurV))setCapCur('caplegacy')}db.cap=null}
+  let c=db.caps.find(x=>x.id===capCurV);if(!c){db.caps=db.caps.filter(x=>(x.t||'').trim()||(x.items||[]).length);c={id:uid('cap'),t:'',src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():'',k:dayKey(),items:null};db.caps.unshift(c);setCapCur(c.id)}return c}
 const capList=c=>{const L=(db.caps||[]).filter(x=>x.id!==c.id&&(x.t||'').trim());if(!L.length)return '';
   return `<div class="fld"><span class="lb">بيانات قبل كده</span><div class="list">${L.slice(0,15).map(x=>`<div class="row"><button class="t" data-act="cap-pick" data-v="${x.id}" style="text-align:start"><b>${esc(x.src||'بيان')} · ${fmt(x.k,{weekday:'long',day:'numeric',month:'long'})}</b><span>${esc((x.t||'').trim().split('\n')[0].slice(0,60))}</span></button>${x.added?`<span class="badge done">اتضاف ${num(x.added)}</span>`:(x.items||[]).length?'<span class="badge part">جاهز للمراجعة</span>':''}${xbtn('cap-del',`data-v="${x.id}"`)}</div>`).join('')}</div></div>`};
 const tgtCap=()=>({key:'cap',kind:'ملاحظات من بيان',put:txt=>{const c=capOf();c.t=(c.t||'').trim()?c.t.trim()+'\n'+txt:txt;save();return '#capText'}});
@@ -662,7 +667,7 @@ function openCap(){view.kbn=null;view.nd=null;view.capEdit=false;openSheet(capR)
 function capR(){const c=capOf(),sum=c.mode==='sum';
   if(view.capBusy)return {head:`<span class="eyebrow">التقاط من بيان</span><h2 class="title">${sum?'بيلخّص':'بينظّم ويصحّح'}…</h2>`,body:`<p class="lead">${sum?'بيعمل ملخص مرتب للبيان':'بيرتّب كلامك كله في أقسام، ويصحّح الإملاء، ويكمّل الآيات والأحاديث جوّه، من غير ما يشيل حاجة'}، وبيطلّع كل حديث وآية وقصة لوحدها.</p><p class="small muted">ممكن ياخد دقيقة أو اتنين. تقدر تقفل، هيكمّل لوحده ويفتحلك النتيجة لما يخلص.</p>`,foot:'<button class="btn ghost" data-act="close-sheet">اقفل وهو يكمّل</button>'};
   if(c.items&&c.items.length&&!view.capEdit)return {head:`<span class="eyebrow">راجع قبل ما تضيف</span><h2 class="title">لقيت ${num(c.items.length)}</h2>`,
-    body:`<p class="small muted">علّم على اللي متأكد منه. اللي مكتوب عليه "اتأكد منه" راجعه في كتاب الأول.</p>${c.items.map((x,i)=>{const cf=CONF[x.confidence]||CONF.low;return `<section class="capi ${x.on?'on':''}">
+    body:`<p class="small muted">علّم على اللي متأكد منه. اللي مكتوب عليه "اتأكد منه" راجعه في كتاب الأول.</p>${c.itBusy?'<p class="notice">بيطلّع كل حديث وآية وقصة لوحدها… تقدر تضيف البيان دلوقتي أو تستنى.</p>':c.items.every(x=>x.doc||x.sum)?'<button class="link" data-act="cap-items" style="align-self:flex-start">✦ طلّع الأحاديث والآيات لوحدها</button>':''}${c.items.map((x,i)=>{const cf=CONF[x.confidence]||CONF.low;return `<section class="capi ${x.on?'on':''}">
       <div class="ch"><button class="pk-ck" data-act="cap-on" data-i="${i}" aria-label="اختار">${x.on?ico('ok'):''}</button><span class="badge ${x.sum||x.doc?'ink':cf[0]}">${x.sum?'الملخص':x.doc?'البيان مرتّب':cf[1]}</span>
        <select class="inp sm" data-act="cap-type" data-i="${i}">${[...new Set([...ZTYPES(),x.type])].map(o=>`<option ${o===x.type?'selected':''}>${esc(o)}</option>`).join('')}</select></div>
       <input class="inp ti" data-act="cap-ti" data-i="${i}" value="${esc(x.title||'')}" placeholder="العنوان"><textarea class="inp" data-act="cap-txt" data-i="${i}">${esc(x.text||'')}</textarea>
@@ -682,13 +687,19 @@ async function capRun(){const c=capOf(),notes=(($('#capText')||{}).value||c.t||'
   view.capBusy=true;view.capEdit=false;paintSheet();const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),150000);
   try{const r=await afetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{},body:JSON.stringify({task:'organize',notes,mode:c.mode==='sum'?'sum':'tidy'})});
     const j=await r.json().catch(()=>({}));if(!r.ok||!j.items)throw new Error(r.status===401?'الجلسة خلصت. ادخل تاني من ⚙︎':j.error==='rate'?'استنى دقيقة وجرّب تاني':'خدمة الذكاء المجانية زحمة دلوقتي. كلامك متحفظ، جرّب بعد شوية');
-    if(j.docFailed&&c.mode!=='sum')toast('الترتيب ما اشتغلش المرة دي، طلّعت النصوص بس. جرّب تاني بعد شوية');else if(j.itemsFailed)toast('رتّب البيان، بس ما لحقش يطلّع النصوص لوحدها');
+    if(j.docFailed&&c.mode!=='sum')toast('الترتيب ما اشتغلش المرة دي، طلّعت النصوص بس. جرّب تاني بعد شوية');
     const sm=j.summary&&j.summary.sections&&j.summary.sections.length?[{type:'ملخص',sum:j.summary,title:j.summary.title||'ملخص البيان',text:'',confidence:'high',on:true,from:'كل ملاحظاتك'}]:[];if(sm.length)sm[0].text=capSumText(sm[0]);
     if(j.doc&&j.doc.sections&&j.doc.sections.length){const dd={type:'بيان',doc:j.doc,title:j.doc.title||'البيان',confidence:'high',on:true,from:'كل ملاحظاتك'};dd.text=docText(dd);sm.unshift(dd)}
     const cc=(db.caps||[]).find(x=>x.id===c.id);if(cc&&cc!==c){Object.assign(c,{...cc,items:c.items});db.caps[db.caps.indexOf(cc)]=c}else if(!cc){db.caps=db.caps||[];db.caps.unshift(c)}
-    c.items=[...sm,...(j.items||[]).filter(x=>x&&x.text).map(x=>({...x,type:['حديث','آية','قصة','فائدة'].includes(x.type)?x.type:'فائدة',on:x.confidence!=='low'}))];save();if(!c.items.length)toast('مالقيتش حاجة واضحة')}
+    c.items=[...sm,...(j.items||[]).filter(x=>x&&x.text).map(x=>({...x,type:['حديث','آية','قصة','فائدة'].includes(x.type)?x.type:'فائدة',on:x.confidence!=='low'}))];save();if(!c.items.length)toast('مالقيتش حاجة واضحة');else if(j.itemsFailed)setTimeout(()=>capItems(c.id,notes),50)}
   catch(e){toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':e.message)}finally{clearTimeout(tm);view.capBusy=false;
-    if(sheetEl&&sheetRender===capR)paintSheet();else if((c.items||[]).length){if(!sheetEl){db.capCur=c.id;openCap()}else toast('خلص ✓ افتح + ← التقاط من بيان')}}}
+    if(sheetEl&&sheetRender===capR)paintSheet();else if((c.items||[]).length){if(!sheetEl){setCapCur(c.id);openCap()}else toast('خلص ✓ افتح + ← التقاط من بيان')}}}
+async function capItems(id,notes){const live=()=>(db.caps||[]).find(x=>x.id===id);let c=live();if(!c||c.itBusy)return;notes=notes||c.t;c.itBusy=true;bgPaint();
+  try{const r=await afetch(SB+'/functions/v1/ocr',{method:'POST',headers:{},body:JSON.stringify({task:'organize',part:'items',notes})});const j=await r.json().catch(()=>({}));c=live();if(!c)return;
+    if(!r.ok||!j.items){toast('ما لحقش يطلّع النصوص. دوس "طلّع الأحاديث" تاني بعد شوية');return}
+    const have=new Set((c.items||[]).map(x=>(x.text||'').slice(0,40)));const add=j.items.filter(x=>x&&x.text&&!have.has(x.text.slice(0,40))).map(x=>({...x,type:['حديث','آية','قصة'].includes(x.type)?x.type:'قصة',on:x.confidence!=='low'}));
+    c.items=[...(c.items||[]),...add];toast(add.length?`طلّع ${add.length} لوحدهم ✓`:'مالقيتش أحاديث أو آيات')}
+  catch(e){toast('ما لحقش يطلّع النصوص. جرّب تاني بعد شوية')}finally{const x=live();if(x)delete x.itBusy;save();bgPaint()}}
 /* ✦ صحّح وكمّل: one item, checked and completed by AI */
 async function fixRun(where){const txt=where==='kbn'?(($('#kbnText')||{}).value||'').trim():((kbRef(view.kbi).o||{}).t||'').trim();
   if(!txt){toast('اكتب حاجة الأول');return}if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
@@ -717,10 +728,10 @@ function capAdd(){const c=capOf(),sel=(c.items||[]).filter(x=>x.on);if(!sel.leng
     if(x.type==='فائدة'){db.notes.push({id:uid('n'),k,mosque:curMosque(),text:(x.text||'').trim(),ti:(x.title||'').trim()||(x.text||'').trim().split(/\s+/).slice(0,6).join(' '),src:c.src||'',topics:(x.tags||[]).slice(0,3)});return}
     const tx=(x.text||'').trim()+(x.source?`\n(${x.source})`:'');db.kb.push({id:uid('kb'),k,type:x.type,ti:(x.title||'').trim()||(x.text||'').trim().split(/\s+/).slice(0,6).join(' '),t:tx,
     h:esc((x.text||'').trim()).replace(/\n/g,'<br>')+(x.source?`<br><span style="color: rgb(90, 103, 94);">(${esc(x.source)})</span>`:''),tags:(x.tags||[]).slice(0,3),src:c.src||''})});
-  c.items=null;c.added=(c.added||0)+sel.length;db.capCur=null;db.caps=(db.caps||[]).slice(0,30);save();closeSheet();toast(`اتضاف ${num(sel.length)} لبنك المعرفة ✓`)}
+  c.items=null;c.added=(c.added||0)+sel.length;setCapCur(null);db.caps=(db.caps||[]).slice(0,30);save();closeSheet();toast(`اتضاف ${num(sel.length)} لبنك المعرفة ✓`)}
 function openKBNew(type,text,prev){view.kbi=null;view.fix=null;view.nd=null;view.kbn=prev?{...prev,type}:{type,t:text||'',tags:[],src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():''};view.kbiTag=false;keepDraft();
   openSheet(()=>{const s=view.kbn;if(!s)return {head:'',body:''};return {head:`<span class="eyebrow">إضافة لعلمي</span><h2 class="title">${{'حديث':'حديث جديد','آية':'آية جديدة','قصة':'قصة جديدة','ملخص':'ملخص درس أو كتاب'}[s.type]||(s.type+' جديد')}</h2>`,
-   body:`<button class="capbtn" data-act="cap-open">${ico('pen')}<span><b>التقاط من بيان</b><small>اكتب أي حاجة، وهو ينظّمها ويطلّع الأحاديث والآيات</small></span>${(db.caps||[]).some(x=>x.id===db.capCur&&(x.t||'').trim())?'<span class="badge part">مسودة</span>':''}</button>${addSeg('kbn-mode',KBT_R[s.type])}<input class="inp ti" id="kbnTi" data-act="kbn-ti" value="${esc(s.ti||'')}" placeholder="العنوان: موضوعه في جملة تفكّرك بيه"><textarea class="inp" id="kbnText" data-act="kbn-text" placeholder="${{'حديث':'نص الحديث، وراويه لو تعرفه','آية':'الآية، واسم السورة ورقمها','قصة':'القصة باختصار، ومن أي كتاب','ملخص':'اسم الدرس أو الكتاب، وأهم النقاط'}[s.type]||''}" style="min-height:140px">${esc(s.t)}</textarea>
+   body:`<button class="capbtn" data-act="cap-open">${ico('pen')}<span><b>التقاط من بيان</b><small>اكتب أي حاجة، وهو ينظّمها ويطلّع الأحاديث والآيات</small></span>${(db.caps||[]).some(x=>x.id===capCurV&&(x.t||'').trim())?'<span class="badge part">مسودة</span>':''}</button>${addSeg('kbn-mode',KBT_R[s.type])}<input class="inp ti" id="kbnTi" data-act="kbn-ti" value="${esc(s.ti||'')}" placeholder="العنوان: موضوعه في جملة تفكّرك بيه"><textarea class="inp" id="kbnText" data-act="kbn-text" placeholder="${{'حديث':'نص الحديث، وراويه لو تعرفه','آية':'الآية، واسم السورة ورقمها','قصة':'القصة باختصار، ومن أي كتاب','ملخص':'اسم الدرس أو الكتاب، وأهم النقاط'}[s.type]||''}" style="min-height:140px">${esc(s.t)}</textarea>
     <div class="kbt"><button class="tg add" data-act="fix-run" data-v="kbn">${ico('spark')}صحّح وكمّل</button>${toolsHTML('kbn','data-kbn="1"')}</div>${fixBox('kbn')}
     <div class="fld"><span class="lb">التصنيفات</span><div class="tagrow">${(s.tags||[]).map(x=>`<span class="tg">${esc(x)}</span>`).join('')}<button class="tg add" data-act="kbi-tagbox">${ico('tag')}${(s.tags||[]).length?'تعديل':'تصنيف'}</button></div>${view.kbiTag?tagPick(s.tags||[],'kbi-tag','kbi-tagnew','kbiTag'):''}</div>
     <div class="fld"><span class="lb">سمعته فين؟ (اختياري)</span>${srcSel('kbn-srcsel',s.src)}</div>`,
@@ -763,7 +774,7 @@ function openNote(id,quick){const n=id&&db.notes.find(x=>x.id===id);
   openSheet(()=>{const s=view.nd,cfg=db.noteCfg,chips=(arr,act,on)=>`<div class="chips">${arr.map(o=>`<button class="chip" data-act="${act}" data-v="${esc(o)}" aria-pressed="${on(o)}">${esc(o)}</button>`).join('')}</div>`;
     return {head:`<span class="eyebrow">${n?fmt(n.k,{weekday:'long',day:'numeric',month:'long'})+(n.mosque?' · '+esc(n.mosque):''):'إضافة'}</span><h2 class="title">${n?'الفائدة':s.mode==='plan'?'خطوة في خطة النهارده':'فائدة جديدة'}</h2>`,
      body:(s.quick?`${addSeg('nd-mode',s.mode)}`:'')
-      +(s.id?'':`<button class="capbtn" data-act="cap-open">${ico('pen')}<span><b>التقاط من بيان</b><small>اكتب أي حاجة، وهو ينظّمها ويطلّع الأحاديث والآيات</small></span>${(db.caps||[]).some(x=>x.id===db.capCur&&(x.t||'').trim())?'<span class="badge part">مسودة</span>':''}</button>`)+(s.restored?`<div class="ch small"><span class="muted">رجّعنالك اللي كنت كاتبه</span><button class="link" data-act="nd-clear">جديد</button></div>`:'')+(s.id?richBox('nd-rich',{t:s.text,h:s.h}):`<textarea class="inp" data-act="nd-text" id="ndText" placeholder="${s.mode==='plan'?'الخطوة':'الفائدة أو الرسالة اللي جاتلك'}" style="min-height:130px">${esc(s.text)}</textarea>`)
+      +(s.id?'':`<button class="capbtn" data-act="cap-open">${ico('pen')}<span><b>التقاط من بيان</b><small>اكتب أي حاجة، وهو ينظّمها ويطلّع الأحاديث والآيات</small></span>${(db.caps||[]).some(x=>x.id===capCurV&&(x.t||'').trim())?'<span class="badge part">مسودة</span>':''}</button>`)+(s.restored?`<div class="ch small"><span class="muted">رجّعنالك اللي كنت كاتبه</span><button class="link" data-act="nd-clear">جديد</button></div>`:'')+(s.id?richBox('nd-rich',{t:s.text,h:s.h}):`<textarea class="inp" data-act="nd-text" id="ndText" placeholder="${s.mode==='plan'?'الخطوة':'الفائدة أو الرسالة اللي جاتلك'}" style="min-height:130px">${esc(s.text)}</textarea>`)
       +(s.mode==='note'?`<div class="fld"><span class="lb">المصدر</span>${srcSel('nd-srcsel',s.src)}</div>
        <div class="fld"><span class="lb">الموضوع</span><div class="tagrow">${s.topics.map(o=>`<span class="tg">${esc(o)}</span>`).join('')}<button class="tg add" data-act="nd-topbox">${ico('tag')}${s.topics.length?'تعديل':'اختار موضوع'}</button></div>${view.ndTop?`<div class="tagbox">${chips(cfg.topics,'nd-top',o=>s.topics.includes(o))}</div>`:''}</div>
        <div class="fld"><span class="lb">مين قالها؟ (اختياري)</span><input class="inp" data-act="nd-by" value="${esc(s.by)}" placeholder="الاسم"></div>
@@ -825,10 +836,10 @@ async function token(force){if(!force&&Date.now()<auth.exp)return auth.at;const 
 async function afetch(url,opt={}){const go=async f=>fetch(url,{...opt,headers:{apikey:SBK,Authorization:'Bearer '+(await token(f)),'Content-Type':'application/json',...(opt.headers||{})}});let r=await go();if(r.status===401&&auth)r=await go(true);return r}
 async function rest(path,opt={}){const r=await afetch(SB+'/rest/v1/'+path,{...opt,headers:{...(opt.headers||{})}});
   if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||('HTTP '+r.status))}return r.status===204?null:r.json().catch(()=>null)}
-function mergeDB(a,b){const m=cp(a),ua=(x=[],y=[])=>{const ids=new Set(x.map(o=>o&&o.id)),yb=new Map((y||[]).map(o=>[o&&o.id,o]));x=x.map(o=>{const r=o&&yb.get(o.id);if(!r)return o;const f={...o};for(const k in r)if(f[k]==null||f[k]==='')f[k]=r[k];return f});return x.concat((y||[]).filter(o=>o&&!ids.has(o.id)))};
-  ['notes','p40','journeys','people','duas','faults','deeds','kb','cols','caps'].forEach(k=>m[k]=ua(a[k]||[],b[k]||[]));m.tags=[...new Set([...(a.tags||[]),...(b.tags||[])])];
-  m.gsecs=ua(a.gsecs,b.gsecs).map(s=>{const o=(b.gsecs||[]).find(x=>x.id===s.id);return o?{...s,items:ua(s.items,o.items)}:s});
-  for(const t2 in b.goals||{})m.goals[t2]=ua((a.goals||{})[t2],b.goals[t2]);
+function mergeDB(a,b){const gone={...(b.gone||{}),...(a.gone||{})},cut=Date.now()-90*864e5;for(const k in gone)if(gone[k]<cut)delete gone[k];const ng=o=>!(o&&gone[o.id]);const m=cp(a),ua=(x=[],y=[])=>{const ids=new Set(x.map(o=>o&&o.id)),yb=new Map((y||[]).map(o=>[o&&o.id,o]));x=x.map(o=>{const r=o&&yb.get(o.id);if(!r)return o;const f={...o};for(const k in r)if(f[k]==null||f[k]==='')f[k]=r[k];return f});return x.concat((y||[]).filter(o=>o&&!ids.has(o.id)))};
+  MKEYS.forEach(k=>m[k]=ua(a[k]||[],b[k]||[]).filter(ng));m.gone=gone;m.tags=[...new Set([...(a.tags||[]),...(b.tags||[])])];
+  m.gsecs=ua(a.gsecs,b.gsecs).filter(ng).map(s=>{const o=(b.gsecs||[]).find(x=>x.id===s.id);return o?{...s,items:ua(s.items,o.items).filter(ng)}:s});
+  for(const t2 in b.goals||{})m.goals[t2]=ua((a.goals||{})[t2],b.goals[t2]).filter(ng);
   for(const k in b.plans||{})m.plans[k]=ua((a.plans||{})[k],b.plans[k]);
   for(const k in b.reviews||{})m.reviews[k]={...b.reviews[k],...((a.reviews||{})[k]||{})};
   for(const k in b.logs||{}){const la=m.logs[k]||(m.logs[k]={}),lb=b.logs[k];for(const id in lb){if(!la[id]||JSON.stringify(lb[id]).length>JSON.stringify(la[id]).length)la[id]=lb[id]}}
@@ -844,7 +855,7 @@ async function syncNow(force){if(!auth||sync.busy)return paintCloud();if(!naviga
   sync.busy=true;paintCloud();let retry=false;
   try{const rows=await rest(`user_data?select=data,updated_at&user_id=eq.${auth.uid}`),r=rows&&rows[0];
     if(r&&r.updated_at!==db.meta.base){const rem=migrate(r.data);
-      if(db.meta.dirty||!db.meta.base){db=mergeDB(db,rem);db.meta.dirty=true}else{db=rem;db.meta={...db.meta,dirty:false}}
+      if(db.meta.dirty||!db.meta.base){markGone();db=mergeDB(db,rem);db.meta.dirty=true}else{db=rem;db.meta={...db.meta,dirty:false}}lastIds=idsOf(db);
       db.meta.base=r.updated_at;db.meta.syncedAt=r.updated_at;saveLocal();bgPaint()}
     if(!r||db.meta.dirty){const ed=db.meta.editAt;db.meta.cv=2;
       const out=await rest('user_data?on_conflict=user_id&select=updated_at',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify({user_id:auth.uid,data:db,device:navigator.userAgent.slice(0,90)})});
@@ -1314,8 +1325,9 @@ document.addEventListener('click',ev=>{
   if(a==='c-leave'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟ الحاجات اللي من غيرك هتختفي عندك';return}(async()=>{try{await rest(`circle_members?circle_id=eq.${db.circle.id}&user_id=eq.${auth.uid}`,{method:'DELETE'})}catch(e){}db.circle=null;db.shared={};db.cmeta=null;save();render()})();return}
   if(a==='cap-open'){dropDraft();return openCap()}
   if(a==='cap-run')return capRun();
-  if(a==='cap-new'){view.capEdit=false;const t=$('#capText');if(t)capOf().t=t.value;db.capCur=null;capOf();save();return paintSheet()}
-  if(a==='cap-pick'){view.capEdit=false;const t=$('#capText');if(t)capOf().t=t.value;db.capCur=b.dataset.v;save();return paintSheet()}
+  if(a==='cap-items')return capItems(capOf().id);
+  if(a==='cap-new'){view.capEdit=false;const t=$('#capText');if(t)capOf().t=t.value;setCapCur(null);capOf();save();return paintSheet()}
+  if(a==='cap-pick'){view.capEdit=false;const t=$('#capText');if(t)capOf().t=t.value;setCapCur(b.dataset.v);save();return paintSheet()}
   if(a==='cap-del'){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}db.caps=db.caps.filter(x=>x.id!==b.dataset.v);save();return paintSheet()}
   if(a==='cap-mode'){const c=capOf(),t=$('#capText');if(t)c.t=t.value;c.mode=b.dataset.v;save();return paintSheet()}
   if(a==='fix-run')return fixRun(v);
