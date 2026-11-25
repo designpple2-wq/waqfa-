@@ -667,7 +667,7 @@ function openCap(){view.kbn=null;view.nd=null;view.capEdit=false;openSheet(capR)
 function capR(){const c=capOf(),sum=c.mode==='sum';
   if(view.capBusy)return {head:`<span class="eyebrow">التقاط من بيان</span><h2 class="title">${sum?'بيلخّص':'بينظّم ويصحّح'}…</h2>`,body:`<p class="lead">${sum?'بيعمل ملخص مرتب للبيان':'بيرتّب كلامك كله في أقسام، ويصحّح الإملاء، ويكمّل الآيات والأحاديث جوّه، من غير ما يشيل حاجة'}، وبيطلّع كل حديث وآية وقصة لوحدها.</p><p class="small muted">ممكن ياخد دقيقة أو اتنين. تقدر تقفل، هيكمّل لوحده ويفتحلك النتيجة لما يخلص.</p>`,foot:'<button class="btn ghost" data-act="close-sheet">اقفل وهو يكمّل</button>'};
   if(c.items&&c.items.length&&!view.capEdit)return {head:`<span class="eyebrow">راجع قبل ما تضيف</span><h2 class="title">لقيت ${num(c.items.length)}</h2>`,
-    body:`<p class="small muted">علّم على اللي متأكد منه. اللي مكتوب عليه "اتأكد منه" راجعه في كتاب الأول.</p>${c.itBusy?'<p class="notice">بيطلّع كل حديث وآية وقصة لوحدها… تقدر تضيف البيان دلوقتي أو تستنى.</p>':c.items.every(x=>x.doc||x.sum)?'<button class="link" data-act="cap-items" style="align-self:flex-start">✦ طلّع الأحاديث والآيات لوحدها</button>':''}${c.items.map((x,i)=>{const cf=CONF[x.confidence]||CONF.low;return `<section class="capi ${x.on?'on':''}">
+    body:`<p class="small muted">علّم على اللي متأكد منه. اللي مكتوب عليه "اتأكد منه" راجعه في كتاب الأول.</p>${itBusy.has(c.id)?'<p class="notice">بيطلّع كل حديث وآية وقصة لوحدها… تقدر تضيف البيان دلوقتي أو تستنى.</p>':c.items.every(x=>x.doc||x.sum)?'<button class="link" data-act="cap-items" style="align-self:flex-start">✦ طلّع الأحاديث والآيات لوحدها</button>':''}${c.items.map((x,i)=>{const cf=CONF[x.confidence]||CONF.low;return `<section class="capi ${x.on?'on':''}">
       <div class="ch"><button class="pk-ck" data-act="cap-on" data-i="${i}" aria-label="اختار">${x.on?ico('ok'):''}</button><span class="badge ${x.sum||x.doc?'ink':cf[0]}">${x.sum?'الملخص':x.doc?'البيان مرتّب':cf[1]}</span>
        <select class="inp sm" data-act="cap-type" data-i="${i}">${[...new Set([...ZTYPES(),x.type])].map(o=>`<option ${o===x.type?'selected':''}>${esc(o)}</option>`).join('')}</select></div>
       <input class="inp ti" data-act="cap-ti" data-i="${i}" value="${esc(x.title||'')}" placeholder="العنوان"><textarea class="inp" data-act="cap-txt" data-i="${i}">${esc(x.text||'')}</textarea>
@@ -694,12 +694,13 @@ async function capRun(){const c=capOf(),notes=(($('#capText')||{}).value||c.t||'
     c.items=[...sm,...(j.items||[]).filter(x=>x&&x.text).map(x=>({...x,type:['حديث','آية','قصة','فائدة'].includes(x.type)?x.type:'فائدة',on:x.confidence!=='low'}))];save();if(!c.items.length)toast('مالقيتش حاجة واضحة');else if(j.itemsFailed)setTimeout(()=>capItems(c.id,notes),50)}
   catch(e){toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':e.message)}finally{clearTimeout(tm);view.capBusy=false;
     if(sheetEl&&sheetRender===capR)paintSheet();else if((c.items||[]).length){if(!sheetEl){setCapCur(c.id);openCap()}else toast('خلص ✓ افتح + ← التقاط من بيان')}}}
-async function capItems(id,notes){const live=()=>(db.caps||[]).find(x=>x.id===id);let c=live();if(!c||c.itBusy)return;notes=notes||c.t;c.itBusy=true;bgPaint();
+const itBusy=new Set();
+async function capItems(id,notes){const live=()=>(db.caps||[]).find(x=>x.id===id);let c=live();if(!c||itBusy.has(id))return;notes=notes||c.t;itBusy.add(id);bgPaint();
   try{const r=await afetch(SB+'/functions/v1/ocr',{method:'POST',headers:{},body:JSON.stringify({task:'organize',part:'items',notes})});const j=await r.json().catch(()=>({}));c=live();if(!c)return;
     if(!r.ok||!j.items){toast('ما لحقش يطلّع النصوص. دوس "طلّع الأحاديث" تاني بعد شوية');return}
     const have=new Set((c.items||[]).map(x=>(x.text||'').slice(0,40)));const add=j.items.filter(x=>x&&x.text&&!have.has(x.text.slice(0,40))).map(x=>({...x,type:['حديث','آية','قصة'].includes(x.type)?x.type:'قصة',on:x.confidence!=='low'}));
     c.items=[...(c.items||[]),...add];toast(add.length?`طلّع ${add.length} لوحدهم ✓`:'مالقيتش أحاديث أو آيات')}
-  catch(e){toast('ما لحقش يطلّع النصوص. جرّب تاني بعد شوية')}finally{const x=live();if(x)delete x.itBusy;save();bgPaint()}}
+  catch(e){toast('ما لحقش يطلّع النصوص. جرّب تاني بعد شوية')}finally{itBusy.delete(id);const x=live();if(x)delete x.itBusy;save();bgPaint()}}
 /* ✦ صحّح وكمّل: one item, checked and completed by AI */
 async function fixRun(where){const txt=where==='kbn'?(($('#kbnText')||{}).value||'').trim():((kbRef(view.kbi).o||{}).t||'').trim();
   if(!txt){toast('اكتب حاجة الأول');return}if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
