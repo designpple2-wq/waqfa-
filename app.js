@@ -168,7 +168,8 @@ function migrate(d){const b=blank();
   if(!d.fri){const dh=d.deeds.find(y=>y.id==='dhuhr');if(dh)dh.notDays=[5];d.fri=1}
   if(!d.mg1){renameTagIn(d,'رسائل','مفاهيم');d.mg1=1;d._mg=1}
   d.version=4;return d}
-function normNotes(d){d.notes.forEach(n=>{if(!n.topics){n.topics=n.tag?[n.tag]:[];delete n.tag}n.topics.forEach(x=>{if(!d.noteCfg.topics.includes(x))d.noteCfg.topics.push(x)});if(n.src==null)n.src=''})}
+function normNotes(d){if((d.kb||[]).some(x=>x.type==='فائدة')){d.kbr=d.kbr||{};d.kb.filter(x=>x.type==='فائدة').forEach(x=>{if(!d.notes.some(n=>n.id===x.id))d.notes.push({id:x.id,k:x.k,text:x.t,ti:x.ti||'',h:x.h||'',src:x.src||'',topics:x.tags||[]});if(d.kbr['s|'+x.id]){d.kbr['n|'+x.id]=d.kbr['s|'+x.id];delete d.kbr['s|'+x.id]}});d.kb=d.kb.filter(x=>x.type!=='فائدة')}
+  d.notes.forEach(n=>{if(!n.topics){n.topics=n.tag?[n.tag]:[];delete n.tag}n.topics.forEach(x=>{if(!d.noteCfg.topics.includes(x))d.noteCfg.topics.push(x)});if(n.src==null)n.src=''})}
 function load(){try{const s=localStorage.getItem(KEY);if(s)return migrate(JSON.parse(s))}catch(e){}return blank()}
 function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
 let pushT=null;
@@ -565,8 +566,8 @@ function memStats(){const all=kbItems(),R2=db.kbr||{},td=dayKey();let mast=0,lea
   all.forEach(x=>{const r=R2[kbKey(x)];if(!r||!r.reps)neu++;else if(r.box>=4)mast++;else learn++;if(r&&r.due&&r.due<=td)due++});
   let streak=0;for(let k=td;streak<400;k=shift(k,-1)){const d=(db.kbDay||{})[k];if(d&&Object.keys(d.done||{}).length)streak++;else if(k!==td)break;else{}if(k<'2020')break}
   return {all,mast,learn,neu,due,streak}}
-const colOf=k=>{if(k.startsWith('n|'))return null;return kbItems().find(x=>kbKey(x)===k)};
-const kbAttr=x=>x.cid?`data-c="${x.cid}"`:x.sid?`data-s="${x.sid}"`:`data-k="${x.k}" data-id="${x.id}" data-f="${x.f}" data-e="${x.eid}"`;
+const colOf=k=>{return kbItems().find(x=>kbKey(x)===k)};
+const kbAttr=x=>x.nid?`data-n="${x.nid}"`:x.cid?`data-c="${x.cid}"`:x.sid?`data-s="${x.sid}"`:`data-k="${x.k}" data-id="${x.id}" data-f="${x.f}" data-e="${x.eid}"`;
 function sessQueue(only){const td=dayKey(),R2=db.kbr||{},all=only?only:kbItems();
   const due=all.filter(x=>{const r=R2[kbKey(x)];return r&&r.reps&&r.due<=td}).sort((a,b)=>R2[kbKey(a)].due.localeCompare(R2[kbKey(b)].due));
   const dd=(db.kbDay||{})[td]||{},newDone=Object.keys(dd.done||{}).filter(k=>{const r=R2[k];return r&&r.reps===1&&r.last===td}).length;
@@ -633,7 +634,7 @@ const KBT={hadith:'حديث',aya:'آية',qissa:'قصة',sum:'ملخص'},KBT_R={
 const ZTYPES=()=>db.kbTypes&&db.kbTypes.length?db.kbTypes:['حديث','آية','قصة','بيان','ملخص','فائدة'];
 const addSeg=(act,cur)=>APP==='zad'?`<div class="chips tsel">${ZTYPES().map(x=>`<button class="chip" data-act="kbn-type" data-v="${esc(x)}" aria-pressed="${(view.kbn||{}).type===x}">${esc(x)}</button>`).join('')}<button class="chip" data-act="kbt-new" aria-label="نوع جديد">+ نوع</button></div>`
   :`<div class="seg seg5">${[['note','فائدة'],['hadith','حديث'],['aya','آية'],['qissa','قصة'],['plan','خطوة']].map(([x,l])=>`<button data-act="${act}" data-v="${x}" aria-pressed="${cur===x}">${l}</button>`).join('')}</div>`;
-function kbRef(r){if(r.c){const o=(db.shared||{})[r.c];return {o,save:()=>{if(o){o._dirty=1;save()}},del:()=>{if(o){o.deleted=true;o._dirty=1;save()}}}}if(r.s){const o=(db.kb||[]).find(x=>x.id===r.s);return {o,save:()=>save(),del:()=>{db.kb=db.kb.filter(x=>x.id!==r.s);save()}}}
+function kbRef(r){if(r.n){const n=db.notes.find(x=>x.id===r.n);const o=n&&{get t(){return n.text},set t(v){n.text=v},get h(){return n.h},set h(v){n.h=v},get ti(){return n.ti},set ti(v){n.ti=v},get tags(){return n.topics},set tags(v){n.topics=v},get k(){return n.k},get src(){return n.src},type:'فائدة'};return {o,save:()=>save(),del:()=>{db.notes=db.notes.filter(x=>x.id!==r.n);save()}}}if(r.c){const o=(db.shared||{})[r.c];return {o,save:()=>{if(o){o._dirty=1;save()}},del:()=>{if(o){o.deleted=true;o._dirty=1;save()}}}}if(r.s){const o=(db.kb||[]).find(x=>x.id===r.s);return {o,save:()=>save(),del:()=>{db.kb=db.kb.filter(x=>x.id!==r.s);save()}}}
   const e=(db.logs[r.k]||{})[r.id];if(!e||!e.a)return {o:null,save(){},del(){}};const arr=kbArr(e.a[r.f]),o=arr.find(x=>x.id===r.e);
   return {o,save:()=>{e.a[r.f]=arr;save()},del:()=>{e.a[r.f]=arr.filter(x=>x.id!==r.e);save()}}}
 function tagPick(tags,act,newAct,inputId){const all=[...new Set([...(db.tags||[]),...(db.noteCfg.topics||[]),...tags])];
@@ -705,6 +706,7 @@ function capAdd(){const c=capOf(),sel=(c.items||[]).filter(x=>x.on);if(!sel.leng
   sel.forEach(x=>{if(x.type&&db.kbTypes&&db.kbTypes.length&&!db.kbTypes.includes(x.type))db.kbTypes.push(x.type);
     if(x.doc&&x.text===docText(x)){db.kb.push({id:uid('kb'),k,type:x.type||'بيان',ti:x.title,t:x.text,h:docHTML(x),tags:[],src:c.src||''});return}
     if(x.sum&&x.text===capSumText(x)){db.kb.push({id:uid('kb'),k,type:'ملخص',ti:x.title,t:x.text,h:x.sum.sections.map(s=>`<h3>${esc(s.heading||'')}</h3><ul>${(s.points||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>`).join(''),tags:[],src:c.src||''});return}
+    if(x.type==='فائدة'){db.notes.push({id:uid('n'),k,mosque:curMosque(),text:(x.text||'').trim(),ti:(x.title||'').trim()||(x.text||'').trim().split(/\s+/).slice(0,6).join(' '),src:c.src||'',topics:(x.tags||[]).slice(0,3)});return}
     const tx=(x.text||'').trim()+(x.source?`\n(${x.source})`:'');db.kb.push({id:uid('kb'),k,type:x.type,ti:(x.title||'').trim()||(x.text||'').trim().split(/\s+/).slice(0,6).join(' '),t:tx,
     h:esc((x.text||'').trim()).replace(/\n/g,'<br>')+(x.source?`<br><span style="color: rgb(90, 103, 94);">(${esc(x.source)})</span>`:''),tags:(x.tags||[]).slice(0,3),src:c.src||''})});
   db.cap=null;save();closeSheet();toast(`اتضاف ${num(sel.length)} لبنك المعرفة ✓`)}
@@ -960,11 +962,12 @@ const tiOf=o=>{if(!o)return '';if(o.ti)return o.ti;const L=(o.t||'').trim().spli
 function kbItems(){const out=[];Object.keys(db.logs).sort().reverse().forEach(k=>{const l=db.logs[k];for(const id in l){const d=byId(id),e=l[id];if(!d||!e||!e.a)continue;
     fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{const v=(o.t||'').trim();if(v)out.push({k,id,f:f.id,eid:o.id,type:f.kb,ti:tiOf(o),text:v,h:o.h||'',tags:o.tags||[]})}))}});
   Object.entries(db.shared||{}).forEach(([id,x])=>{if(!x.deleted&&(x.t||'').trim())out.push({k:x.k||'2000-01-01',cid:id,type:x.type,ti:tiOf(x),text:x.t.trim(),h:x.h||'',tags:x.tags||[],src:x.src||'',by:x.by})});
+  (db.notes||[]).forEach(n=>{if((n.text||'').trim())out.push({k:n.k||'2000-01-01',nid:n.id,type:'فائدة',ti:n.ti||'',text:n.text.trim(),h:n.h||'',tags:n.topics||[],src:n.src||''})});
   (db.kb||[]).forEach(x=>{if((x.t||'').trim())out.push({k:x.k,sid:x.id,type:x.type,ti:tiOf(x),text:x.t.trim(),h:x.h||'',tags:x.tags||[],src:x.src||''})});
   return out.sort((a,b)=>b.k.localeCompare(a.k))}
 /* spaced repetition (Leitner): remembered well -> longer gap, forgot -> back tomorrow */
 const KB_INT=[1,1,3,7,14,30,60,120];
-const kbKey=x=>x.cid?`c|${x.cid}`:x.sid?`s|${x.sid}`:`${x.k}|${x.id}|${x.f}`+(x.eid&&x.eid!=='0'?'|'+x.eid:'');
+const kbKey=x=>x.nid?`n|${x.nid}`:x.cid?`c|${x.cid}`:x.sid?`s|${x.sid}`:`${x.k}|${x.id}|${x.f}`+(x.eid&&x.eid!=='0'?'|'+x.eid:'');
 /* SRS (SM-2 style): every item has its own ease. q: 0 نسيت · 1 صعب · 2 كويس · 3 سهل */
 function srsNext(r,q){r=Object.assign({reps:0,ease:2.5,ivl:0,lapses:0},r||{});if(!r.ivl&&r.box)r.ivl=KB_INT[Math.min(r.box,KB_INT.length-1)]||1;
   let iv=r.ivl||0,e=r.ease||2.5;
@@ -1207,6 +1210,7 @@ document.addEventListener('click',ev=>{
   if(a==='tag-tog'&&d){setTag(d,fid,b.dataset.e,v,b.getAttribute('aria-pressed')!=='true');return sheetEl?paintSheet():render()}
   if(a==='tag-new'&&d){const inp=$('#tagnew'),s=(inp&&inp.value||'').trim().replace(/^#/,'');if(!s)return;setTag(d,fid,b.dataset.e,s,true);return sheetEl?paintSheet():render()}
   if(a==='kb-rand'){const n=kbItems().length;if(n)view.kbPick=Math.floor(Math.random()*n);return render()}
+  if(a==='kb-open'&&b.dataset.n)return openNote(b.dataset.n);
   if(a==='kb-open')return openKBItem(b.dataset.c?{c:b.dataset.c}:b.dataset.s?{s:b.dataset.s}:{k:b.dataset.k,id,f:b.dataset.f,e:b.dataset.e});
   if(a==='kbi-day'){const r=view.kbi;closeSheet(true);return openDeed(r.id,r.k)}
   if(a==='kbi-tagbox'){view.kbiTag=!view.kbiTag;return paintSheet()}
@@ -1215,7 +1219,8 @@ document.addEventListener('click',ev=>{
   if(a==='kbi-del'){if(!b.dataset.sure){b.dataset.sure=1;b.classList.add('sure');b.textContent='متأكد؟';return}kbRef(view.kbi).del();closeSheet();toast('اتمسح');return}
   if(a==='kbn-type'){view.kbn.type=v;keepDraft();return paintSheet()}
   if(a==='kbn-src'){view.kbn.src=view.kbn.src===v?'':v;return paintSheet()}
-  if(a==='kbn-save'){const s=view.kbn,tx=(($('#kbnText')||{}).value||s.t||'').trim(),ti=(($('#kbnTi')||{}).value||s.ti||'').trim();if(!tx){toast('اكتب الأول');return}if(!ti){toast('حط عنوان، هو اللي هيفكّرك في المراجعة');const t=$('#kbnTi');t&&t.focus();return}db.kb=db.kb||[];db.kb.push({id:uid('kb'),k:dayKey(),type:s.type,ti,t:tx,...(s.h&&tx===(s.t||'').trim()?{h:s.h}:{}),tags:s.tags||[],src:s.src||''});dropDraft();save();view.kbn=null;closeSheet();toast(`اتحفظ في علمي ✓`);if(view.kbnBack){const fb=view.kbnBack;view.kbnBack=null;openFault(fb)}return}
+  if(a==='kbn-save'){const s=view.kbn,tx=(($('#kbnText')||{}).value||s.t||'').trim(),ti=(($('#kbnTi')||{}).value||s.ti||'').trim();if(!tx){toast('اكتب الأول');return}if(!ti){toast('حط عنوان، هو اللي هيفكّرك في المراجعة');const t=$('#kbnTi');t&&t.focus();return}
+    if(s.type==='فائدة'){db.notes.push({id:uid('n'),k:dayKey(),mosque:curMosque(),text:tx,ti,...(s.h&&tx===(s.t||'').trim()?{h:s.h}:{}),src:s.src||'',topics:s.tags||[]});dropDraft();save();view.kbn=null;closeSheet();toast('اتحفظت في الفوايد ✓');return}db.kb=db.kb||[];db.kb.push({id:uid('kb'),k:dayKey(),type:s.type,ti,t:tx,...(s.h&&tx===(s.t||'').trim()?{h:s.h}:{}),tags:s.tags||[],src:s.src||''});dropDraft();save();view.kbn=null;closeSheet();toast(`اتحفظ في علمي ✓`);if(view.kbnBack){const fb=view.kbnBack;view.kbnBack=null;openFault(fb)}return}
   if(a==='p40-edit')return openP40();
   if(a==='p40-add'){const v2=$('#p40-new').value.trim();if(!v2){toast('اكتب البند الأول');return}db.p40.push({id:uid('p40'),text:v2,link:$('#p40-newlink').value||null});save();paintSheet();render();toast('اتضاف');return}
   if(a==='p40-del'){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}db.p40=db.p40.filter(x=>x.id!==id);save();paintSheet();return render()}
@@ -1319,7 +1324,7 @@ document.addEventListener('click',ev=>{
   if(a==='f-ename'){view.fEditName=!view.fEditName;return paintSheet()}
   if(a==='r-edit'){view.rEdit=v;return paintSheet()}
   if(a==='f-pick')return openKBPick(id);
-  if(a==='pk'){const f=db.faults.find(x=>x.id===view.kbiBack),vv=vName(f),R2=kbRef(b.dataset.c?{c:b.dataset.c}:b.dataset.s?{s:b.dataset.s}:{k:b.dataset.k,id:b.dataset.id,f:b.dataset.f,e:b.dataset.e});if(!R2.o)return;
+  if(a==='pk'){const f=db.faults.find(x=>x.id===view.kbiBack),vv=vName(f),R2=kbRef(b.dataset.n?{n:b.dataset.n}:b.dataset.c?{c:b.dataset.c}:b.dataset.s?{s:b.dataset.s}:{k:b.dataset.k,id:b.dataset.id,f:b.dataset.f,e:b.dataset.e});if(!R2.o)return;
     const tg=R2.o.tags||[];R2.o.tags=tg.includes(vv)?tg.filter(x=>x!==vv):[...tg,vv];db.tags=db.tags||[];if(!db.tags.includes(vv))db.tags.push(vv);R2.save();buzz();return paintSheet()}
   if(a==='fr-add'){const f=db.faults.find(x=>x.id===id);f.rules=f.rules||[];const nr={id:uid('r'),a:'',b:''};f.rules.push(nr);view.rEdit=nr.id;save();paintSheet();const ins=sheetEl.querySelectorAll('[data-act=fr][data-k=a]');ins.length&&ins[ins.length-1].focus();return}
   if(a==='fr-del'){const f=db.faults.find(x=>x.id===id);f.rules=(f.rules||[]).filter(x=>x.id!==b.dataset.r);save();return paintSheet()}
@@ -1387,7 +1392,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   if(a==='kbn-text'){view.kbn.t=v;return}
   if(a==='kbn-ti'&&view.kbn){view.kbn.ti=v.trim();keepDraft();return}
   if(a==='kbi-ti'){const r=kbRef(view.kbi);if(r.o){r.o.ti=v.trim();r.save()}return}
-  if(a==='sess-ti'){const x=kbItems().find(y=>kbKey(y)===el.dataset.key),r=x&&kbRef(x.cid?{c:x.cid}:x.sid?{s:x.sid}:{k:x.k,id:x.id,f:x.f,e:x.eid});if(r&&r.o){r.o.ti=v.trim();r.save();toast('اتحفظ العنوان')}return}
+  if(a==='sess-ti'){const x=kbItems().find(y=>kbKey(y)===el.dataset.key),r=x&&kbRef(x.nid?{n:x.nid}:x.cid?{c:x.cid}:x.sid?{s:x.sid}:{k:x.k,id:x.id,f:x.f,e:x.eid});if(r&&r.o){r.o.ti=v.trim();r.save();toast('اتحفظ العنوان')}return}
   if(a==='kbti'&&d){const e=E(id),o=kbArr((e.a||{})[fid]).find(x=>x.id===el.dataset.e);if(o){o.ti=v.trim();save()}return}
   if(a==='f-txt'&&f){f[el.dataset.k]=v.trim();save();return}
   if(a==='fr'&&f){const r=(f.rules||[]).find(x=>x.id===el.dataset.r);if(r){r[el.dataset.k]=v.trim();save()}return}
