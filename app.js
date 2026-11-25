@@ -648,9 +648,39 @@ function openKBItem(r){view.kbi=r;view.kbiTag=false;view.kbn=null;openSheet(()=>
     <div class="fld"><div class="ch"><span class="lb">المراجعة</span><button class="link" data-act="quiz" data-key="${esc(kbKey(x))}">اختبر نفسك</button></div><span class="small muted">${x.k?kbNext(x):''}</span></div>
     <div class="fld"><span class="lb">المصدر</span>${r.c?`<span>${esc(o.by||'')} · ${esc(o.src||'الحلقة')}</span>`:r.s?`<span>${o.src?esc(o.src):'اتضاف من زرار +'}</span>`:`<button class="link" data-act="kbi-day" style="align-self:flex-start">التعليم الانفرادي · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})} ←</button>`}</div>`,
    foot:`<button class="btn danger icon" data-act="kbi-del" aria-label="امسح">${ico('trash')}</button><button class="btn" data-act="close-sheet">تمام</button>`}})}
+/* ===== التقاط من بيان: write fragments, AI completes them, you approve ===== */
+const capOf=()=>db.cap||(db.cap={t:'',src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():'',k:dayKey(),items:null});
+const tgtCap=()=>({key:'cap',kind:'ملاحظات من بيان',put:txt=>{const c=capOf();c.t=(c.t||'').trim()?c.t.trim()+'\n'+txt:txt;save();return '#capText'}});
+const CONF={high:['done','متأكد'],medium:['part','غالبًا'],low:['miss','اتأكد منه']};
+function openCap(){view.kbn=null;view.nd=null;openSheet(()=>{const c=capOf();
+  if(view.capBusy)return {head:'<span class="eyebrow">التقاط من بيان</span><h2 class="title">بيدوّر على النصوص…</h2>',body:'<p class="lead">بيكمّل كل حتة كتبتها، ويجيب نصها الصحيح ومصدرها. ممكن ياخد دقيقة.</p>',foot:''};
+  if(c.items&&c.items.length)return {head:`<span class="eyebrow">راجع قبل ما تضيف</span><h2 class="title">لقيت ${num(c.items.length)}</h2>`,
+    body:`<p class="small muted">علّم على اللي متأكد منه. اللي مكتوب عليه "اتأكد منه" راجعه في كتاب الأول.</p>${c.items.map((x,i)=>{const cf=CONF[x.confidence]||CONF.low;return `<section class="capi ${x.on?'on':''}">
+      <div class="ch"><button class="pk-ck" data-act="cap-on" data-i="${i}" aria-label="اختار">${x.on?ico('ok'):''}</button><span class="badge ${cf[0]}">${cf[1]}</span>
+       <select class="inp sm" data-act="cap-type" data-i="${i}">${[...new Set([...ZTYPES(),x.type])].map(o=>`<option ${o===x.type?'selected':''}>${esc(o)}</option>`).join('')}</select></div>
+      ${x.title?`<b>${esc(x.title)}</b>`:''}<textarea class="inp" data-act="cap-txt" data-i="${i}">${esc(x.text||'')}</textarea>
+      ${x.source?`<span class="small">${esc(x.source)}</span>`:''}${x.note?`<span class="small" style="color:var(--alert)">${esc(x.note)}</span>`:''}
+      <span class="small muted">كتبت: ${esc(x.from||'')}</span></section>`}).join('')}`,
+    foot:`<button class="btn ghost" data-act="cap-back">رجوع</button><button class="btn" data-act="cap-add">ضيف (${num(c.items.filter(x=>x.on).length)})</button>`};
+  return {head:'<span class="eyebrow">التقاط من بيان</span><h2 class="title">اكتب اللي تلحقه</h2>',
+   body:`<div class="fld"><span class="lb">البيان</span>${srcSel('cap-src',c.src)}</div>
+    <textarea class="inp" id="capText" data-act="cap-text" style="min-height:220px" placeholder="كل حاجة في سطر لوحده، ولو حتة صغيرة&#10;مثلًا: إنما الأعمال بالنيات&#10;ومن يتق الله يجعل له&#10;قصة الصحابي اللي آثر أخوه بالمية">${esc(c.t||'')}</textarea>
+    <div class="kbt"><span class="small muted">أو سجّل بصوتك</span>${toolsHTML('cap','data-capm="1"')}</div>`,
+   foot:`<button class="btn ghost" data-act="close-sheet">بعدين</button><button class="btn" data-act="cap-run">${ico('spark')} كمّل</button>`}})}
+async function capRun(){const c=capOf(),notes=(($('#capText')||{}).value||c.t||'').trim();c.t=notes;save();if(!notes){toast('اكتب حاجة الأول');return}
+  if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت. اللي كتبته متحفظ، كمّله لما النت يرجع');return}
+  view.capBusy=true;paintSheet();const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),150000);
+  try{const tk=await token();const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({task:'complete',notes})});
+    const j=await r.json().catch(()=>({}));if(!r.ok||!j.items)throw new Error(j.error==='rate'?'استنى دقيقة وجرّب تاني':'الخدمة زحمة دلوقتي. جرّب كمان شوية');
+    c.items=j.items.filter(x=>x&&x.text).map(x=>({...x,type:['حديث','آية','قصة','فائدة'].includes(x.type)?x.type:'فائدة',on:x.confidence!=='low'}));save();if(!c.items.length)toast('مالقيتش حاجة واضحة')}
+  catch(e){toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':e.message)}finally{clearTimeout(tm);view.capBusy=false;if(sheetEl)paintSheet()}}
+function capAdd(){const c=capOf(),sel=(c.items||[]).filter(x=>x.on);if(!sel.length){toast('علّم على حاجة الأول');return}db.kb=db.kb||[];const k=dayKey();
+  sel.forEach(x=>{const tx=(x.text||'').trim()+(x.source?`\n(${x.source})`:'');db.kb.push({id:uid('kb'),k,type:x.type,t:(x.title?x.title+'\n':'')+tx,
+    h:(x.title?`<h3>${esc(x.title)}</h3>`:'')+esc((x.text||'').trim()).replace(/\n/g,'<br>')+(x.source?`<br><span style="color: rgb(90, 103, 94);">(${esc(x.source)})</span>`:''),tags:(x.tags||[]).slice(0,3),src:c.src||''})});
+  db.cap=null;save();closeSheet();toast(`اتضاف ${num(sel.length)} لبنك المعرفة ✓`)}
 function openKBNew(type,text,prev){view.kbi=null;view.nd=null;view.kbn=prev?{...prev,type}:{type,t:text||'',tags:[],src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():''};view.kbiTag=false;keepDraft();
   openSheet(()=>{const s=view.kbn;if(!s)return {head:'',body:''};return {head:`<span class="eyebrow">إضافة لعلمي</span><h2 class="title">${{'حديث':'حديث جديد','آية':'آية جديدة','قصة':'قصة جديدة','ملخص':'ملخص درس أو كتاب'}[s.type]||(s.type+' جديد')}</h2>`,
-   body:`${addSeg('kbn-mode',KBT_R[s.type])}<textarea class="inp" id="kbnText" data-act="kbn-text" placeholder="${{'حديث':'نص الحديث، وراويه لو تعرفه','آية':'الآية، واسم السورة ورقمها','قصة':'القصة باختصار، ومن أي كتاب','ملخص':'اسم الدرس أو الكتاب، وأهم النقاط'}[s.type]||''}" style="min-height:140px">${esc(s.t)}</textarea>
+   body:`<button class="capbtn" data-act="cap-open">${ico('pen')}<span><b>التقاط من بيان</b><small>اكتب أي حتة، والذكاء الاصطناعي يكمّلها</small></span>${(db.cap&&db.cap.t)?'<span class="badge part">مسودة</span>':''}</button>${addSeg('kbn-mode',KBT_R[s.type])}<textarea class="inp" id="kbnText" data-act="kbn-text" placeholder="${{'حديث':'نص الحديث، وراويه لو تعرفه','آية':'الآية، واسم السورة ورقمها','قصة':'القصة باختصار، ومن أي كتاب','ملخص':'اسم الدرس أو الكتاب، وأهم النقاط'}[s.type]||''}" style="min-height:140px">${esc(s.t)}</textarea>
     <div class="kbt"><span class="small muted">صوّر الصفحة أو سجّل بصوتك</span>${toolsHTML('kbn','data-kbn="1"')}</div>
     <div class="fld"><span class="lb">التصنيفات</span><div class="tagrow">${(s.tags||[]).map(x=>`<span class="tg">${esc(x)}</span>`).join('')}<button class="tg add" data-act="kbi-tagbox">${ico('tag')}${(s.tags||[]).length?'تعديل':'تصنيف'}</button></div>${view.kbiTag?tagPick(s.tags||[],'kbi-tag','kbi-tagnew','kbiTag'):''}</div>
     <div class="fld"><span class="lb">سمعته فين؟ (اختياري)</span>${srcSel('kbn-srcsel',s.src)}</div>`,
@@ -691,7 +721,7 @@ function openNote(id,quick){const n=id&&db.notes.find(x=>x.id===id);
   openSheet(()=>{const s=view.nd,cfg=db.noteCfg,chips=(arr,act,on)=>`<div class="chips">${arr.map(o=>`<button class="chip" data-act="${act}" data-v="${esc(o)}" aria-pressed="${on(o)}">${esc(o)}</button>`).join('')}</div>`;
     return {head:`<span class="eyebrow">${n?fmt(n.k,{weekday:'long',day:'numeric',month:'long'})+(n.mosque?' · '+esc(n.mosque):''):'إضافة'}</span><h2 class="title">${n?'الفائدة':s.mode==='plan'?'خطوة في خطة النهارده':'فائدة جديدة'}</h2>`,
      body:(s.quick?`${addSeg('nd-mode',s.mode)}`:'')
-      +(s.restored?`<div class="ch small"><span class="muted">رجّعنالك اللي كنت كاتبه</span><button class="link" data-act="nd-clear">جديد</button></div>`:'')+(s.id?richBox('nd-rich',{t:s.text,h:s.h}):`<textarea class="inp" data-act="nd-text" id="ndText" placeholder="${s.mode==='plan'?'الخطوة':'الفائدة أو الرسالة اللي جاتلك'}" style="min-height:130px">${esc(s.text)}</textarea>`)
+      +(s.id?'':`<button class="capbtn" data-act="cap-open">${ico('pen')}<span><b>التقاط من بيان</b><small>اكتب أي حتة، والذكاء الاصطناعي يكمّلها</small></span>${(db.cap&&db.cap.t)?'<span class="badge part">مسودة</span>':''}</button>`)+(s.restored?`<div class="ch small"><span class="muted">رجّعنالك اللي كنت كاتبه</span><button class="link" data-act="nd-clear">جديد</button></div>`:'')+(s.id?richBox('nd-rich',{t:s.text,h:s.h}):`<textarea class="inp" data-act="nd-text" id="ndText" placeholder="${s.mode==='plan'?'الخطوة':'الفائدة أو الرسالة اللي جاتلك'}" style="min-height:130px">${esc(s.text)}</textarea>`)
       +(s.mode==='note'?`<div class="fld"><span class="lb">المصدر</span>${srcSel('nd-srcsel',s.src)}</div>
        <div class="fld"><span class="lb">الموضوع</span><div class="tagrow">${s.topics.map(o=>`<span class="tg">${esc(o)}</span>`).join('')}<button class="tg add" data-act="nd-topbox">${ico('tag')}${s.topics.length?'تعديل':'اختار موضوع'}</button></div>${view.ndTop?`<div class="tagbox">${chips(cfg.topics,'nd-top',o=>s.topics.includes(o))}</div>`:''}</div>
        <div class="fld"><span class="lb">مين قالها؟ (اختياري)</span><input class="inp" data-act="nd-by" value="${esc(s.by)}" placeholder="الاسم"></div>
@@ -1124,7 +1154,7 @@ document.addEventListener('click',ev=>{
   if(a==='pl-tog'){const x=plan(b.dataset.k)[b.dataset.i];x.done=!x.done;buzz();return upd()}
   if(a==='pl-del'){plan(b.dataset.k).splice(b.dataset.i,1);return upd()}
   if(a==='pl-add'){const inp=document.getElementById('pl-'+b.dataset.k),val=inp.value.trim();if(!val){toast('اكتب الخطوة الأول');return}plan(b.dataset.k).push({id:uid('p'),t:val,done:false});upd();const n2=document.getElementById('pl-'+b.dataset.k);n2&&n2.focus();return}
-  if(a==='mic'){if(b.dataset.kbn)return toggleMic(tgtNew());if(d){const f=findF(d,fid);if(f)toggleMic(tgtDeed(d,f))}return}
+  if(a==='mic'){if(b.dataset.capm)return toggleMic(tgtCap());if(b.dataset.kbn)return toggleMic(tgtNew());if(d){const f=findF(d,fid);if(f)toggleMic(tgtDeed(d,f))}return}
   if(a==='kbadd'&&d){const e=E(id);e.a=e.a||{};const arr=kbArr(e.a[fid]).filter(o=>(o.t||'').trim());const nid=uid('e');arr.push({id:nid,t:''});e.a[fid]=arr;save();if(sheetEl)paintSheet();else render();
     const el=document.querySelector(`[data-act="kbtext"][data-id="${id}"][data-f="${fid}"][data-e="${nid}"]`);if(el)el.focus();return}
   if(a==='kbdel'&&d){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}const e=E(id);e.a[fid]=kbArr(e.a[fid]).filter(o=>o.id!==b.dataset.e);save();if(sheetEl)paintSheet();else render();return}
@@ -1230,6 +1260,11 @@ document.addEventListener('click',ev=>{
       db.circle={id:j.id,name:j.name,code:j.code,owner:a==='c-new'};db.cmeta={pull:'1970-01-01T00:00:00Z',h:{}};save();view.cmem=null;render();toast(a==='c-new'?'اتعملت. ابعت الكود لصاحبك':'دخلت الحلقة ✓');await circleSync();render()}catch(e){toast('محتاج نت، جرّب تاني')}})();return}
   if(a==='c-share'){const C=db.circle,msg=`تعالى نذاكر مع بعض على زاد\nالكود: ${C.code}\nhttps://designpple2-wq.github.io/waqfa-/zad/`;if(navigator.share)navigator.share({text:msg}).catch(()=>{});else{navigator.clipboard&&navigator.clipboard.writeText(msg);toast('اتنسخ')}return}
   if(a==='c-leave'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟ الحاجات اللي من غيرك هتختفي عندك';return}(async()=>{try{await rest(`circle_members?circle_id=eq.${db.circle.id}&user_id=eq.${auth.uid}`,{method:'DELETE'})}catch(e){}db.circle=null;db.shared={};db.cmeta=null;save();render()})();return}
+  if(a==='cap-open'){dropDraft();return openCap()}
+  if(a==='cap-run')return capRun();
+  if(a==='cap-on'){const x=capOf().items[b.dataset.i];x.on=!x.on;save();return paintSheet()}
+  if(a==='cap-back'){capOf().items=null;save();return paintSheet()}
+  if(a==='cap-add')return capAdd();
   if(a==='quiz'){closeSheet(true);return openQuiz(b.dataset.key||'')}
   if(a==='qz-rev'){view.qz.shown[b.dataset.i]=1;return paintSheet()}
   if(a==='qz-all'){view.qz.hide.forEach((h,i)=>{if(h)view.qz.shown[i]=1});return paintSheet()}
@@ -1276,7 +1311,7 @@ document.addEventListener('click',ev=>{
   if(a==='import'){try{toast(doImport($('#importBox').value));save();render()}catch(e){toast('النص ده مش نسخة سليمة')}return}
 });
 document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!a)return;const id=el.dataset.id,d=id&&byId(id),fid=el.dataset.f,v=el.value;
-  if(a==='ocr'){const file=el.files&&el.files[0];el.value='';if(!file)return;if(el.dataset.kbn)return ocrImage(file,tgtNew());const f=d&&findF(d,fid);if(f)ocrImage(file,tgtDeed(d,f));return}
+  if(a==='ocr'){const file=el.files&&el.files[0];el.value='';if(!file)return;if(el.dataset.capm)return ocrImage(file,tgtCap());if(el.dataset.kbn)return ocrImage(file,tgtNew());const f=d&&findF(d,fid);if(f)ocrImage(file,tgtDeed(d,f));return}
   if(a==='kbtext'&&d){const e=E(id);e.a=e.a||{};const arr=kbArr(e.a[fid]),eid=el.dataset.e,o=arr.find(x=>x.id===eid);
     if(o)o.t=v.trim();else if(v.trim()){const nid=uid('e');arr.push({id:nid,t:v.trim()});el.dataset.e=nid}e.a[fid]=arr;delete e.miss;save();
     if(sheetEl){const hh=sheetEl.querySelector('.hh');if(hh)hh.innerHTML=sheetRender().head}return}
@@ -1302,6 +1337,9 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   const f=db.faults.find(x=>x.id===id);
   if(a==='f-name'&&f){f.name=v.trim()||f.name;return upd()}
   if(a==='f-detail'&&f){f.detail=v.trim();save();return}
+  if(a==='cap-src'){capOf().src=v;save();return}
+  if(a==='cap-type'){capOf().items[el.dataset.i].type=v;save();return}
+  if(a==='cap-txt'){capOf().items[el.dataset.i].text=v;save();return}
   if(a==='nd-srcsel'&&view.nd){view.nd.src=v;ndApply();return}
   if(a==='kbn-srcsel'&&view.kbn){view.kbn.src=v;keepDraft();return}
   if(a==='kbi-text'){const r=kbRef(view.kbi);if(r.o){r.o.t=v.trim();r.save()}return}
@@ -1316,7 +1354,7 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   if(a==='shura'){const sh=shuraOf(j,view.day),[g,ff]=el.dataset.path.split('.');(sh[g]||(sh[g]={}))[ff]=v.trim();save();return}
   if(a==='assign'){const sh=shuraOf(j,view.day),x=sh.assign[el.dataset.v]||(sh.assign[el.dataset.v]={});x.who=v.trim();save();return}
 });
-document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(ev.target.matches('textarea.inp'))fitTA(ev.target.parentNode);if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='kbi-rich'||a==='nd-rich'){const el=ev.target.closest('.rich'),h=cleanHTML(el.innerHTML),tx=(el.innerText??el.textContent).trim();if(a==='nd-rich'&&view.nd){view.nd.text=tx;view.nd.h=h;ndApply()}else if(view.kbi){const r=kbRef(view.kbi);if(r.o){r.o.t=tx;r.o.h=h;clearTimeout(rtT);rtT=setTimeout(()=>r.save(),500)}}return}if(a==='cpq'){view.pq=ev.target.value;const el=$('#cpl'),c=(db.cols||[]).find(x=>x.id===view.colId);if(el&&c)el.innerHTML=colPickList(kbItems().filter(x=>!view.pq||x.text.includes(view.pq)),c)}if(a==='pq'){view.pq=ev.target.value;const el=$('#pkl'),f=db.faults.find(x=>x.id===view.kbiBack);if(el&&f)el.innerHTML=pickList(kbItems().filter(x=>!view.pq||x.text.includes(view.pq)),vName(f))}if(a==='nd-text'&&view.nd){view.nd.text=ev.target.value;ndApply()}if(a==='nd-by'&&view.nd){view.nd.by=ev.target.value;ndApply()}if(a==='kbn-text'&&view.kbn){view.kbn.t=ev.target.value;keepDraft()}});
+document.addEventListener('input',ev=>{const a=ev.target.dataset.act;if(ev.target.matches('textarea.inp'))fitTA(ev.target.parentNode);if(a==='kbq'){view.kbq=ev.target.value;const el=$('#kblist');if(el)el.innerHTML=kbList()}if(a==='nsearch'){view.nq=ev.target.value;$('#nlist').innerHTML=notesList()}if(a==='kbi-rich'||a==='nd-rich'){const el=ev.target.closest('.rich'),h=cleanHTML(el.innerHTML),tx=(el.innerText??el.textContent).trim();if(a==='nd-rich'&&view.nd){view.nd.text=tx;view.nd.h=h;ndApply()}else if(view.kbi){const r=kbRef(view.kbi);if(r.o){r.o.t=tx;r.o.h=h;clearTimeout(rtT);rtT=setTimeout(()=>r.save(),500)}}return}if(a==='cpq'){view.pq=ev.target.value;const el=$('#cpl'),c=(db.cols||[]).find(x=>x.id===view.colId);if(el&&c)el.innerHTML=colPickList(kbItems().filter(x=>!view.pq||x.text.includes(view.pq)),c)}if(a==='cap-text'){capOf().t=ev.target.value;clearTimeout(rtT);rtT=setTimeout(save,600)}if(a==='pq'){view.pq=ev.target.value;const el=$('#pkl'),f=db.faults.find(x=>x.id===view.kbiBack);if(el&&f)el.innerHTML=pickList(kbItems().filter(x=>!view.pq||x.text.includes(view.pq)),vName(f))}if(a==='nd-text'&&view.nd){view.nd.text=ev.target.value;ndApply()}if(a==='nd-by'&&view.nd){view.nd.by=ev.target.value;ndApply()}if(a==='kbn-text'&&view.kbn){view.kbn.t=ev.target.value;keepDraft()}});
 document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='kbiTag'){ev.preventDefault();const b=document.querySelector('[data-act="kbi-tagnew"]');if(b)b.click();return}if(ev.key==='Enter'&&ev.target.id==='tagnew'){ev.preventDefault();const b=document.querySelector('[data-act="tag-new"]');if(b)b.click();return}if(ev.key==='Enter'&&ev.target.id&&ev.target.id.startsWith('pl-')){ev.preventDefault();const b=document.querySelector(`[data-act="pl-add"][data-k="${ev.target.id.slice(3)}"]`);b&&b.click()}});
 ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 let lastTouch=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouch<300&&!e.target.closest('input,textarea,select'))e.preventDefault();lastTouch=n},{passive:false});

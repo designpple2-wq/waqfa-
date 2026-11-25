@@ -301,3 +301,7 @@ body.wz nav.tabs{display:none}
 .rate4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.rate4 button{border-radius:16px;padding:10px 4px;display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);background:var(--white)}.rate4 b{font-size:15px}.rate4 span{font-size:12px;color:var(--muted)}
 .rate4 .q0{border-color:rgba(200,16,27,.35)}.rate4 .q0 b{color:var(--alert)}.rate4 .q2{border-color:var(--forest)}.rate4 .q2 b,.rate4 .q3 b{color:var(--forest)}
 .tsel{flex-wrap:wrap}
+.capbtn{display:flex;align-items:center;gap:12px;width:100%;text-align:start;padding:12px 14px;border-radius:16px;background:var(--fog);border:1px dashed var(--forest)}.capbtn svg{width:22px;height:22px;color:var(--forest);flex:0 0 22px}.capbtn span{display:flex;flex-direction:column;flex:1}.capbtn small{color:var(--muted);font-size:12px}
+.capi{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--white);opacity:.75}.capi.on{opacity:1;border-color:var(--forest)}
+.pk-ck{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line);display:grid;place-items:center;flex:0 0 26px}.capi.on .pk-ck{background:var(--forest);border-color:var(--forest);color:#fff}.pk-ck svg{width:14px;height:14px}
+select.inp.sm{width:auto;padding:4px 30px 4px 12px;font-size:14px;margin-inline-start:auto}
