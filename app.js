@@ -805,7 +805,7 @@ async function token(force){if(!force&&Date.now()<auth.exp)return auth.at;const 
 async function afetch(url,opt={}){const go=async f=>fetch(url,{...opt,headers:{apikey:SBK,Authorization:'Bearer '+(await token(f)),'Content-Type':'application/json',...(opt.headers||{})}});let r=await go();if(r.status===401&&auth)r=await go(true);return r}
 async function rest(path,opt={}){const r=await afetch(SB+'/rest/v1/'+path,{...opt,headers:{...(opt.headers||{})}});
   if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||('HTTP '+r.status))}return r.status===204||r.status===201?null:r.json().catch(()=>null)}
-function mergeDB(a,b){const m=cp(a),ua=(x=[],y=[])=>{const ids=new Set(x.map(o=>o&&o.id));return x.concat((y||[]).filter(o=>o&&!ids.has(o.id)))};
+function mergeDB(a,b){const m=cp(a),ua=(x=[],y=[])=>{const ids=new Set(x.map(o=>o&&o.id)),yb=new Map((y||[]).map(o=>[o&&o.id,o]));x=x.map(o=>{const r=o&&yb.get(o.id);return r&&r.ti&&!o.ti?{...o,ti:r.ti}:o});return x.concat((y||[]).filter(o=>o&&!ids.has(o.id)))};
   ['notes','p40','journeys','people','duas','faults','deeds','kb','cols'].forEach(k=>m[k]=ua(a[k]||[],b[k]||[]));m.tags=[...new Set([...(a.tags||[]),...(b.tags||[])])];
   m.gsecs=ua(a.gsecs,b.gsecs).map(s=>{const o=(b.gsecs||[]).find(x=>x.id===s.id);return o?{...s,items:ua(s.items,o.items)}:s});
   for(const t2 in b.goals||{})m.goals[t2]=ua((a.goals||{})[t2],b.goals[t2]);
