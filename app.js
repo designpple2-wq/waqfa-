@@ -639,10 +639,10 @@ function kbRef(r){if(r.c){const o=(db.shared||{})[r.c];return {o,save:()=>{if(o)
 function tagPick(tags,act,newAct,inputId){const all=[...new Set([...(db.tags||[]),...(db.noteCfg.topics||[]),...tags])];
   return `<div class="tagbox">${all.length?`<div class="tagrow">${all.map(x=>`<button class="chip" data-act="${act}" data-v="${esc(x)}" aria-pressed="${tags.includes(x)}">${esc(x)}</button>`).join('')}</div>`:''}
     <div class="row-in"><input class="inp" id="${inputId}" placeholder="تصنيف جديد، زي: الصبر"><button class="btn ghost sm" data-act="${newAct}">أضف</button></div></div>`}
-function openKBItem(r){view.kbi=r;view.kbiTag=false;view.kbn=null;openSheet(()=>{const R2=kbRef(r),o=R2.o;if(!o){closeSheet();return {head:'',body:''}}
+function openKBItem(r){view.kbi=r;view.fix=null;view.kbiTag=false;view.kbn=null;openSheet(()=>{const R2=kbRef(r),o=R2.o;if(!o){closeSheet();return {head:'',body:''}}
   const x=kbItems().find(y=>r.c?y.cid===r.c:r.s?y.sid===r.s:(y.k===r.k&&y.id===r.id&&y.f===r.f&&y.eid===r.e))||{},type=x.type||o.type,tags=o.tags||[],dk=r.c||r.s?o.k:r.k;
   return {head:`<span class="eyebrow">${esc(type)} · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})}</span><h2 class="title">${KBTITLE[type]||esc(type)}</h2>`,
-   body:`${richBox('kbi-rich',o)}
+   body:`${richBox('kbi-rich',o)}<div class="kbt"><button class="tg add" data-act="fix-run" data-v="kbi">${ico('spark')}صحّح وكمّل</button></div>${fixBox('kbi')}
     <div class="fld"><span class="lb">التصنيفات</span><div class="tagrow">${tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}<button class="tg add" data-act="kbi-tagbox">${ico('tag')}${tags.length?'تعديل':'تصنيف'}</button></div>${view.kbiTag?tagPick(tags,'kbi-tag','kbi-tagnew','kbiTag'):''}</div>
     ${(db.cols||[]).length?`<div class="fld"><span class="lb">المجموعات</span><div class="tagrow">${db.cols.map(c=>`<button class="chip" data-act="col-tog" data-c="${c.id}" data-key="${esc(kbKey(x))}" aria-pressed="${c.items.includes(kbKey(x))}">${esc(c.name)}</button>`).join('')}</div></div>`:''}
     <div class="fld"><div class="ch"><span class="lb">المراجعة</span><button class="link" data-act="quiz" data-key="${esc(kbKey(x))}">اختبر نفسك</button></div><span class="small muted">${x.k?kbNext(x):''}</span></div>
@@ -674,14 +674,31 @@ async function capRun(){const c=capOf(),notes=(($('#capText')||{}).value||c.t||'
     const j=await r.json().catch(()=>({}));if(!r.ok||!j.items)throw new Error(j.error==='rate'?'استنى دقيقة وجرّب تاني':'الخدمة زحمة دلوقتي. جرّب كمان شوية');
     c.items=j.items.filter(x=>x&&x.text).map(x=>({...x,type:['حديث','آية','قصة','فائدة'].includes(x.type)?x.type:'فائدة',on:x.confidence!=='low'}));save();if(!c.items.length)toast('مالقيتش حاجة واضحة')}
   catch(e){toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':e.message)}finally{clearTimeout(tm);view.capBusy=false;if(sheetEl)paintSheet()}}
+/* ✦ صحّح وكمّل: one item, checked and completed by AI */
+async function fixRun(where){const txt=where==='kbn'?(($('#kbnText')||{}).value||'').trim():((kbRef(view.kbi).o||{}).t||'').trim();
+  if(!txt){toast('اكتب حاجة الأول');return}if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
+  if(where==='kbn')view.kbn.t=txt;view.fix={where,busy:true};paintSheet();const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),120000);
+  try{const tk=await token();const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({task:'complete',notes:txt})});
+    const j=await r.json().catch(()=>({}));if(!r.ok||!j.items||!j.items.length)throw new Error(j.error==='rate'?'استنى دقيقة وجرّب تاني':'مقدرش يتعرّف عليه. جرّب تاني');
+    view.fix={where,res:j.items[0]}}
+  catch(e){view.fix=null;toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي':e.message)}finally{clearTimeout(tm);if(sheetEl)paintSheet()}}
+function fixBox(where){const F=view.fix;if(!F||F.where!==where)return '';if(F.busy)return '<p class="small muted">بيراجع ويكمّل…</p>';const x=F.res,cf=CONF[x.confidence]||CONF.low;
+  return `<section class="capi on"><div class="ch"><span class="badge ${cf[0]}">${cf[1]}</span><span class="small muted">${esc(x.type||'')}</span></div>${x.title?`<b>${esc(x.title)}</b>`:''}<p class="rv">${esc(x.text||'')}</p>
+   ${x.source?`<span class="small">${esc(x.source)}</span>`:''}${x.note?`<span class="small" style="color:var(--alert)">${esc(x.note)}</span>`:''}
+   <div class="ch"><button class="link" data-act="fix-x">سيبه زي ما هو</button><button class="btn sm" data-act="fix-use">استخدم ده</button></div></section>`}
+function fixUse(){const F=view.fix,x=F&&F.res;if(!x)return;const body=(x.text||'').trim(),src=x.source?`\n(${x.source})`:'';
+  const h=(x.title?`<h3>${esc(x.title)}</h3>`:'')+esc(body).replace(/\n/g,'<br>')+(x.source?`<br><span style="color: rgb(90, 103, 94);">(${esc(x.source)})</span>`:'');
+  if(F.where==='kbn'){const s=view.kbn;s.t=(x.title?x.title+'\n':'')+body+src;s.h=h;if(['حديث','آية','قصة','فائدة'].includes(x.type)&&ZTYPES().includes(x.type))s.type=x.type;if(x.tags&&x.tags.length)s.tags=[...new Set([...(s.tags||[]),...x.tags.slice(0,2)])];keepDraft()}
+  else{const r=kbRef(view.kbi);if(r.o){r.o.t=(x.title?x.title+'\n':'')+body+src;r.o.h=h;r.save()}}
+  view.fix=null;paintSheet();toast('اتعدّل ✓')}
 function capAdd(){const c=capOf(),sel=(c.items||[]).filter(x=>x.on);if(!sel.length){toast('علّم على حاجة الأول');return}db.kb=db.kb||[];const k=dayKey();
   sel.forEach(x=>{const tx=(x.text||'').trim()+(x.source?`\n(${x.source})`:'');db.kb.push({id:uid('kb'),k,type:x.type,t:(x.title?x.title+'\n':'')+tx,
     h:(x.title?`<h3>${esc(x.title)}</h3>`:'')+esc((x.text||'').trim()).replace(/\n/g,'<br>')+(x.source?`<br><span style="color: rgb(90, 103, 94);">(${esc(x.source)})</span>`:''),tags:(x.tags||[]).slice(0,3),src:c.src||''})});
   db.cap=null;save();closeSheet();toast(`اتضاف ${num(sel.length)} لبنك المعرفة ✓`)}
-function openKBNew(type,text,prev){view.kbi=null;view.nd=null;view.kbn=prev?{...prev,type}:{type,t:text||'',tags:[],src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():''};view.kbiTag=false;keepDraft();
+function openKBNew(type,text,prev){view.kbi=null;view.fix=null;view.nd=null;view.kbn=prev?{...prev,type}:{type,t:text||'',tags:[],src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():''};view.kbiTag=false;keepDraft();
   openSheet(()=>{const s=view.kbn;if(!s)return {head:'',body:''};return {head:`<span class="eyebrow">إضافة لعلمي</span><h2 class="title">${{'حديث':'حديث جديد','آية':'آية جديدة','قصة':'قصة جديدة','ملخص':'ملخص درس أو كتاب'}[s.type]||(s.type+' جديد')}</h2>`,
    body:`<button class="capbtn" data-act="cap-open">${ico('pen')}<span><b>التقاط من بيان</b><small>اكتب أي حتة، والذكاء الاصطناعي يكمّلها</small></span>${(db.cap&&db.cap.t)?'<span class="badge part">مسودة</span>':''}</button>${addSeg('kbn-mode',KBT_R[s.type])}<textarea class="inp" id="kbnText" data-act="kbn-text" placeholder="${{'حديث':'نص الحديث، وراويه لو تعرفه','آية':'الآية، واسم السورة ورقمها','قصة':'القصة باختصار، ومن أي كتاب','ملخص':'اسم الدرس أو الكتاب، وأهم النقاط'}[s.type]||''}" style="min-height:140px">${esc(s.t)}</textarea>
-    <div class="kbt"><span class="small muted">صوّر الصفحة أو سجّل بصوتك</span>${toolsHTML('kbn','data-kbn="1"')}</div>
+    <div class="kbt"><button class="tg add" data-act="fix-run" data-v="kbn">${ico('spark')}صحّح وكمّل</button>${toolsHTML('kbn','data-kbn="1"')}</div>${fixBox('kbn')}
     <div class="fld"><span class="lb">التصنيفات</span><div class="tagrow">${(s.tags||[]).map(x=>`<span class="tg">${esc(x)}</span>`).join('')}<button class="tg add" data-act="kbi-tagbox">${ico('tag')}${(s.tags||[]).length?'تعديل':'تصنيف'}</button></div>${view.kbiTag?tagPick(s.tags||[],'kbi-tag','kbi-tagnew','kbiTag'):''}</div>
     <div class="fld"><span class="lb">سمعته فين؟ (اختياري)</span>${srcSel('kbn-srcsel',s.src)}</div>`,
    foot:'<button class="btn ghost" data-act="close-sheet">بعدين</button><button class="btn" data-act="kbn-save">احفظ</button>'}});
@@ -1179,7 +1196,7 @@ document.addEventListener('click',ev=>{
   if(a==='kbi-del'){if(!b.dataset.sure){b.dataset.sure=1;b.classList.add('sure');b.textContent='متأكد؟';return}kbRef(view.kbi).del();closeSheet();toast('اتمسح');return}
   if(a==='kbn-type'){view.kbn.type=v;keepDraft();return paintSheet()}
   if(a==='kbn-src'){view.kbn.src=view.kbn.src===v?'':v;return paintSheet()}
-  if(a==='kbn-save'){const s=view.kbn,tx=(($('#kbnText')||{}).value||s.t||'').trim();if(!tx){toast('اكتب الأول');return}db.kb=db.kb||[];db.kb.push({id:uid('kb'),k:dayKey(),type:s.type,t:tx,tags:s.tags||[],src:s.src||''});dropDraft();save();view.kbn=null;closeSheet();toast(`اتحفظ في علمي ✓`);if(view.kbnBack){const fb=view.kbnBack;view.kbnBack=null;openFault(fb)}return}
+  if(a==='kbn-save'){const s=view.kbn,tx=(($('#kbnText')||{}).value||s.t||'').trim();if(!tx){toast('اكتب الأول');return}db.kb=db.kb||[];db.kb.push({id:uid('kb'),k:dayKey(),type:s.type,t:tx,...(s.h&&tx===(s.t||'').trim()?{h:s.h}:{}),tags:s.tags||[],src:s.src||''});dropDraft();save();view.kbn=null;closeSheet();toast(`اتحفظ في علمي ✓`);if(view.kbnBack){const fb=view.kbnBack;view.kbnBack=null;openFault(fb)}return}
   if(a==='p40-edit')return openP40();
   if(a==='p40-add'){const v2=$('#p40-new').value.trim();if(!v2){toast('اكتب البند الأول');return}db.p40.push({id:uid('p40'),text:v2,link:$('#p40-newlink').value||null});save();paintSheet();render();toast('اتضاف');return}
   if(a==='p40-del'){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}db.p40=db.p40.filter(x=>x.id!==id);save();paintSheet();return render()}
@@ -1262,6 +1279,9 @@ document.addEventListener('click',ev=>{
   if(a==='c-leave'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟ الحاجات اللي من غيرك هتختفي عندك';return}(async()=>{try{await rest(`circle_members?circle_id=eq.${db.circle.id}&user_id=eq.${auth.uid}`,{method:'DELETE'})}catch(e){}db.circle=null;db.shared={};db.cmeta=null;save();render()})();return}
   if(a==='cap-open'){dropDraft();return openCap()}
   if(a==='cap-run')return capRun();
+  if(a==='fix-run')return fixRun(v);
+  if(a==='fix-use')return fixUse();
+  if(a==='fix-x'){view.fix=null;return paintSheet()}
   if(a==='cap-on'){const x=capOf().items[b.dataset.i];x.on=!x.on;save();return paintSheet()}
   if(a==='cap-back'){capOf().items=null;save();return paintSheet()}
   if(a==='cap-add')return capAdd();
