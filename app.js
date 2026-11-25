@@ -5,7 +5,7 @@ const KEY='waqfa.v1';
 /* ================= icons ================= */
 const P={salah:'<path d="M4 20h16M6 20v-8a6 6 0 0 1 12 0v8M12 6V3"/>',dhikr:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16M8 12h8"/>',fardi:'<path d="M4 5h16v11H9l-5 4z"/>',
  jamaai:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15.5 14.2c2.9.3 5.5 2.6 5.5 5.8"/>',adab:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
- nafs:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',ok:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+ nafs:'<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',ok:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
  back:'<path d="M9 6l6 6-6 6"/>',fwd:'<path d="M15 6l-6 6 6 6"/>',up:'<path d="M6 15l6-6 6 6"/>',down:'<path d="M6 9l6 6 6-6"/>',map:'<path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',cam:'<path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.2l1.6-2.2h6.4L16.8 7H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="12" cy="12.8" r="3.4"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',tag:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/>',pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>',book:'<path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5zM12 6.5v13"/>',trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>',plus:'<path d="M12 5v14M5 12h14"/>',spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',stop:'<rect x="7" y="7" width="10" height="10" rx="2.5" fill="currentColor" stroke="none"/>'};
 const ico=(n,cls='')=>`<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]||''}</svg>`;
@@ -284,7 +284,7 @@ function fieldHTML(d,f,e,k){if(!visible(f,e,k))return '';const v=ans(e,f.id),A=`
   else if(f.type==='num'){const n=Number(v||0),st=f.step||1;
     h+=`<div class="stepper"><button class="sb" data-act="inc" ${A} data-n="${-st}" aria-label="أقل">−</button><input type="number" inputmode="numeric" min="0" data-act="numin" ${A} value="${n||''}" placeholder="0"><button class="sb" data-act="inc" ${A} data-n="${st}" aria-label="أكتر">+</button><span class="u">${esc(f.unit||'')}${f.goal?` من ${num(f.goal)}`:''}</span></div>${f.goal?`<div class="meter"><i style="width:${Math.min(100,n/f.goal*100)}%"></i></div>`:''}`}
   else if(f.type==='text'&&f.kb){const arr=kbArr(v),more=f.kb==='حديث'?'تاني':'تانية';
-    h+=(arr.length?arr:[{id:'new',t:''}]).map((o,i)=>`<div class="row-in" style="align-items:flex-start"><textarea class="inp" data-act="kbtext" ${A} data-e="${o.id}" placeholder="${esc(i?f.kb+' '+more:(f.ph||'اكتب هنا'))}">${esc(o.t||'')}</textarea>${arr.length>1?xbtn('kbdel',`${A} data-e="${o.id}"`):''}</div>${o.id!=='new'&&(o.t||'').trim()?tagRow(o,A,d.id+f.id+o.id):''}`).join('')
+    h+=(arr.length?arr:[{id:'new',t:''}]).map((o,i)=>`${o.id!=='new'&&(o.t||'').trim()?`<input class="inp ti" data-act="kbti" ${A} data-e="${o.id}" value="${esc(o.ti||'')}" placeholder="عنوان يفكّرك بيه">`:''}<div class="row-in" style="align-items:flex-start"><textarea class="inp" data-act="kbtext" ${A} data-e="${o.id}" placeholder="${esc(i?f.kb+' '+more:(f.ph||'اكتب هنا'))}">${esc(o.t||'')}</textarea>${arr.length>1?xbtn('kbdel',`${A} data-e="${o.id}"`):''}</div>${o.id!=='new'&&(o.t||'').trim()?tagRow(o,A,d.id+f.id+o.id):''}`).join('')
       +`<div class="kbt"><button class="link" data-act="kbadd" ${A}>+ ${esc(f.kb)} ${more}</button>${toolsHTML(d.id+f.id,A)}</div>`}
   else if(f.type==='text'){h+=`<textarea class="inp" data-act="text" ${A} placeholder="${esc(f.ph||'اكتب هنا')}">${esc(v||'')}</textarea>`}
   else if(f.type==='counts'){const c=v||{};h+=`<div>${f.items.map(it=>{const n=Number(c[it.n]||0);return `<div class="crow"><span class="n">${esc(it.n)}</span><span class="mini"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="-10">−</button><input type="number" inputmode="numeric" data-act="cnt" ${A} data-k="${esc(it.n)}" value="${n||''}" placeholder="0"><button data-act="cinc" ${A} data-k="${esc(it.n)}" data-n="33">+</button></span><span class="g ${n>=it.goal?'ok':''}">/ ${num(it.goal)}</span></div>`}).join('')}</div><p class="small muted">+ ٣٣  ·  − ١٠</p>`}
@@ -309,7 +309,7 @@ function deedBody(d,k){const e=(db.logs[k]||{})[d.id]||{a:{}};
 /* ================= sheet ================= */
 let sheetEl=null,sheetRender=null;
 function openSheet(renderFn,opts={}){closeSheet(true);sheetRender=renderFn;const s=document.createElement('div');s.className='scrim';
-  s.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="sh-h"><div class="grab"></div><div class="hh"></div></div><div class="sh-b"></div><div class="sh-f"></div></div>`;
+  s.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="sh-h"><div class="grab"></div><button class="sh-x" data-act="close-sheet" aria-label="اقفل">${ico('x')}</button><div class="hh"></div></div><div class="sh-b"></div><div class="sh-f"></div></div>`;
   s.addEventListener('click',ev=>{if(ev.target===s)closeSheet()});document.body.appendChild(s);
   const sh=s.querySelector('.sheet');let y0=null,x0=0,dy=0,drag=false;
   sh.addEventListener('touchstart',e=>{const b=sh.querySelector('.sh-b');if(e.target.closest('input[type=range]')){y0=null;return}if(e.target.closest('.sh-h')||(e.target.closest('.sh-b')&&b.scrollTop<=0)){y0=e.touches[0].clientY;x0=e.touches[0].clientX;dy=0;drag=false}else y0=null},{passive:true});
@@ -545,7 +545,7 @@ function rtApply(v){const box=document.querySelector('.rich');if(!box)return;
   if(k==='fc'||k==='hc'||k==='fb'||k==='fs'){view.rtPal='';const w=document.querySelector('.rtw');if(w)w.outerHTML=rtBar()}
   box.dispatchEvent(new Event('input',{bubbles:true}))}
 const richView=x=>x.h?x.h:esc(x.text||x.t||'');
-const kbCard=x=>`<button class="ncard" data-act="kb-open" ${kbAttr(x)}><span class="nm"><span class="badge done">${esc(x.type)}</span><span class="small muted">${x.by?esc(x.by)+' · ':''}${kbNext(x)}</span></span><p>${esc(x.text)}</p>${x.tags.length?`<span class="tagrow">${x.tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}</span>`:''}</button>`;
+const kbCard=x=>`<button class="ncard" data-act="kb-open" ${kbAttr(x)}><span class="nm"><span class="badge done">${esc(x.type)}</span><span class="small muted">${x.by?esc(x.by)+' · ':''}${kbNext(x)}</span></span>${x.ti?`<b class="kti">${esc(x.ti)}</b>`:''}<p>${esc(x.text)}</p>${x.tags.length?`<span class="tagrow">${x.tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}</span>`:''}</button>`;
 function allTags(){const kb=kbItems(),m=new Map();const add=(s,key)=>{if(!s)return;const o=m.get(s)||{kb:0,notes:0};if(key)o[key]++;m.set(s,o)};
   (db.tags||[]).forEach(s=>add(s));(db.noteCfg.topics||[]).forEach(s=>add(s));kb.forEach(x=>x.tags.forEach(s=>add(s,'kb')));db.notes.forEach(n=>(n.topics||[]).forEach(s=>add(s,'notes')));
   return [...m].map(([s,o])=>({s,...o})).sort((a,b)=>(b.kb+b.notes)-(a.kb+a.notes))}
@@ -582,10 +582,10 @@ function renderSess(){const S=view.sess;if(!S){view.sub=null;return renderZHome(
   const key=S.q[S.i],x=map.get(key);if(!x){S.i++;return renderSess()}const r=(db.kbr||{})[key],isNew=!r||!r.reps;
   const words=x.text.split(/\s+/),hint=words.slice(0,Math.min(8,Math.ceil(words.length/4))).join(' ');
   const nx=[0,1,2,3].map(q=>ivLabel(srsNext(r,q).ivl));
-  return `<header class="sess-top rise"><button class="iconbtn" data-act="sess-end" aria-label="إنهاء">${ico('x')}</button><div class="meter"><i style="width:${Math.round(S.i/S.q.length*100)}%"></i></div><span class="small muted"><bdi>${S.i+1}/${S.q.length}</bdi>${S.min?` · <bdi>${el}/${S.min}</bdi> د`:''}</span></header>
+  return `<header class="sess-top rise"><button class="iconbtn" data-act="sess-end" aria-label="إنهاء">${ico('x')}</button><div class="meter"><i style="width:${Math.round(S.i/S.q.length*100)}%"></i></div><span class="small muted"><bdi>${S.i+1}</bdi> من <bdi>${S.q.length}</bdi>${S.min?` · ${ico('clock')}<bdi>${el}</bdi> من <bdi>${S.min}</bdi> دقيقة`:''}</span></header>
    ${over?'<p class="note-c">خلص الوقت اللي حددته. تقدر تكمّل أو تنهي.</p>':''}
    <section class="card sess-card rise"><div class="ch"><span class="badge ${isNew?'':'done'}">${isNew?'جديد':esc(x.type)}</span>${x.tags.length?`<span class="small muted">${esc(x.tags.slice(0,2).join(' · '))}</span>`:''}</div>
-    ${S.open?`<div class="rv sess-txt">${richView(x)}</div>`:`<p class="sess-hint">${esc(hint)} …</p><p class="small muted">افتكره كله، وبعدين اكشف.</p>`}</section>
+    ${x.ti?`<h2 class="sess-ti">${esc(x.ti)}</h2>`:''}${S.open?`<div class="rv sess-txt">${richView(x)}</div>${x.ti?'':`<input class="inp" data-act="sess-ti" data-key="${esc(key)}" placeholder="حط عنوان يفكّرك بيه المرة الجاية">`}`:x.ti?`<p class="small muted">افتكر النص كله، وبعدين اكشف.</p>`:`<p class="sess-hint">${esc(hint)} …</p><p class="small muted">افتكره كله، وبعدين اكشف.</p>`}</section>
    ${S.open?`<div class="rate4 rise">${[['نسيت',0],['صعب',1],['كويس',2],['سهل',3]].map(([l,q])=>`<button data-act="sess-rate" data-v="${q}" class="q${q}"><b>${l}</b><span>${nx[q]}</span></button>`).join('')}</div>`
      :`<button class="btn block rise" data-act="sess-open">اكشف</button>`}`}
 function zadReviewCard(){const Q=sessQueue(),m=view.sessMin??15;
@@ -623,7 +623,7 @@ function openQuiz(key){const x=key?kbItems().find(y=>kbKey(y)===key):quizPick();
     return {head:`<span class="eyebrow">اختبار · ${esc(x.type)}</span><h2 class="title">كمّل من حفظك</h2>`,
      body:`<p class="qz">${q.W.map((w,i)=>q.hide[i]&&!q.shown[i]?`<button class="qb" data-act="qz-rev" data-i="${i}">${'ـ'.repeat(Math.min(8,Math.max(3,w.length)))}</button>`:esc(w)).join('')}</p>
       ${left?`<button class="link" data-act="qz-all" style="align-self:center">اكشف الكل</button>`:`<span class="lb">فاكر قد إيه؟</span><div class="seg">${[['0','نسيت'],['1','بالعافية'],['2','فاكر كويس']].map(([v,l])=>`<button data-act="kb-rate" data-quiz="1" data-k="${esc(q.key)}" data-v="${v}">${l}</button>`).join('')}</div>`}`,
-     foot:'<button class="btn ghost" data-act="close-sheet">بعدين</button><button class="btn" data-act="quiz" data-key="">واحد تاني</button>'}})}
+     foot:'<button class="btn" data-act="quiz" data-key="">واحد تاني</button>'}})}
 
 function renderIlm(){const v=view.ilm||'kb',n=kbItems().length+db.notes.length;
   return top(`${num(n)} حاجة اتعلمتها`,APP==='zad'?'المكتبة':'علمي',gearBtn)+`<div class="seg-tabs">${[['kb','أحاديث وآيات'],['notes','الفوايد'],['tags','التصنيفات']].map(([x,l])=>`<button data-act="ilm" data-v="${x}" aria-pressed="${v===x}">${l}</button>`).join('')}</div>`
@@ -642,7 +642,7 @@ function tagPick(tags,act,newAct,inputId){const all=[...new Set([...(db.tags||[]
 function openKBItem(r){view.kbi=r;view.fix=null;view.kbiTag=false;view.kbn=null;openSheet(()=>{const R2=kbRef(r),o=R2.o;if(!o){closeSheet();return {head:'',body:''}}
   const x=kbItems().find(y=>r.c?y.cid===r.c:r.s?y.sid===r.s:(y.k===r.k&&y.id===r.id&&y.f===r.f&&y.eid===r.e))||{},type=x.type||o.type,tags=o.tags||[],dk=r.c||r.s?o.k:r.k;
   return {head:`<span class="eyebrow">${esc(type)} · ${fmt(dk,{weekday:'long',day:'numeric',month:'long'})}</span><h2 class="title">${KBTITLE[type]||esc(type)}</h2>`,
-   body:`${richBox('kbi-rich',o)}<div class="kbt"><button class="tg add" data-act="fix-run" data-v="kbi">${ico('spark')}صحّح وكمّل</button></div>${fixBox('kbi')}
+   body:`<input class="inp ti" data-act="kbi-ti" value="${esc(tiOf(o))}" placeholder="العنوان: كلمتين يفكّروك بيه">${richBox('kbi-rich',o)}<div class="kbt"><button class="tg add" data-act="fix-run" data-v="kbi">${ico('spark')}صحّح وكمّل</button></div>${fixBox('kbi')}
     <div class="fld"><span class="lb">التصنيفات</span><div class="tagrow">${tags.map(s=>`<span class="tg">${esc(s)}</span>`).join('')}<button class="tg add" data-act="kbi-tagbox">${ico('tag')}${tags.length?'تعديل':'تصنيف'}</button></div>${view.kbiTag?tagPick(tags,'kbi-tag','kbi-tagnew','kbiTag'):''}</div>
     ${(db.cols||[]).length?`<div class="fld"><span class="lb">المجموعات</span><div class="tagrow">${db.cols.map(c=>`<button class="chip" data-act="col-tog" data-c="${c.id}" data-key="${esc(kbKey(x))}" aria-pressed="${c.items.includes(kbKey(x))}">${esc(c.name)}</button>`).join('')}</div></div>`:''}
     <div class="fld"><div class="ch"><span class="lb">المراجعة</span><button class="link" data-act="quiz" data-key="${esc(kbKey(x))}">اختبر نفسك</button></div><span class="small muted">${x.k?kbNext(x):''}</span></div>
@@ -658,7 +658,7 @@ function openCap(){view.kbn=null;view.nd=null;openSheet(()=>{const c=capOf();
     body:`<p class="small muted">علّم على اللي متأكد منه. اللي مكتوب عليه "اتأكد منه" راجعه في كتاب الأول.</p>${c.items.map((x,i)=>{const cf=CONF[x.confidence]||CONF.low;return `<section class="capi ${x.on?'on':''}">
       <div class="ch"><button class="pk-ck" data-act="cap-on" data-i="${i}" aria-label="اختار">${x.on?ico('ok'):''}</button><span class="badge ${x.sum?'ink':cf[0]}">${x.sum?'الملخص':cf[1]}</span>
        <select class="inp sm" data-act="cap-type" data-i="${i}">${[...new Set([...ZTYPES(),x.type])].map(o=>`<option ${o===x.type?'selected':''}>${esc(o)}</option>`).join('')}</select></div>
-      ${x.title?`<b>${esc(x.title)}</b>`:''}<textarea class="inp" data-act="cap-txt" data-i="${i}">${esc(x.text||'')}</textarea>
+      <input class="inp ti" data-act="cap-ti" data-i="${i}" value="${esc(x.title||'')}" placeholder="العنوان"><textarea class="inp" data-act="cap-txt" data-i="${i}">${esc(x.text||'')}</textarea>
       ${x.source?`<span class="small">${esc(x.source)}</span>`:''}${x.note?`<span class="small" style="color:var(--alert)">${esc(x.note)}</span>`:''}
       <span class="small muted">كتبت: ${esc(x.from||'')}</span></section>`}).join('')}`,
     foot:`<button class="btn ghost" data-act="cap-back">رجوع</button><button class="btn" data-act="cap-add">ضيف (${num(c.items.filter(x=>x.on).length)})</button>`};
@@ -666,12 +666,12 @@ function openCap(){view.kbn=null;view.nd=null;openSheet(()=>{const c=capOf();
    body:`<div class="fld"><span class="lb">البيان</span>${srcSel('cap-src',c.src)}</div>
     <textarea class="inp" id="capText" data-act="cap-text" style="min-height:220px" placeholder="اكتب زي ما تحب، من غير ترتيب&#10;نقط البيان، أو أطراف أحاديث وآيات&#10;مثلًا: إنما الأعمال&#10;ومن يتق الله يجعل له">${esc(c.t||'')}</textarea>
     <div class="kbt"><span class="small muted">أو سجّل بصوتك</span>${toolsHTML('cap','data-capm="1"')}</div>`,
-   foot:`<button class="btn ghost" data-act="close-sheet">بعدين</button><button class="btn" data-act="cap-run">${ico('spark')} نظّم وكمّل</button>`}})}
+   foot:`<button class="btn" data-act="cap-run">${ico('spark')} نظّم وكمّل</button>`}})}
 async function capRun(){const c=capOf(),notes=(($('#capText')||{}).value||c.t||'').trim();c.t=notes;save();if(!notes){toast('اكتب حاجة الأول');return}
   if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت. اللي كتبته متحفظ، كمّله لما النت يرجع');return}
   view.capBusy=true;paintSheet();const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),150000);
-  try{const tk=await token();const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({task:'organize',notes})});
-    const j=await r.json().catch(()=>({}));if(!r.ok||!j.items)throw new Error(j.error==='rate'?'استنى دقيقة وجرّب تاني':'الخدمة زحمة دلوقتي. جرّب كمان شوية');
+  try{const r=await afetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{},body:JSON.stringify({task:'organize',notes})});
+    const j=await r.json().catch(()=>({}));if(!r.ok||!j.items)throw new Error(r.status===401?'الجلسة خلصت. ادخل تاني من ⚙︎':j.error==='rate'?'استنى دقيقة وجرّب تاني':'الخدمة زحمة دلوقتي. جرّب كمان شوية');
     const sm=j.summary&&j.summary.sections&&j.summary.sections.length?[{type:'ملخص',sum:j.summary,title:j.summary.title||'ملخص البيان',text:'',confidence:'high',on:true,from:'كل ملاحظاتك'}]:[];if(sm.length)sm[0].text=capSumText(sm[0]);
     c.items=[...sm,...j.items.filter(x=>x&&x.text).map(x=>({...x,type:['حديث','آية','قصة','فائدة'].includes(x.type)?x.type:'فائدة',on:x.confidence!=='low'}))];save();if(!c.items.length)toast('مالقيتش حاجة واضحة')}
   catch(e){toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':e.message)}finally{clearTimeout(tm);view.capBusy=false;if(sheetEl)paintSheet()}}
@@ -679,8 +679,8 @@ async function capRun(){const c=capOf(),notes=(($('#capText')||{}).value||c.t||'
 async function fixRun(where){const txt=where==='kbn'?(($('#kbnText')||{}).value||'').trim():((kbRef(view.kbi).o||{}).t||'').trim();
   if(!txt){toast('اكتب حاجة الأول');return}if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
   if(where==='kbn')view.kbn.t=txt;view.fix={where,busy:true};paintSheet();const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),120000);
-  try{const tk=await token();const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({task:'complete',notes:txt})});
-    const j=await r.json().catch(()=>({}));if(!r.ok||!j.items||!j.items.length)throw new Error(j.error==='rate'?'استنى دقيقة وجرّب تاني':'مقدرش يتعرّف عليه. جرّب تاني');
+  try{const r=await afetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{},body:JSON.stringify({task:'complete',notes:txt})});
+    const j=await r.json().catch(()=>({}));if(!r.ok||!j.items||!j.items.length)throw new Error(r.status===401?'الجلسة خلصت. ادخل تاني من ⚙︎':j.error==='rate'?'استنى دقيقة وجرّب تاني':'مقدرش يتعرّف عليه. جرّب تاني');
     view.fix={where,res:j.items[0]}}
   catch(e){view.fix=null;toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي':e.message)}finally{clearTimeout(tm);if(sheetEl)paintSheet()}}
 function fixBox(where){const F=view.fix;if(!F||F.where!==where)return '';if(F.busy)return '<p class="small muted">بيراجع ويكمّل…</p>';const x=F.res,cf=CONF[x.confidence]||CONF.low;
@@ -688,23 +688,23 @@ function fixBox(where){const F=view.fix;if(!F||F.where!==where)return '';if(F.bu
    ${x.source?`<span class="small">${esc(x.source)}</span>`:''}${x.note?`<span class="small" style="color:var(--alert)">${esc(x.note)}</span>`:''}
    <div class="ch"><button class="link" data-act="fix-x">سيبه زي ما هو</button><button class="btn sm" data-act="fix-use">استخدم ده</button></div></section>`}
 function fixUse(){const F=view.fix,x=F&&F.res;if(!x)return;const body=(x.text||'').trim(),src=x.source?`\n(${x.source})`:'';
-  const h=(x.title?`<h3>${esc(x.title)}</h3>`:'')+esc(body).replace(/\n/g,'<br>')+(x.source?`<br><span style="color: rgb(90, 103, 94);">(${esc(x.source)})</span>`:'');
-  if(F.where==='kbn'){const s=view.kbn;s.t=(x.title?x.title+'\n':'')+body+src;s.h=h;if(['حديث','آية','قصة','فائدة'].includes(x.type)&&ZTYPES().includes(x.type))s.type=x.type;if(x.tags&&x.tags.length)s.tags=[...new Set([...(s.tags||[]),...x.tags.slice(0,2)])];keepDraft()}
-  else{const r=kbRef(view.kbi);if(r.o){r.o.t=(x.title?x.title+'\n':'')+body+src;r.o.h=h;r.save()}}
+  const h=esc(body).replace(/\n/g,'<br>')+(x.source?`<br><span style="color: rgb(90, 103, 94);">(${esc(x.source)})</span>`:'');
+  if(F.where==='kbn'){const s=view.kbn;s.t=body+src;s.h=h;if(x.title)s.ti=x.title;if(['حديث','آية','قصة','فائدة'].includes(x.type)&&ZTYPES().includes(x.type))s.type=x.type;if(x.tags&&x.tags.length)s.tags=[...new Set([...(s.tags||[]),...x.tags.slice(0,2)])];keepDraft()}
+  else{const r=kbRef(view.kbi);if(r.o){r.o.t=body+src;r.o.h=h;if(x.title&&!r.o.ti)r.o.ti=x.title;r.save()}}
   view.fix=null;paintSheet();toast('اتعدّل ✓')}
 const capSumText=x=>x.sum.sections.map(s=>(s.heading||'')+'\n'+(s.points||[]).map(p=>'• '+p).join('\n')).join('\n\n');
 function capAdd(){const c=capOf(),sel=(c.items||[]).filter(x=>x.on);if(!sel.length){toast('علّم على حاجة الأول');return}db.kb=db.kb||[];const k=dayKey();
-  sel.forEach(x=>{if(x.sum&&x.text===capSumText(x)){db.kb.push({id:uid('kb'),k,type:'ملخص',t:x.title+'\n'+x.text,h:`<h2>${esc(x.title)}</h2>`+x.sum.sections.map(s=>`<h3>${esc(s.heading||'')}</h3><ul>${(s.points||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>`).join(''),tags:[],src:c.src||''});return}
-    const tx=(x.text||'').trim()+(x.source?`\n(${x.source})`:'');db.kb.push({id:uid('kb'),k,type:x.type,t:(x.title?x.title+'\n':'')+tx,
-    h:(x.title?`<h3>${esc(x.title)}</h3>`:'')+esc((x.text||'').trim()).replace(/\n/g,'<br>')+(x.source?`<br><span style="color: rgb(90, 103, 94);">(${esc(x.source)})</span>`:''),tags:(x.tags||[]).slice(0,3),src:c.src||''})});
+  sel.forEach(x=>{if(x.sum&&x.text===capSumText(x)){db.kb.push({id:uid('kb'),k,type:'ملخص',ti:x.title,t:x.text,h:x.sum.sections.map(s=>`<h3>${esc(s.heading||'')}</h3><ul>${(s.points||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>`).join(''),tags:[],src:c.src||''});return}
+    const tx=(x.text||'').trim()+(x.source?`\n(${x.source})`:'');db.kb.push({id:uid('kb'),k,type:x.type,ti:(x.title||'').trim()||(x.text||'').trim().split(/\s+/).slice(0,6).join(' '),t:tx,
+    h:esc((x.text||'').trim()).replace(/\n/g,'<br>')+(x.source?`<br><span style="color: rgb(90, 103, 94);">(${esc(x.source)})</span>`:''),tags:(x.tags||[]).slice(0,3),src:c.src||''})});
   db.cap=null;save();closeSheet();toast(`اتضاف ${num(sel.length)} لبنك المعرفة ✓`)}
 function openKBNew(type,text,prev){view.kbi=null;view.fix=null;view.nd=null;view.kbn=prev?{...prev,type}:{type,t:text||'',tags:[],src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():''};view.kbiTag=false;keepDraft();
   openSheet(()=>{const s=view.kbn;if(!s)return {head:'',body:''};return {head:`<span class="eyebrow">إضافة لعلمي</span><h2 class="title">${{'حديث':'حديث جديد','آية':'آية جديدة','قصة':'قصة جديدة','ملخص':'ملخص درس أو كتاب'}[s.type]||(s.type+' جديد')}</h2>`,
-   body:`<button class="capbtn" data-act="cap-open">${ico('pen')}<span><b>التقاط من بيان</b><small>اكتب أي حاجة، وهو ينظّمها ويطلّع الأحاديث والآيات</small></span>${(db.cap&&db.cap.t)?'<span class="badge part">مسودة</span>':''}</button>${addSeg('kbn-mode',KBT_R[s.type])}<textarea class="inp" id="kbnText" data-act="kbn-text" placeholder="${{'حديث':'نص الحديث، وراويه لو تعرفه','آية':'الآية، واسم السورة ورقمها','قصة':'القصة باختصار، ومن أي كتاب','ملخص':'اسم الدرس أو الكتاب، وأهم النقاط'}[s.type]||''}" style="min-height:140px">${esc(s.t)}</textarea>
+   body:`<button class="capbtn" data-act="cap-open">${ico('pen')}<span><b>التقاط من بيان</b><small>اكتب أي حاجة، وهو ينظّمها ويطلّع الأحاديث والآيات</small></span>${(db.cap&&db.cap.t)?'<span class="badge part">مسودة</span>':''}</button>${addSeg('kbn-mode',KBT_R[s.type])}<input class="inp ti" id="kbnTi" data-act="kbn-ti" value="${esc(s.ti||'')}" placeholder="العنوان: كلمتين يفكّروك بيه"><textarea class="inp" id="kbnText" data-act="kbn-text" placeholder="${{'حديث':'نص الحديث، وراويه لو تعرفه','آية':'الآية، واسم السورة ورقمها','قصة':'القصة باختصار، ومن أي كتاب','ملخص':'اسم الدرس أو الكتاب، وأهم النقاط'}[s.type]||''}" style="min-height:140px">${esc(s.t)}</textarea>
     <div class="kbt"><button class="tg add" data-act="fix-run" data-v="kbn">${ico('spark')}صحّح وكمّل</button>${toolsHTML('kbn','data-kbn="1"')}</div>${fixBox('kbn')}
     <div class="fld"><span class="lb">التصنيفات</span><div class="tagrow">${(s.tags||[]).map(x=>`<span class="tg">${esc(x)}</span>`).join('')}<button class="tg add" data-act="kbi-tagbox">${ico('tag')}${(s.tags||[]).length?'تعديل':'تصنيف'}</button></div>${view.kbiTag?tagPick(s.tags||[],'kbi-tag','kbi-tagnew','kbiTag'):''}</div>
     <div class="fld"><span class="lb">سمعته فين؟ (اختياري)</span>${srcSel('kbn-srcsel',s.src)}</div>`,
-   foot:'<button class="btn ghost" data-act="close-sheet">بعدين</button><button class="btn" data-act="kbn-save">احفظ</button>'}});
+   foot:'<button class="btn" data-act="kbn-save">احفظ</button>'}});
   setTimeout(()=>{const el=$('#kbnText');el&&!el.value&&el.focus()},350)}
 function renderNotes(){const v=view.nview||'days';
   return `
@@ -734,7 +734,9 @@ const dropDraft=()=>{try{localStorage.removeItem(DRAFT)}catch(e){}};
 let ndT=0;function ndApply(){const s=view.nd;if(!s)return;if(!s.id)return keepDraft();const n=db.notes.find(x=>x.id===s.id);if(!n)return;
   const txt=(s.text||'').trim();if(!txt)return;clearTimeout(ndT);ndT=setTimeout(()=>{Object.assign(n,{text:txt,h:s.h||'',src:s.src,topics:s.topics,by:(s.by||'').trim(),star:s.star});save()},500)}
 const draftNote=()=>{const d=getDraft();return d&&d.v?d:null};
-const srcSel=(act,cur)=>`<select class="inp" data-act="${act}"><option value="">من غير مصدر</option>${db.noteCfg.srcs.map(o=>`<option ${cur===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
+const srcSel=(act,cur)=>`<select class="inp" data-act="${act}"><option value="">من غير مصدر</option>${db.noteCfg.srcs.map(o=>`<option ${cur===o?'selected':''}>${esc(o)}</option>`).join('')}<option value="__new">+ مصدر جديد</option><option value="__edit">تعديل القايمة</option></select>`;
+function srcPick(v,set,reopen){if(v==='__new'){const n=(prompt('اسم المصدر، مثلًا: مذاكرة')||'').trim();if(n&&!db.noteCfg.srcs.includes(n))db.noteCfg.srcs.push(n);if(n)set(n);save();paintSheet();return true}
+  if(v==='__edit'){view.cfgRet=reopen;openNoteCfg();return true}return false}
 function openNote(id,quick){const n=id&&db.notes.find(x=>x.id===id);
   const dr=!n&&draftNote();if(dr&&dr.kind==='kbn')return openKBNew(dr.v.type,dr.v.t,dr.v);
   view.nd=n?{id,text:n.text,h:n.h||'',src:n.src||'',topics:[...(n.topics||[])],by:n.by||'',star:!!n.star,mode:'note'}:dr?{...dr.v,quick:!!quick,restored:true}:{text:'',src:db.noteCfg.srcs.includes(autoSrc())?autoSrc():'',topics:[],by:'',star:false,mode:'note',quick:!!quick};view.ndTop=false;
@@ -748,7 +750,7 @@ function openNote(id,quick){const n=id&&db.notes.find(x=>x.id===id);
        <button class="chip" data-act="nd-star" aria-pressed="${s.star}" style="align-self:flex-start">${s.star?'★ مميّزة':'☆ ميّزها'}</button>
        <button class="link" data-act="ncfg" style="align-self:flex-start">+ مصدر أو موضوع</button>
        ${n?'<button class="btn ghost" data-act="nd-plan">+ خطة بكرة</button>':''}`:''),
-     foot:n?'<button class="btn danger icon" data-act="nd-del" aria-label="امسح">'+ico('trash')+'</button><button class="btn" data-act="nd-save">تمام</button>':'<button class="btn ghost" data-act="close-sheet">بعدين</button><button class="btn" data-act="nd-save">احفظ</button>'}});
+     foot:n?'<button class="btn danger icon" data-act="nd-del" aria-label="امسح">'+ico('trash')+'</button><button class="btn" data-act="nd-save">تمام</button>':'<button class="btn" data-act="nd-save">احفظ</button>'}});
   if(!n)setTimeout(()=>{const x=$('#ndText');x&&x.focus()},350)}
 function openTagMgr(){view.tagEdit='';openSheet(()=>{const T=allTags();
   return {head:'<span class="eyebrow">علمي</span><h2 class="title">المواضيع والتصنيفات</h2>',
@@ -757,8 +759,8 @@ function openTagMgr(){view.tagEdit='';openSheet(()=>{const T=allTags();
       :`<button class="row" data-act="tag-edit" data-v="${esc(o.s)}"><span class="t"><b>${esc(o.s)}</b><span>${o.notes?`${num(o.notes)} فائدة`:''}${o.notes&&o.kb?' · ':''}${o.kb?`${num(o.kb)} من الأحاديث والآيات`:''}${!o.notes&&!o.kb?'فاضي':''}</span></span><span class="small muted">تعديل</span></button>`).join('')}</div>
     <div class="row-in"><input class="inp" id="tagAdd" placeholder="موضوع جديد"><button class="btn ghost sm" data-act="tag-add">أضف</button></div>`,
    foot:'<button class="btn" data-act="close-sheet">تمام</button>'}})}
-function openNoteCfg(){const back=view.nd&&sheetEl?view.nd:null;openSheet(()=>{const sec=(key,l)=>`<div class="fld"><span class="lb">${l}</span><div class="chips">${db.noteCfg[key].map((o,i)=>`<span class="tag">${esc(o)}${xbtn('cfg-del',`data-v="${key}" data-i="${i}"`)}</span>`).join('')}</div><div class="row-in"><input class="inp" id="cfg-${key}" placeholder="أضف"><button class="btn ghost sm" data-act="cfg-add" data-v="${key}">أضف</button></div></div>`;
-  return {head:'<span class="eyebrow">طلعت بإيه</span><h2 class="title">المصادر والمواضيع</h2>',body:sec('srcs','المصادر')+sec('topics','المواضيع')+(back?'':'<button class="btn ghost" data-act="tagmgr">دمج وتسمية</button>'),foot:`<button class="btn" data-act="${back?'cfg-back':'close-sheet'}">تمام</button>`}})}
+function openNoteCfg(){const back=view.nd&&sheetEl&&!view.cfgRet?view.nd:null;openSheet(()=>{const sec=(key,l)=>`<div class="fld"><span class="lb">${l}</span><div class="chips">${db.noteCfg[key].map((o,i)=>`<span class="tag">${esc(o)}${xbtn('cfg-del',`data-v="${key}" data-i="${i}"`)}</span>`).join('')}</div><div class="row-in"><input class="inp" id="cfg-${key}" placeholder="أضف"><button class="btn ghost sm" data-act="cfg-add" data-v="${key}">أضف</button></div></div>`;
+  return {head:'<span class="eyebrow">طلعت بإيه</span><h2 class="title">المصادر والمواضيع</h2>',body:sec('srcs','المصادر')+sec('topics','المواضيع')+(back?'':'<button class="btn ghost" data-act="tagmgr">دمج وتسمية</button>'),foot:`<button class="btn" data-act="${back||view.cfgRet?'cfg-back':'close-sheet'}">تمام</button>`}})}
 function fawaidCard(k){const pool=db.notes.filter(n=>n.k!==dayKey());if(!pool.length)return '';let h=0;for(const c of k)h=(h*31+c.charCodeAt(0))>>>0;
   const st=pool.filter(n=>n.star),P=st.length&&!((view.fseed||0)%2)?st:pool,n=P[(h+(view.fseed||0))%P.length];
   return `<section class="card fcard rise"><div class="ch"><span class="eyebrow">فائدة من اللي فات</span><button class="link" data-act="fseed">غيّرها</button></div><p class="ftext">${esc(n.text)}</p><span class="small muted">${noteMeta(n).map(esc).join(' · ')}${n.k?' · '+fmt(n.k,{day:'numeric',month:'long'}):''}</span></section>`}
@@ -798,8 +800,10 @@ const saveAuth=()=>{try{auth?localStorage.setItem(AK,JSON.stringify(auth)):local
 const errAr=m=>/Invalid login/i.test(m)?'الإيميل أو الباسورد غلط.':/not confirmed/i.test(m)?'لسه ما أكّدتش الإيميل. افتح الإيميل اللي وصلك واضغط على اللينك، وبعدين ارجع اضغط دخول.':/already registered|duplicate key|users_email/i.test(m)?'الإيميل ده عنده حساب. اضغط "دخول".':/rate limit|too many/i.test(m)?'محاولات كتير. استنى شوية وجرّب تاني.':/password/i.test(m)?'الباسورد لازم ٦ حروف على الأقل.':/fetch|network/i.test(m)?'مفيش نت دلوقتي.':'حصلت مشكلة: '+m;
 async function sbAuth(path,body){const r=await fetch(SB+'/auth/v1/'+path,{method:'POST',headers:{apikey:SBK,'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(j.msg||j.error_description||j.message||('HTTP '+r.status)),{status:r.status});return j}
 function setSession(j){auth={at:j.access_token,rt:j.refresh_token,exp:Date.now()+((j.expires_in||3600)-60)*1000,email:(j.user&&j.user.email)||(auth&&auth.email),uid:(j.user&&j.user.id)||(auth&&auth.uid)};saveAuth()}
-async function token(){if(Date.now()<auth.exp)return auth.at;try{setSession(await sbAuth('token?grant_type=refresh_token',{refresh_token:auth.rt}))}catch(e){if(e.status===400||e.status===401){auth=null;saveAuth();sync.msg='انتهت الجلسة. ادخل تاني.'}throw e}return auth.at}
-async function rest(path,opt={}){const tk=await token();const r=await fetch(SB+'/rest/v1/'+path,{...opt,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json',...(opt.headers||{})}});
+const storedAuth=()=>{try{return JSON.parse(localStorage.getItem(AK)||'null')}catch(e){return null}};
+async function token(force){if(!force&&Date.now()<auth.exp)return auth.at;const st=storedAuth();if(st&&st.at!==auth.at&&Date.now()<st.exp){auth=st;return auth.at}try{setSession(await sbAuth('token?grant_type=refresh_token',{refresh_token:auth.rt}))}catch(e){if(e.status===400||e.status===401){auth=null;saveAuth();sync.msg='انتهت الجلسة. ادخل تاني.'}throw e}return auth.at}
+async function afetch(url,opt={}){const go=async f=>fetch(url,{...opt,headers:{apikey:SBK,Authorization:'Bearer '+(await token(f)),'Content-Type':'application/json',...(opt.headers||{})}});let r=await go();if(r.status===401&&auth)r=await go(true);return r}
+async function rest(path,opt={}){const r=await afetch(SB+'/rest/v1/'+path,{...opt,headers:{...(opt.headers||{})}});
   if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||('HTTP '+r.status))}return r.status===204||r.status===201?null:r.json().catch(()=>null)}
 function mergeDB(a,b){const m=cp(a),ua=(x=[],y=[])=>{const ids=new Set(x.map(o=>o&&o.id));return x.concat((y||[]).filter(o=>o&&!ids.has(o.id)))};
   ['notes','p40','journeys','people','duas','faults','deeds','kb','cols'].forEach(k=>m[k]=ua(a[k]||[],b[k]||[]));m.tags=[...new Set([...(a.tags||[]),...(b.tags||[])])];
@@ -830,10 +834,10 @@ async function syncNow(){if(!auth||sync.busy)return paintCloud();if(!navigator.o
 /* ===== الحلقة: library shared with friends; reviews stay personal ===== */
 const myPre=()=>auth?auth.uid.slice(0,8)+':':'';
 function myLibrary(){const out={},P=myPre();
-  (db.kb||[]).forEach(x=>{if((x.t||'').trim())out[P+'s:'+x.id]={type:x.type,t:x.t,h:x.h||'',tags:x.tags||[],k:x.k,src:x.src||''}});
-  (db.notes||[]).forEach(n=>{if((n.text||'').trim())out[P+'n:'+n.id]={type:'فائدة',t:n.text,h:n.h||'',tags:n.topics||[],k:n.k,src:n.src||''}});
+  (db.kb||[]).forEach(x=>{if((x.t||'').trim())out[P+'s:'+x.id]={type:x.type,ti:x.ti||'',t:x.t,h:x.h||'',tags:x.tags||[],k:x.k,src:x.src||''}});
+  (db.notes||[]).forEach(n=>{if((n.text||'').trim())out[P+'n:'+n.id]={type:'فائدة',ti:n.ti||'',t:n.text,h:n.h||'',tags:n.topics||[],k:n.k,src:n.src||''}});
   Object.entries(db.logs||{}).forEach(([k,l])=>Object.entries(l||{}).forEach(([id,e])=>{const d=db.deeds.find(x=>x.id===id);if(!d||!e||!e.a)return;
-    fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{if((o.t||'').trim())out[P+'l:'+k+'|'+id+'|'+f.id+'|'+o.id]={type:f.kb,t:o.t,h:o.h||'',tags:o.tags||[],k,src:''}}))}));
+    fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{if((o.t||'').trim())out[P+'l:'+k+'|'+id+'|'+f.id+'|'+o.id]={type:f.kb,ti:o.ti||'',t:o.t,h:o.h||'',tags:o.tags||[],k,src:''}}))}));
   return out}
 let cBusy=false;
 async function circleSync(){if(!auth||!db.circle||cBusy||!navigator.onLine)return;cBusy=true;
@@ -849,7 +853,7 @@ async function circleSync(){if(!auth||!db.circle||cBusy||!navigator.onLine)retur
       if(r.deleted){if(db.shared[r.id]){delete db.shared[r.id];ch=true}}else{db.shared[r.id]={...r.data,by:(r.author_email||'').split('@')[0],byId:r.author_id};ch=true}});
     if(rows.length||got.length)save();if(ch&&!sheetEl)render()}
   catch(e){console.warn('circle',e)}finally{cBusy=false}}
-async function circleCall(fn,arg){const tk=await token();const r=await fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify(arg)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.message||'HTTP '+r.status);return j}
+async function circleCall(fn,arg){const r=await afetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{},body:JSON.stringify(arg)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.message||'HTTP '+r.status);return j}
 async function circleMembers(){if(!db.circle||!auth)return;try{view.cmem=await rest(`circle_members?circle_id=eq.${db.circle.id}&select=email,user_id,joined_at&order=joined_at`);if(view.sub==='settings')render()}catch(e){}}
 function circleCard(){if(!auth)return `<section class="card"><h2>الحلقة</h2><p class="small muted">سجّل دخول الأول، وبعدين تقدر تذاكر مع صاحبك.</p></section>`;
   const C=db.circle;if(!C)return `<section class="card"><h2>الحلقة</h2><p class="small muted">كل حاجة أي حد يضيفها بتظهر عند الكل، والمراجعة فردية.</p>
@@ -893,7 +897,7 @@ async function toWav16k(ab){const AC=window.AudioContext||window.webkitAudioCont
 async function sendAI(payload,T,label){if(!auth){toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){toast('محتاج نت');return}
   view.aiBusy={key:T.key,label};paintKB();
   const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),130000);
-  try{const tk=await token();const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({...payload,kind:T.kind})});
+  try{const r=await afetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{},body:JSON.stringify({...payload,kind:T.kind})});
     const j=await r.json().catch(()=>({}));
     if(!r.ok)throw new Error(j.error==='no_key'?'لسه مفتاح Gemini ما اتحطّش في Supabase':j.error==='rate'?'استنى دقيقة وجرّب تاني':j.error==='key'?'مفتاح Gemini فيه مشكلة':j.error==='too_big'?'التسجيل طويل. خليه أقل من دقيقتين':j.error==='model'?'الخدمة زحمة دلوقتي. جرّب كمان دقيقة':'حصلت مشكلة. جرّب تاني');
     const txt=(j.text||'').trim();if(!txt||txt==='لا يوجد نص')throw new Error(payload.image?'مش لاقي نص واضح. قرّب الكاميرا وخلّي الإضاءة كويسة':'مسمعتش كلام واضح. جرّب تاني');
@@ -942,10 +946,11 @@ function tagRow(o,A,key){const tg=o.tags||[],open=view.tagFor===key;
   return h}
 function setTag(d,fid,eid,tag,on){const e=E(d.id);e.a=e.a||{};const arr=kbArr(e.a[fid]),o=arr.find(x=>x.id===eid);if(!o)return;
   o.tags=(o.tags||[]).filter(x=>x!==tag);if(on)o.tags.push(tag);db.tags=db.tags||[];if(!db.tags.includes(tag))db.tags.push(tag);e.a[fid]=arr;save()}
+const tiOf=o=>{if(!o)return '';if(o.ti)return o.ti;const L=(o.t||'').trim().split('\n');return L.length>1&&L[0].length<=70?L[0].trim():''};
 function kbItems(){const out=[];Object.keys(db.logs).sort().reverse().forEach(k=>{const l=db.logs[k];for(const id in l){const d=byId(id),e=l[id];if(!d||!e||!e.a)continue;
-    fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{const v=(o.t||'').trim();if(v)out.push({k,id,f:f.id,eid:o.id,type:f.kb,text:v,h:o.h||'',tags:o.tags||[]})}))}});
-  Object.entries(db.shared||{}).forEach(([id,x])=>{if(!x.deleted&&(x.t||'').trim())out.push({k:x.k||'2000-01-01',cid:id,type:x.type,text:x.t.trim(),h:x.h||'',tags:x.tags||[],src:x.src||'',by:x.by})});
-  (db.kb||[]).forEach(x=>{if((x.t||'').trim())out.push({k:x.k,sid:x.id,type:x.type,text:x.t.trim(),h:x.h||'',tags:x.tags||[],src:x.src||''})});
+    fieldsOf(d).filter(f=>f.kb).forEach(f=>kbArr(e.a[f.id]).forEach(o=>{const v=(o.t||'').trim();if(v)out.push({k,id,f:f.id,eid:o.id,type:f.kb,ti:tiOf(o),text:v,h:o.h||'',tags:o.tags||[]})}))}});
+  Object.entries(db.shared||{}).forEach(([id,x])=>{if(!x.deleted&&(x.t||'').trim())out.push({k:x.k||'2000-01-01',cid:id,type:x.type,ti:tiOf(x),text:x.t.trim(),h:x.h||'',tags:x.tags||[],src:x.src||'',by:x.by})});
+  (db.kb||[]).forEach(x=>{if((x.t||'').trim())out.push({k:x.k,sid:x.id,type:x.type,ti:tiOf(x),text:x.t.trim(),h:x.h||'',tags:x.tags||[],src:x.src||''})});
   return out.sort((a,b)=>b.k.localeCompare(a.k))}
 /* spaced repetition (Leitner): remembered well -> longer gap, forgot -> back tomorrow */
 const KB_INT=[1,1,3,7,14,30,60,120];
@@ -1005,8 +1010,8 @@ function fStreak(id){const td=dayKey();let n=0;const ks=Object.keys(db.logs).fil
 function fRel(f){const keys=[vName(f),f.name].filter(Boolean);return {kb:kbItems().filter(x=>x.tags.some(s=>keys.includes(s))),nt:db.notes.filter(n=>(n.topics||[]).some(s=>keys.includes(s))).slice().reverse()}}
 async function suggestFault(id,auto){const f=db.faults.find(x=>x.id===id);if(!f)return;if(!auth){if(!auto)toast('سجّل دخول الأول من ⚙︎');return}if(!navigator.onLine){if(!auto)toast('محتاج نت');return}
   view.fSug=id;if(sheetEl)paintSheet();const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),100000);
-  try{const tk=await token();const r=await fetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{apikey:SBK,Authorization:'Bearer '+tk,'Content-Type':'application/json'},body:JSON.stringify({task:'tazkiya',virtue:f.virtue||'',fault:f.name||''})});
-    const j=await r.json().catch(()=>({}));if(!r.ok||!j.plan)throw new Error(j.error==='rate'?'استنى دقيقة وجرّب تاني':'الخدمة زحمة دلوقتي. جرّب كمان شوية');
+  try{const r=await afetch(SB+'/functions/v1/ocr',{method:'POST',signal:ac.signal,headers:{},body:JSON.stringify({task:'tazkiya',virtue:f.virtue||'',fault:f.name||''})});
+    const j=await r.json().catch(()=>({}));if(!r.ok||!j.plan)throw new Error(r.status===401?'الجلسة خلصت. ادخل تاني من ⚙︎':j.error==='rate'?'استنى دقيقة وجرّب تاني':'الخدمة زحمة دلوقتي. جرّب كمان شوية');
     const P=j.plan,s=x=>String(x||'').trim();if(!f.virtue&&s(P.virtue))f.virtue=s(P.virtue);if(!f.name&&s(P.fault))f.name=s(P.fault);
     f.rules=f.rules||[];(P.rules||[]).forEach(x=>{const ra=s(x.if||x.a),rb=s(x.then||x.b);if(ra&&rb&&!f.rules.some(y=>y.a===ra))f.rules.push({id:uid('r'),a:ra,b:rb})});
     ['drill','signs','when','kaff'].forEach(k=>{if(!s(f[k])&&s(P[k]))f[k]=s(P[k])});save();toast('اقترحت عليك ✓ عدّل اللي مش مناسبك')}
@@ -1090,7 +1095,7 @@ function openDeedEditor(id){openSheet(()=>{const d=byId(id);if(!d){closeSheet();
 /* ---------- quick add ---------- */
 function openQuickOld(){view.qk=view.qk||'note';openSheet(()=>({head:`<span class="eyebrow">إضافة سريعة</span><h2 class="title">اكتب اللي في بالك</h2>`,
   body:`<div class="seg">${[['note','نقطة في طلعت بإيه'],['plan','خطوة في خطة النهارده']].map(([v,t])=>`<button data-act="qk" data-v="${v}" aria-pressed="${view.qk===v}">${t}</button>`).join('')}</div><textarea class="inp" id="qText" placeholder="${view.qk==='note'?'النقطة أو الرسالة':'الخطوة'}" style="min-height:120px"></textarea>`,
-  foot:`<button class="btn ghost" data-act="close-sheet">إلغاء</button><button class="btn" data-act="qk-save">احفظ</button>`}));setTimeout(()=>{const t=$('#qText');t&&t.focus()},300)}
+  foot:`<button class="btn" data-act="qk-save">احفظ</button>`}));setTimeout(()=>{const t=$('#qText');t&&t.focus()},300)}
 
 /* ================= import / backup ================= */
 const curMosque=()=>{const j=activeJ(),m=j&&(j.mosques||[]).slice(-1)[0];return m?m.name:''};
@@ -1149,6 +1154,7 @@ document.addEventListener('click',ev=>{
   if(a==='tag-ren'){const to=(($('#tagRen')||{}).value||'').trim();if(!to||to===v){view.tagEdit='';return paintSheet()}const merge=allTags().some(o=>o.s===to);renameTagIn(db,v,to);save();view.tagEdit='';toast(merge?`اتدمج في "${to}"`:'اتغيّر الاسم');return paintSheet()}
   if(a==='tag-del'){if(!b.dataset.sure){b.dataset.sure=1;b.textContent='متأكد؟ هيتشال من كل حاجة';return}renameTagIn(db,v,'');save();view.tagEdit='';toast('اتمسح');return paintSheet()}
   if(a==='tag-add'){const s=(($('#tagAdd')||{}).value||'').trim();if(!s)return;db.noteCfg.topics=db.noteCfg.topics||[];if(!db.noteCfg.topics.includes(s))db.noteCfg.topics.push(s);save();return paintSheet()}
+  if(a==='cfg-back'&&view.cfgRet){const f=view.cfgRet;view.cfgRet=null;return f()}
   if(a==='cfg-back'){const n=view.nd;openNote(n.id||null,n.quick);Object.assign(view.nd,n);return paintSheet()}
   if(a==='cfg-add'){const inp=$('#cfg-'+v),val=inp.value.trim();if(!val)return;if(!db.noteCfg[v].includes(val))db.noteCfg[v].push(val);save();return paintSheet()}
   if(a==='cfg-del'){db.noteCfg[v].splice(Number(b.dataset.i),1);save();return paintSheet()}
@@ -1199,7 +1205,7 @@ document.addEventListener('click',ev=>{
   if(a==='kbi-del'){if(!b.dataset.sure){b.dataset.sure=1;b.classList.add('sure');b.textContent='متأكد؟';return}kbRef(view.kbi).del();closeSheet();toast('اتمسح');return}
   if(a==='kbn-type'){view.kbn.type=v;keepDraft();return paintSheet()}
   if(a==='kbn-src'){view.kbn.src=view.kbn.src===v?'':v;return paintSheet()}
-  if(a==='kbn-save'){const s=view.kbn,tx=(($('#kbnText')||{}).value||s.t||'').trim();if(!tx){toast('اكتب الأول');return}db.kb=db.kb||[];db.kb.push({id:uid('kb'),k:dayKey(),type:s.type,t:tx,...(s.h&&tx===(s.t||'').trim()?{h:s.h}:{}),tags:s.tags||[],src:s.src||''});dropDraft();save();view.kbn=null;closeSheet();toast(`اتحفظ في علمي ✓`);if(view.kbnBack){const fb=view.kbnBack;view.kbnBack=null;openFault(fb)}return}
+  if(a==='kbn-save'){const s=view.kbn,tx=(($('#kbnText')||{}).value||s.t||'').trim(),ti=(($('#kbnTi')||{}).value||s.ti||'').trim();if(!tx){toast('اكتب الأول');return}if(!ti){toast('حط عنوان، هو اللي هيفكّرك في المراجعة');const t=$('#kbnTi');t&&t.focus();return}db.kb=db.kb||[];db.kb.push({id:uid('kb'),k:dayKey(),type:s.type,ti,t:tx,...(s.h&&tx===(s.t||'').trim()?{h:s.h}:{}),tags:s.tags||[],src:s.src||''});dropDraft();save();view.kbn=null;closeSheet();toast(`اتحفظ في علمي ✓`);if(view.kbnBack){const fb=view.kbnBack;view.kbnBack=null;openFault(fb)}return}
   if(a==='p40-edit')return openP40();
   if(a==='p40-add'){const v2=$('#p40-new').value.trim();if(!v2){toast('اكتب البند الأول');return}db.p40.push({id:uid('p40'),text:v2,link:$('#p40-newlink').value||null});save();paintSheet();render();toast('اتضاف');return}
   if(a==='p40-del'){if(!b.dataset.sure){b.dataset.sure=1;b.style.color='var(--alert)';toast('اضغط تاني للمسح');return}db.p40=db.p40.filter(x=>x.id!==id);save();paintSheet();return render()}
@@ -1360,13 +1366,18 @@ document.addEventListener('change',ev=>{const el=ev.target,a=el.dataset.act;if(!
   const f=db.faults.find(x=>x.id===id);
   if(a==='f-name'&&f){f.name=v.trim()||f.name;return upd()}
   if(a==='f-detail'&&f){f.detail=v.trim();save();return}
-  if(a==='cap-src'){capOf().src=v;save();return}
+  if(a==='cap-src'){if(srcPick(v,v=>{capOf().src=v},()=>openCap()))return;capOf().src=v;save();return}
   if(a==='cap-type'){capOf().items[el.dataset.i].type=v;save();return}
+  if(a==='cap-ti'){capOf().items[el.dataset.i].title=v.trim();save();return}
   if(a==='cap-txt'){capOf().items[el.dataset.i].text=v;save();return}
-  if(a==='nd-srcsel'&&view.nd){view.nd.src=v;ndApply();return}
-  if(a==='kbn-srcsel'&&view.kbn){view.kbn.src=v;keepDraft();return}
+  if(a==='nd-srcsel'&&view.nd){if(srcPick(v,v=>{view.nd.src=v;ndApply()},null))return;view.nd.src=v;ndApply();return}
+  if(a==='kbn-srcsel'&&view.kbn){if(srcPick(v,v=>{view.kbn.src=v;keepDraft()},(k=>()=>{openKBNew(k.type,k.t,k)})({...view.kbn})))return;view.kbn.src=v;keepDraft();return}
   if(a==='kbi-text'){const r=kbRef(view.kbi);if(r.o){r.o.t=v.trim();r.save()}return}
   if(a==='kbn-text'){view.kbn.t=v;return}
+  if(a==='kbn-ti'&&view.kbn){view.kbn.ti=v.trim();keepDraft();return}
+  if(a==='kbi-ti'){const r=kbRef(view.kbi);if(r.o){r.o.ti=v.trim();r.save()}return}
+  if(a==='sess-ti'){const x=kbItems().find(y=>kbKey(y)===el.dataset.key),r=x&&kbRef(x.cid?{c:x.cid}:x.sid?{s:x.sid}:{k:x.k,id:x.id,f:x.f,e:x.eid});if(r&&r.o){r.o.ti=v.trim();r.save();toast('اتحفظ العنوان')}return}
+  if(a==='kbti'&&d){const e=E(id),o=kbArr((e.a||{})[fid]).find(x=>x.id===el.dataset.e);if(o){o.ti=v.trim();save()}return}
   if(a==='f-txt'&&f){f[el.dataset.k]=v.trim();save();return}
   if(a==='fr'&&f){const r=(f.rules||[]).find(x=>x.id===el.dataset.r);if(r){r[el.dataset.k]=v.trim();save()}return}
   if(a==='f-pct'&&f){const k=dayKey(),last=f.hist[f.hist.length-1];if(last&&last[0]===k)last[1]=Number(v);else f.hist.push([k,Number(v)]);return upd()}

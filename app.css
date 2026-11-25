@@ -305,3 +305,8 @@ body.wz nav.tabs{display:none}
 .capi{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--white);opacity:.75}.capi.on{opacity:1;border-color:var(--forest)}
 .pk-ck{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line);display:grid;place-items:center;flex:0 0 26px}.capi.on .pk-ck{background:var(--forest);border-color:var(--forest);color:#fff}.pk-ck svg{width:14px;height:14px}
 select.inp.sm{width:auto;padding:4px 30px 4px 12px;font-size:14px;margin-inline-start:auto}
+
+.btn{display:inline-flex;align-items:center;justify-content:center}.btn svg{width:18px;height:18px;flex:none;margin-inline-end:6px}.btn.icon svg{margin:0}
+.sheet .sh-h{position:relative}.sh-x{position:absolute;top:14px;inset-inline-end:14px;width:36px;height:36px;border-radius:999px;display:grid;place-items:center;color:var(--muted);background:transparent}.sh-x svg{width:20px;height:20px}.sh-x:active{background:var(--card)}
+.sess-top .small svg{width:13px;height:13px;vertical-align:-2px;margin-inline-end:2px}
+.inp.ti{font-weight:700;font-size:17px}.kti{display:block;font-size:16px;margin-bottom:2px}.ncard .kti+p{-webkit-line-clamp:2}.sess-ti{font-size:22px;line-height:1.5;margin:4px 0 6px}
