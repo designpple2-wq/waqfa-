@@ -821,8 +821,8 @@ const storedAuth=()=>{try{return JSON.parse(localStorage.getItem(AK)||'null')}ca
 async function token(force){if(!force&&Date.now()<auth.exp)return auth.at;const st=storedAuth();if(st&&st.at!==auth.at&&Date.now()<st.exp){auth=st;return auth.at}try{setSession(await sbAuth('token?grant_type=refresh_token',{refresh_token:auth.rt}))}catch(e){if(e.status===400||e.status===401){auth=null;saveAuth();sync.msg='انتهت الجلسة. ادخل تاني.'}throw e}return auth.at}
 async function afetch(url,opt={}){const go=async f=>fetch(url,{...opt,headers:{apikey:SBK,Authorization:'Bearer '+(await token(f)),'Content-Type':'application/json',...(opt.headers||{})}});let r=await go();if(r.status===401&&auth)r=await go(true);return r}
 async function rest(path,opt={}){const r=await afetch(SB+'/rest/v1/'+path,{...opt,headers:{...(opt.headers||{})}});
-  if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||('HTTP '+r.status))}return r.status===204||r.status===201?null:r.json().catch(()=>null)}
-function mergeDB(a,b){const m=cp(a),ua=(x=[],y=[])=>{const ids=new Set(x.map(o=>o&&o.id)),yb=new Map((y||[]).map(o=>[o&&o.id,o]));x=x.map(o=>{const r=o&&yb.get(o.id);return r&&r.ti&&!o.ti?{...o,ti:r.ti}:o});return x.concat((y||[]).filter(o=>o&&!ids.has(o.id)))};
+  if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||('HTTP '+r.status))}return r.status===204?null:r.json().catch(()=>null)}
+function mergeDB(a,b){const m=cp(a),ua=(x=[],y=[])=>{const ids=new Set(x.map(o=>o&&o.id)),yb=new Map((y||[]).map(o=>[o&&o.id,o]));x=x.map(o=>{const r=o&&yb.get(o.id);if(!r)return o;const f={...o};for(const k in r)if(f[k]==null||f[k]==='')f[k]=r[k];return f});return x.concat((y||[]).filter(o=>o&&!ids.has(o.id)))};
   ['notes','p40','journeys','people','duas','faults','deeds','kb','cols','caps'].forEach(k=>m[k]=ua(a[k]||[],b[k]||[]));m.tags=[...new Set([...(a.tags||[]),...(b.tags||[])])];
   m.gsecs=ua(a.gsecs,b.gsecs).map(s=>{const o=(b.gsecs||[]).find(x=>x.id===s.id);return o?{...s,items:ua(s.items,o.items)}:s});
   for(const t2 in b.goals||{})m.goals[t2]=ua((a.goals||{})[t2],b.goals[t2]);
@@ -834,20 +834,20 @@ const cloudState=()=>!auth?['miss','مش محفوظ أونلاين']:sync.busy?[
 const cloudChip=()=>{const [c,l]=cloudState();return `<span class="badge ${c}" data-cloud>${l}</span>`};
 function paintCloud(){document.querySelectorAll('[data-cloud]').forEach(el=>el.outerHTML=cloudChip())}
 function timeAgo(iso){const m=Math.round((Date.now()-Date.parse(iso))/60000);return m<1?'من شوية':m<60?`من ${num(m)} دقيقة`:m<1440?`من ${num(Math.round(m/60))} ساعة`:fmt(keyOf(new Date(iso)),{day:'numeric',month:'long'})}
-async function syncNow(){if(!auth||sync.busy)return paintCloud();if(!navigator.onLine){sync.state='offline';return paintCloud()}
-  sync.busy=true;paintCloud();
-  try{const rows=await rest(`user_data?select=data,updated_at&user_id=eq.${auth.uid}`),r=rows&&rows[0],lastT=Date.parse(db.meta.syncedAt||0)||0;
-    if(r&&Date.parse(r.updated_at)>lastT){const rem=migrate(r.data);
-      if(db.meta.dirty||!lastT){db=mergeDB(db,rem);db.meta.dirty=true}else{db=rem;db.meta={...db.meta,dirty:false,syncedAt:r.updated_at}}
-      saveLocal();if(sheetEl)paintSheet();else render()}
-    if(!r||db.meta.dirty){const ed=db.meta.editAt,now=new Date().toISOString();
-      await rest('user_data?on_conflict=user_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:auth.uid,data:db,updated_at:now,device:navigator.userAgent.slice(0,90)})});
-      db.meta.syncedAt=now;if(db.meta.editAt===ed)db.meta.dirty=false;
+async function syncNow(force){if(!auth||sync.busy)return paintCloud();if(!navigator.onLine){sync.state='offline';return paintCloud()}
+  sync.busy=true;paintCloud();let retry=false;
+  try{const rows=await rest(`user_data?select=data,updated_at&user_id=eq.${auth.uid}`),r=rows&&rows[0];
+    if(r&&r.updated_at!==db.meta.base){const rem=migrate(r.data);
+      if(db.meta.dirty||!db.meta.base){db=mergeDB(db,rem);db.meta.dirty=true}else{db=rem;db.meta={...db.meta,dirty:false}}
+      db.meta.base=r.updated_at;db.meta.syncedAt=r.updated_at;saveLocal();if(sheetEl)paintSheet();else render()}
+    if(!r||db.meta.dirty){const ed=db.meta.editAt;db.meta.cv=2;
+      const out=await rest('user_data?on_conflict=user_id&select=updated_at',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=representation'},body:JSON.stringify({user_id:auth.uid,data:db,device:navigator.userAgent.slice(0,90)})});
+      const u=out&&out[0]&&out[0].updated_at;if(u){db.meta.base=u;db.meta.syncedAt=u}if(db.meta.editAt===ed)db.meta.dirty=false;
       if(!db.meta.snapAt||Date.now()-db.meta.snapAt>30*60e3){await rest('snapshots?on_conflict=user_id,day',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:auth.uid,day:dayKey(),data:db})});db.meta.snapAt=Date.now()}
       saveLocal()}
     sync.state='ok';sync.msg=''}
-  catch(e){sync.state='error';if(!sync.msg)sync.msg=errAr(e.message)}
-  sync.busy=false;paintCloud();circleSync();if(view.sub==='settings'&&!sheetEl&&!document.activeElement.matches('input,textarea'))render()}
+  catch(e){if(/stale/.test(e.message||'')&&!force){retry=true;db.meta.dirty=true}else{sync.state='error';if(!sync.msg)sync.msg=errAr(e.message)}}
+  sync.busy=false;paintCloud();if(retry){setTimeout(()=>syncNow(true),400);return}circleSync();if(view.sub==='settings'&&!sheetEl&&!document.activeElement.matches('input,textarea'))render()}
 /* ===== الحلقة: library shared with friends; reviews stay personal ===== */
 const myPre=()=>auth?auth.uid.slice(0,8)+':':'';
 function myLibrary(){const out={},P=myPre();
@@ -884,7 +884,7 @@ function circleCard(){if(!auth)return `<section class="card"><h2>الحلقة</h
 async function doLogin(signup){const email=$('#acc-email').value.trim(),password=$('#acc-pass').value;if(!email||password.length<6){toast('اكتب الإيميل وباسورد ٦ حروف على الأقل');return}
   sync.msg='';toast(signup?'بنعمل الحساب…':'بندخّلك…');
   try{const j=await sbAuth(signup?'signup':'token?grant_type=password',{email,password});
-    if(j.access_token){setSession(j);db.meta.syncedAt=null;toast('أهلًا بيك. بنحفظ بياناتك…');await syncNow();toast('بياناتك اتحفظت أونلاين ✓')}
+    if(j.access_token){setSession(j);db.meta.syncedAt=null;db.meta.base=null;toast('أهلًا بيك. بنحفظ بياناتك…');await syncNow();toast('بياناتك اتحفظت أونلاين ✓')}
     else sync.msg=`بعتنالك إيميل تأكيد على ${email}. افتحه واضغط على اللينك (لو فتح صفحة مش شغالة تجاهلها)، وبعدين ارجع هنا واضغط "دخول".`}
   catch(e){sync.msg=errAr(e.message)}render()}
 function accountCard(){if(!auth)return `<section class="card"><h2>احفظ بياناتك أونلاين</h2><p class="lead">سجّل بإيميلك، وبياناتك تتحفظ أونلاين وتلاقيها من أي موبايل.</p>
