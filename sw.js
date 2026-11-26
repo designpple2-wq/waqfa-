@@ -1,5 +1,5 @@
 // Offline cache for وقفة. Bump VERSION on every update so phones pick up the new files.
-const VERSION='waqfa-2026-11-25s';
+const VERSION='waqfa-2026-11-26a';
 const CORE=['./','index.html','app.css?v='+VERSION.slice(6),'app.js?v='+VERSION.slice(6),'manifest.webmanifest','icon-180.png','icon-192.png','icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(CORE.map(u=>new Request(u,{cache:'reload'})))).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==VERSION).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

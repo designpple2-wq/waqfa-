@@ -310,3 +310,4 @@ select.inp.sm{width:auto;padding:4px 30px 4px 12px;font-size:14px;margin-inline-
 .sheet .sh-h{position:relative}.sh-x{position:absolute;top:14px;inset-inline-end:14px;width:36px;height:36px;border-radius:999px;display:grid;place-items:center;color:var(--muted);background:transparent}.sh-x svg{width:20px;height:20px}.sh-x:active{background:var(--card)}
 .sess-top .small svg{width:13px;height:13px;vertical-align:-2px;margin-inline-end:2px}
 .inp.ti{font-weight:700;font-size:17px}.kti{display:block;font-size:16px;margin-bottom:2px}.ncard .kti+p{-webkit-line-clamp:2}.sess-ti{font-size:22px;line-height:1.5;margin:4px 0 6px}
+.quiet *,.quiet *::before,.quiet *::after{animation:none!important;transition:none!important}
