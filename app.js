@@ -637,7 +637,7 @@ function renderIlm(){const v=view.ilm||'kb',n=kbItems().length+db.notes.length;
 /* ---------- عنصر واحد من بنك المعرفة ---------- */
 const KBT={hadith:'حديث',aya:'آية',qissa:'قصة',sum:'ملخص'},KBT_R={'حديث':'hadith','آية':'aya','قصة':'qissa','ملخص':'sum'},KBTITLE={'حديث':'الحديث','آية':'الآية','قصة':'القصة','ملخص':'الملخص'};
 const ZTYPES=()=>db.kbTypes&&db.kbTypes.length?db.kbTypes:['فائدة','حديث','آية','قصة','بيان','ملخص'];
-const addSeg=(act,cur)=>{const t=view.kbn?view.kbn.type:cur==='plan'?'':'';return `<div class="chips tsel">${ZTYPES().map(x=>`<button class="chip" data-act="kbn-type" data-v="${esc(x)}" aria-pressed="${t===x}">${esc(x)}</button>`).join('')}<button class="chip" data-act="kbn-plan" aria-pressed="${cur==='plan'}">خطوة</button><button class="chip" data-act="kbt-new" aria-label="نوع جديد">+ نوع</button></div>`};
+const addSeg=(act,cur)=>{const t=view.kbn?view.kbn.type:cur==='plan'?'':'';return `<div class="chips tsel">${ZTYPES().map(x=>`<button class="chip" data-act="kbn-type" data-v="${esc(x)}" aria-pressed="${t===x}">${esc(x)}</button>`).join('')}<button class="chip" data-act="kbn-plan" aria-pressed="${cur==='plan'}">خطوة</button><button class="chip" data-act="fq-open">عيب</button><button class="chip" data-act="kbt-new" aria-label="نوع جديد">+ نوع</button></div>`};
 function kbRef(r){if(r.n){const n=db.notes.find(x=>x.id===r.n);const o=n&&{get t(){return n.text},set t(v){n.text=v},get h(){return n.h},set h(v){n.h=v},get ti(){return n.ti},set ti(v){n.ti=v},get tags(){return n.topics},set tags(v){n.topics=v},get k(){return n.k},get src(){return n.src},type:'فائدة'};return {o,save:()=>save(),del:()=>{db.notes=db.notes.filter(x=>x.id!==r.n);save()}}}if(r.c){const o=(db.shared||{})[r.c];return {o,save:()=>{if(o){o._dirty=1;save()}},del:()=>{if(o){o.deleted=true;o._dirty=1;save()}}}}if(r.s){const o=(db.kb||[]).find(x=>x.id===r.s);return {o,save:()=>save(),del:()=>{db.kb=db.kb.filter(x=>x.id!==r.s);save()}}}
   const e=(db.logs[r.k]||{})[r.id];if(!e||!e.a)return {o:null,save(){},del(){}};const arr=kbArr(e.a[r.f]),o=arr.find(x=>x.id===r.e);
   return {o,save:()=>{e.a[r.f]=arr;save()},del:()=>{e.a[r.f]=arr.filter(x=>x.id!==r.e);save()}}}
@@ -1052,6 +1052,11 @@ async function suggestFault(id,auto){let f=db.faults.find(x=>x.id===id);if(!f)re
     ['drill','signs','when','kaff'].forEach(k=>{if(!s(f[k])&&s(P[k]))f[k]=s(P[k])});save();toast('اقترحت عليك ✓ عدّل اللي مش مناسبك')}
   catch(e){toast(e.name==='AbortError'?'الخدمة بطيئة دلوقتي. جرّب كمان شوية':e.message||'حصلت مشكلة')}
   finally{clearTimeout(tm);view.fSug=null;if(sheetEl)paintSheet();else render()}}
+function openFQ(){openSheet(()=>{const td=dayKey(),c=ans((db.logs[td]||{}).tazkiya,'f')||{},L=[...db.faults.filter(f=>f.mode==='focus'&&f.name),...db.faults.filter(f=>f.mode==='watch'&&f.name)];
+  return {head:'وقعت في عيب',body:`<p class="small muted">اختار العيب، ويتعدّ في مراجعة النهارده لوحده.</p><textarea class="inp" id="fqText" placeholder="حصل إيه؟ (اختياري)" style="min-height:70px"></textarea>
+  <div class="list">${L.map(f=>`<button class="row" data-act="fq" data-id="${f.id}"><span class="t"><b>${esc(f.name)}</b></span>${Number(c[f.id])?`<span class="badge">${num(c[f.id])} النهارده</span>`:''}${ico('plus')}</button>`).join('')}</div>
+  <div class="row-in"><input class="inp" id="fqNew" placeholder="عيب مش في القايمة"><button class="btn ghost sm icon" data-act="fq-new" aria-label="أضف">${ico('plus')}</button></div>`}})}
+function fqLog(f){const td=dayKey(),e=E('tazkiya',td),o=e.a.f||(e.a.f={});o[f.id]=Number(o[f.id]||0)+1;const tx=(($('#fqText')||{}).value||'').trim();if(tx){f.log=f.log||[];f.log.push({id:uid('l'),k:td,kind:'',what:tx,felt:'',next:''})}buzz();save();closeSheet();render();toast(`اتسجّل: ${f.name} · ${num(o[f.id])} مرة النهارده`)}
 function renderFaults(){const td=dayKey(),foc=db.faults.filter(f=>f.mode==='focus');
   let h='';const due=foc.filter(f=>!fStageAt(f)||diffDays(fStageAt(f),td)>=7);
   if(due.length)h+=`<section class="note-c rise"><b>وقفة الأسبوع</b><span>حدّد مرحلتك في ${due.map(f=>`<button class="link" data-act="fault" data-id="${f.id}">${esc(vName(f))}</button>`).join('، ')}</span></section>`;
@@ -1300,6 +1305,9 @@ document.addEventListener('click',ev=>{
   if(a==='dkind'){view.dkind=v;const t2=$('#duaText').value;render();$('#duaText').value=t2;return}
   if(a==='dua-add'){const val=$('#duaText').value.trim();if(!val){toast('اكتب الدعاء الأول');return}db.duas.push({id:uid('dua'),text:val,k:view.dkind||'mine'});upd();toast('اتحفظ الدعاء');return}
   if(a==='dua-del'){if(!b.dataset.sure){b.dataset.sure=1;toast('اضغط تاني للمسح');return}db.duas=db.duas.filter(x=>x.id!==id);return upd()}
+  if(a==='fq-open'){view.kbn=null;view.nd=null;return openFQ()}
+  if(a==='fq'){const f=db.faults.find(x=>x.id===id);return f&&fqLog(f)}
+  if(a==='fq-new'){const val=(($('#fqNew')||{}).value||'').trim();if(!val){toast('اكتب العيب الأول');return}let f=db.faults.find(x=>x.name===val);if(!f){f={id:uid('flt'),g:'other',name:val,virtue:'',mode:'watch',on:true,detail:'',hist:[],stg:[],rules:[],log:[]};db.faults.push(f);suggestFault(f.id,true)}return fqLog(f)}
   if(a==='fault'){view.fOpen={};view.flog=null;view.fEditName=false;view.rEdit='';return openFault(id)}
   if(a==='f-add'){const val=$('#fn-'+v).value.trim();if(!val){toast('اكتب الخُلق الأول');return}const nf={id:uid('flt'),g:v,name:'',virtue:val,mode:'watch',on:true,detail:'',hist:[],stg:[],rules:[],log:[]};db.faults.push(nf);save();render();view.fOpen={};view.flog=null;openFault(nf.id);suggestFault(nf.id,true);return}
   if(a==='f-on'){const f=db.faults.find(x=>x.id===id);if(f)f.on=v==='1';return upd()}
