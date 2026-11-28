@@ -1054,7 +1054,7 @@ async function suggestFault(id,auto){let f=db.faults.find(x=>x.id===id);if(!f)re
   finally{clearTimeout(tm);view.fSug=null;if(sheetEl)paintSheet();else render()}}
 function openFQ(){openSheet(()=>{const td=dayKey(),c=ans((db.logs[td]||{}).tazkiya,'f')||{},L=[...db.faults.filter(f=>f.mode==='focus'&&f.name),...db.faults.filter(f=>f.mode==='watch'&&f.name)];
   return {head:'وقعت في عيب',body:`<p class="small muted">اختار العيب، ويتعدّ في مراجعة النهارده لوحده.</p><textarea class="inp" id="fqText" placeholder="حصل إيه؟ (اختياري)" style="min-height:70px"></textarea>
-  <div class="list">${L.map(f=>`<button class="row" data-act="fq" data-id="${f.id}"><span class="t"><b>${esc(f.name)}</b></span>${Number(c[f.id])?`<span class="badge">${num(c[f.id])} النهارده</span>`:''}${ico('plus')}</button>`).join('')}</div>
+  <div class="list">${L.map(f=>`<div class="row-in"><button class="row" style="flex:1" data-act="fq" data-id="${f.id}"><span class="t"><b>${esc(f.name)}</b></span>${Number(c[f.id])?`<span class="badge">${num(c[f.id])} النهارده</span>`:''}${ico('plus')}</button>${Number(c[f.id])?`<button class="btn ghost sm icon" data-act="fq-dec" data-id="${f.id}" aria-label="شيل مرة">−</button>`:''}</div>`).join('')}</div>
   <div class="row-in"><input class="inp" id="fqNew" placeholder="عيب مش في القايمة"><button class="btn ghost sm icon" data-act="fq-new" aria-label="أضف">${ico('plus')}</button></div>`}})}
 function fqLog(f){const td=dayKey(),e=E('tazkiya',td),o=e.a.f||(e.a.f={});o[f.id]=Number(o[f.id]||0)+1;const tx=(($('#fqText')||{}).value||'').trim();if(tx){f.log=f.log||[];f.log.push({id:uid('l'),k:td,kind:'',what:tx,felt:'',next:''})}buzz();save();closeSheet();render();toast(`اتسجّل: ${f.name} · ${num(o[f.id])} مرة النهارده`)}
 function renderFaults(){const td=dayKey(),foc=db.faults.filter(f=>f.mode==='focus');
@@ -1306,6 +1306,7 @@ document.addEventListener('click',ev=>{
   if(a==='dua-add'){const val=$('#duaText').value.trim();if(!val){toast('اكتب الدعاء الأول');return}db.duas.push({id:uid('dua'),text:val,k:view.dkind||'mine'});upd();toast('اتحفظ الدعاء');return}
   if(a==='dua-del'){if(!b.dataset.sure){b.dataset.sure=1;toast('اضغط تاني للمسح');return}db.duas=db.duas.filter(x=>x.id!==id);return upd()}
   if(a==='fq-open'){view.kbn=null;view.nd=null;return openFQ()}
+  if(a==='fq-dec'){const td=dayKey(),e=E('tazkiya',td),o=e.a.f||{},f=db.faults.find(x=>x.id===id);if(o[id]>0)o[id]--;if(f&&f.log&&f.log.length){const L=f.log[f.log.length-1];if(L.k===td&&!L.kind&&!L.felt&&!L.next&&f.log.filter(x=>x.k===td&&!x.kind).length>o[id])f.log.pop()}buzz();save();render();paintSheet();toast(`اتشالت مرة · ${f?f.name:''}: ${num(o[id]||0)} النهارده`);return}
   if(a==='fq'){const f=db.faults.find(x=>x.id===id);return f&&fqLog(f)}
   if(a==='fq-new'){const val=(($('#fqNew')||{}).value||'').trim();if(!val){toast('اكتب العيب الأول');return}let f=db.faults.find(x=>x.name===val);if(!f){f={id:uid('flt'),g:'other',name:val,virtue:'',mode:'watch',on:true,detail:'',hist:[],stg:[],rules:[],log:[]};db.faults.push(f);suggestFault(f.id,true)}return fqLog(f)}
   if(a==='fault'){view.fOpen={};view.flog=null;view.fEditName=false;view.rEdit='';return openFault(id)}
